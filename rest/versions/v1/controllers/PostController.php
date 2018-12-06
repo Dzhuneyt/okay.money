@@ -1,4 +1,5 @@
 <?php
+
 namespace rest\versions\v1\controllers;
 
 use common\models\Post;
@@ -12,10 +13,11 @@ class PostController extends ActiveController
 
     public function behaviors()
     {
-        $behaviors = parent::behaviors();
+        $behaviors                  = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => QueryParamAuth::className(),
         ];
+
         return $behaviors;
     }
 
@@ -25,13 +27,13 @@ class PostController extends ActiveController
             parent::actions(),
             [
                 'index' => [
-                    'class' => 'yii\rest\IndexAction',
-                    'modelClass' => $this->modelClass,
-                    'checkAccess' => [$this, 'checkAccess'],
+                    'class'               => 'yii\rest\IndexAction',
+                    'modelClass'          => $this->modelClass,
+                    'checkAccess'         => [$this, 'checkAccess'],
                     'prepareDataProvider' => function ($action) {
                         /* @var $model Post */
-                        $model = new $this->modelClass;
-                        $query = $model::find();
+                        $model        = new $this->modelClass;
+                        $query        = $model::find();
                         $dataProvider = new ActiveDataProvider(['query' => $query]);
 
                         $model->setAttribute('title', @$_GET['title']);

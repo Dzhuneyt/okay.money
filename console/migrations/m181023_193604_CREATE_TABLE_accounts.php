@@ -19,7 +19,7 @@ class m181023_193604_CREATE_TABLE_accounts extends Migration {
 			'owner_id'         => $this->integer(),
 			'created_at'       => $this->integer( 11 ),
 			'updated_at'       => $this->integer( 11 ),
-		] );
+		] , 'ENGINE InnoDB');
 
 		$this->addForeignKey(
 			'account_owner_id',

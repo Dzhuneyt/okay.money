@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dzhuneyt
- * Date: 24.10.2018 г.
- * Time: 21:56
- */
 
 namespace rest\versions\v1\controllers;
 
@@ -12,7 +6,6 @@ namespace rest\versions\v1\controllers;
 use common\models\Account;
 use rest\versions\v1\actions\account\CreateAction;
 use Yii;
-use yii\filters\auth\QueryParamAuth;
 use yii\helpers\ArrayHelper;
 use yii\web\ForbiddenHttpException;
 
@@ -25,9 +18,11 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
     {
         switch ($action) {
             case 'delete':
+            case 'view':
+                // Prevent getting or deleting other people's accounts
                 /** @var $model Account */
                 if ($model && $model->owner_id !== Yii::$app->getUser()->id) {
-                    throw new ForbiddenHttpException('You can only delete your own accounts');
+                    throw new ForbiddenHttpException();
                 }
                 break;
         }
@@ -36,10 +31,10 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
 
     public function behaviors()
     {
-        $behaviors                  = parent::behaviors();
-        $behaviors['authenticator'] = [
-            'class' => QueryParamAuth::class,
-        ];
+        $behaviors = parent::behaviors();
+//        $behaviors['authenticator'] = [
+//            'class' => QueryParamAuth::class,
+//        ];
 
         return $behaviors;
     }

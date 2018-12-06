@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dzhuneyt
- * Date: 2.11.2018 г.
- * Time: 8:43
- */
 
 namespace rest\versions\shared\controllers;
 
