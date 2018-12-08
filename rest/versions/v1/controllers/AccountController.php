@@ -6,6 +6,7 @@ namespace rest\versions\v1\controllers;
 use common\models\Account;
 use rest\versions\v1\actions\account\CreateAction;
 use Yii;
+use yii\filters\auth\QueryParamAuth;
 use yii\helpers\ArrayHelper;
 use yii\web\ForbiddenHttpException;
 
@@ -25,6 +26,9 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
                     throw new ForbiddenHttpException();
                 }
                 break;
+            case 'create':
+                return true;
+                break;
         }
         parent::checkAccess($action, $model, $params);
     }
@@ -32,9 +36,9 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-//        $behaviors['authenticator'] = [
-//            'class' => QueryParamAuth::class,
-//        ];
+        $behaviors['authenticator'] = [
+            'class' => QueryParamAuth::class,
+        ];
 
         return $behaviors;
     }
@@ -45,12 +49,12 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
             parent::actions(),
             [
                 'create' => [
-                    'class'       => CreateAction::class,
-                    'modelClass'  => $this->modelClass,
+                    'class' => CreateAction::class,
+                    'modelClass' => $this->modelClass,
                     'checkAccess' => function ($action, $model = null, $params = []) {
                         return $this->checkAccess($action, $model, $params);
                     },
-                    'scenario'    => $this->createScenario,
+                    'scenario' => $this->createScenario,
                 ],
             ]
         );

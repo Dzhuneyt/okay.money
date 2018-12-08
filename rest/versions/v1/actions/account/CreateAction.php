@@ -36,7 +36,7 @@ class CreateAction extends \yii\rest\CreateAction
         $model->owner_id = Yii::$app->getUser()->id;
         if ($model->save()) {
             $this->handleSuccess($model);
-        } elseif ( ! $model->hasErrors()) {
+        } elseif (!$model->hasErrors()) {
             $this->handleError();
         }
 
