@@ -37,7 +37,7 @@ class CreateAction extends \yii\rest\CreateAction
         if ($model->save()) {
             $model->refresh();
             $this->handleSuccess($model);
-        } elseif (!$model->hasErrors()) {
+        } elseif ( ! $model->hasErrors()) {
             $this->handleError();
         }
 
