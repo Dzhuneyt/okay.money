@@ -35,6 +35,7 @@ class CreateAction extends \yii\rest\CreateAction
         $model->load($params, '');
         $model->owner_id = Yii::$app->getUser()->id;
         if ($model->save()) {
+            $model->refresh();
             $this->handleSuccess($model);
         } elseif (!$model->hasErrors()) {
             $this->handleError();
@@ -48,7 +49,7 @@ class CreateAction extends \yii\rest\CreateAction
         throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
     }
 
-    public function handleSuccess(Account $model)
+    public function handleSuccess(Account &$model)
     {
         $response = Yii::$app->getResponse();
         $response->setStatusCode(201);

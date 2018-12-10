@@ -51,12 +51,18 @@ class Account extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id'               => 'ID',
-            'name'             => 'Name',
+            'id' => 'ID',
+            'name' => 'Name',
             'starting_balance' => 'Starting Balance',
-            'owner_id'         => 'Owner ID',
-            'created_at'       => 'Created At',
-            'updated_at'       => 'Updated At',
+            'owner_id' => 'Owner ID',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ];
+    }
+
+    public function afterFind()
+    {
+        parent::afterFind();
+        $this->starting_balance = (float)$this->starting_balance;
     }
 }
