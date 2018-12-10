@@ -11,6 +11,7 @@ namespace tests\functional\account;
 
 use common\models\User;
 use tests\functional\FunctionalTestCase;
+use yii\web\ForbiddenHttpException;
 use yii\web\ServerErrorHttpException;
 
 class DeleteActionTest extends FunctionalTestCase
@@ -32,13 +33,21 @@ class DeleteActionTest extends FunctionalTestCase
     public function testDeleteMyOwnAccount()
     {
         $account = $this->createAccount();
-        $success = $this->apiCall('v1/accounts/'.$account['id'], 'DELETE');
-        $this->assertEquals($account['id'], $success['id']);
+        $success = $this->apiCall('v1/accounts/' . $account['id'], 'DELETE');
+        $this->assertNull($success, 'Can not delete my own account');
     }
 
     public function testDeleteAnotherUserAccount()
     {
-        $this->markTestIncomplete();
+        $account = $this->createAccount();
+        $user2 = $this->createUser();
+        $this->loginAsUser($user2->id);
+        $this->expectException(ForbiddenHttpException::class);
+        try {
+            $this->apiCall('v1/accounts/' . $account['id'], 'DELETE');
+        } finally {
+            $this->deleteUser($user2->id);
+        }
     }
 
     protected function tearDown()
