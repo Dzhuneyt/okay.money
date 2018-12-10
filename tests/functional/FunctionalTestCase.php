@@ -10,7 +10,7 @@ use yii\helpers\Json;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
-use yii\web\UnauthorizedHttpException as UnauthorizedHttpExceptionAlias;
+use yii\web\UnauthorizedHttpException;
 
 class FunctionalTestCase extends TestCase
 {
@@ -30,7 +30,6 @@ class FunctionalTestCase extends TestCase
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
-     * @throws UnauthorizedHttpExceptionAlias
      */
     protected function apiCall($path, $method = 'GET', $params = [])
     {
@@ -63,26 +62,26 @@ class FunctionalTestCase extends TestCase
                 throw new Exception('HTTP method not implemented for API call');
         }
 
-        try {
-            $response = Json::decode($response, true);
-        } catch (Exception $e) {
-            \Yii::error("Can not parse JSON response from API");
-            throw $e;
+        if ($response !== false) {
+            try {
+                $response = Json::decode($response, true);
+            } catch (Exception $e) {
+                \Yii::error("Can not parse JSON response from API");
+                throw $e;
+            }
         }
 
         // List of status codes here http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
         switch ($curl->responseCode) {
 
             case 'timeout':
-                //timeout error logic here
-                throw new Exception('API call resulted in timeout:' . $path);
-            case 200:
+                throw new Exception('API call resulted in timeout: ' . $path);
+            case 200: // success
             case 201: // successfully created
             case 204: // successfully deleted
-                //success logic here
                 return $response;
             case 401:
-                throw new UnauthorizedHttpExceptionAlias('Attempting to call an authenticated API with no token: ' . $method . " " . $url);
+                throw new UnauthorizedHttpException('Attempting to call an authenticated API with no token: ' . $method . " " . $url);
                 break;
             case 403:
                 throw new ForbiddenHttpException('Unauthorized API call: ' . $url);
