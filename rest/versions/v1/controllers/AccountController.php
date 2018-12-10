@@ -5,6 +5,7 @@ namespace rest\versions\v1\controllers;
 
 use common\models\Account;
 use rest\versions\v1\actions\account\CreateAction;
+use rest\versions\v1\actions\account\IndexAction;
 use Yii;
 use yii\filters\auth\QueryParamAuth;
 use yii\helpers\ArrayHelper;
@@ -27,6 +28,8 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
                 }
                 break;
             case 'create':
+            case 'index':
+                // Anyone can create accounts
                 return true;
                 break;
         }
@@ -35,7 +38,7 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
 
     public function behaviors()
     {
-        $behaviors = parent::behaviors();
+        $behaviors                  = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => QueryParamAuth::class,
         ];
@@ -48,13 +51,16 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
         return ArrayHelper::merge(
             parent::actions(),
             [
+                'index'  => [
+                    'class' => IndexAction::class
+                ],
                 'create' => [
-                    'class' => CreateAction::class,
-                    'modelClass' => $this->modelClass,
+                    'class'       => CreateAction::class,
+                    'modelClass'  => $this->modelClass,
                     'checkAccess' => function ($action, $model = null, $params = []) {
                         return $this->checkAccess($action, $model, $params);
                     },
-                    'scenario' => $this->createScenario,
+                    'scenario'    => $this->createScenario,
                 ],
             ]
         );

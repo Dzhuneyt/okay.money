@@ -24,6 +24,7 @@ class FunctionalTestCase extends TestCase
      * @param $path
      * @param string $method
      * @param array $params
+     *
      * @return array
      * @throws Exception
      * @throws ForbiddenHttpException
@@ -113,13 +114,13 @@ class FunctionalTestCase extends TestCase
      */
     protected function createUser()
     {
-        $faker = \Faker\Factory::create('en_US');
-        $user = new User();
-        $user->username = $faker->userName;
-        $user->auth_key = md5(md5($faker->password));
+        $faker               = \Faker\Factory::create('en_US');
+        $user                = new User();
+        $user->username      = $faker->userName;
+        $user->auth_key      = md5(md5($faker->password));
         $user->password_hash = md5($faker->password);
-        $user->email = $faker->email;
-        $user->status = 10;
+        $user->email         = $faker->email;
+        $user->status        = 10;
         if ($user->save()) {
             return $user;
         } else {
@@ -130,8 +131,9 @@ class FunctionalTestCase extends TestCase
 
     protected function deleteUser($id)
     {
-        $user = User::findOne($id);
+        $user    = User::findOne($id);
         $deleted = $user->delete();
+
         return $deleted;
     }
 
@@ -143,14 +145,15 @@ class FunctionalTestCase extends TestCase
     protected function loginAsUser($idUser = null)
     {
         if ($idUser != null) {
-            $token = \Yii::$app->db->createCommand(
+            $token             = \Yii::$app->db->createCommand(
                 'SELECT auth_key FROM user WHERE id=:id',
                 [':id' => $idUser]
             )->queryScalar();
             $this->accessToken = $token;
+
             return;
         }
-        $accessToken = $this->apiCall('v1/user/login', 'POST', [
+        $accessToken       = $this->apiCall('v1/user/login', 'POST', [
             'username' => 'demo',
             'password' => 'demo',
         ]);
@@ -159,6 +162,7 @@ class FunctionalTestCase extends TestCase
 
     protected function createAccount()
     {
+        // @TODO Replace with direct query based insert
         // SUT
         return $this->apiCall(
             'v1/accounts',
