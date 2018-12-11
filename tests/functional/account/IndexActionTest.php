@@ -26,7 +26,13 @@ class IndexActionTest extends FunctionalTestCase
 
         // Create 3 accounts for this user
         for ($i = 0; $i < 3; $i++) {
-            $this->accounts[] = $this->createAccount();
+            $this->accounts[] = $this->apiCall(
+                'v1/accounts',
+                'POST',
+                [
+                    'name' => '[TEST] My wallet',
+                ]
+            );
         }
     }
 

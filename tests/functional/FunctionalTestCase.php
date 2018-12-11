@@ -2,11 +2,16 @@
 
 namespace tests\functional;
 
+use common\models\Account;
+use common\models\Transaction;
 use common\models\User;
+use Faker\Generator;
 use linslin\yii2\curl\Curl;
 use PHPUnit\Framework\TestCase;
 use yii\base\Exception;
+use yii\db\Query;
 use yii\helpers\Json;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
@@ -19,6 +24,17 @@ class FunctionalTestCase extends TestCase
     private $baseUrl = 'http://localhost:9009/';
 
     private $accessToken;
+
+    /**
+     * @var Generator
+     */
+    protected $faker;
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->faker = \Faker\Factory::create();
+    }
 
     /**
      * @param $path
@@ -80,20 +96,22 @@ class FunctionalTestCase extends TestCase
             case 201: // successfully created
             case 204: // successfully deleted
                 return $response;
+            case 400:
+                throw new BadRequestHttpException('Invalid request to API: ' . $method . ':' . $url);
             case 401:
                 throw new UnauthorizedHttpException('Attempting to call an authenticated API with no token: ' . $method . " " . $url);
-                break;
             case 403:
                 throw new ForbiddenHttpException('Unauthorized API call: ' . $url);
             case 404:
                 //404 Error logic here
                 throw new NotFoundHttpException("URL not found:" . $path);
             case 422:
-                \Yii::error($response);
+                var_dump($response);
                 throw new ServerErrorHttpException('Model validation failed - error 422: ' . print_r($response, true));
             case 500:
-                \Yii::error($response);
-                throw new ServerErrorHttpException('API call during test threw 500 Internal Server Error');
+                var_dump($response);
+                throw new ServerErrorHttpException('API call during test threw 500 Internal Server Error: ' . print_r($response,
+                        true));
             default:
                 \Yii::error('Test error');
                 \Yii::error($url);
@@ -159,16 +177,43 @@ class FunctionalTestCase extends TestCase
         $this->accessToken = $accessToken;
     }
 
-    protected function createAccount()
+    /**
+     * @return Account
+     * @throws Exception
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
+    protected function createAccount($ownerId = null)
     {
-        // @TODO Replace with direct query based insert
-        // SUT
-        return $this->apiCall(
-            'v1/accounts',
-            'POST',
-            [
-                'name' => '[TEST] My wallet',
-            ]
-        );
+        $account       = new Account();
+        $account->name = $this->faker->text(50);
+
+        if ($ownerId === null) {
+            $account->owner_id = (int)(new Query())
+                ->select('id')
+                ->from(User::tableName())
+                ->orderBy('id DESC')
+                ->one();
+        } else {
+            $account->owner_id = $ownerId;
+        }
+
+        if ( ! $account->save()) {
+            print_r($account->getErrors());
+            throw new Exception('Can not create an account in DB for tests');
+        }
+
+        return $account;
+    }
+
+    protected function deleteAccount($id)
+    {
+        Account::deleteAll(['id' => $id]);
+    }
+
+    protected function deleteTransaction($id)
+    {
+        Transaction::deleteAll(['id' => $id]);
     }
 }

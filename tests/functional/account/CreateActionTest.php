@@ -26,18 +26,33 @@ class CreateActionTest extends FunctionalTestCase
 
     public function testCreateAccountSuccess()
     {
-        $account = $this->createAccount();
+        $account = $this->apiCall(
+            'v1/accounts',
+            'POST',
+            [
+                'name' => '[TEST] My wallet',
+            ]
+        );
 
         // Assertions
         $this->assertNotNull(
             $account['id'],
             'Failed to create a wallet as a regular user'
         );
+
+        // Cleanup
+        $this->deleteAccount($account['id']);
     }
 
     public function testCreateAccountAndMakeSureIOwnIt()
     {
-        $account = $this->createAccount();
+        $account = $this->apiCall(
+            'v1/accounts',
+            'POST',
+            [
+                'name' => '[TEST] My wallet',
+            ]
+        );
 
         // Assertions
         $this->assertEquals(
@@ -45,6 +60,9 @@ class CreateActionTest extends FunctionalTestCase
             $this->baseUser->id,
             'New wallet created but the owner ID is not my own ID'
         );
+
+        // Cleanup
+        $this->deleteAccount($account['id']);
     }
 
     public function testCreateAccountWithStartingBalance()
@@ -57,7 +75,7 @@ class CreateActionTest extends FunctionalTestCase
             'v1/accounts',
             'POST',
             [
-                'name' => '[TEST] My wallet with starting balance',
+                'name'             => '[TEST] My wallet with starting balance',
                 'starting_balance' => $accountStartingBalance,
             ]
         );
@@ -69,6 +87,8 @@ class CreateActionTest extends FunctionalTestCase
             'Wallet created with starting balance ' . $accountStartingBalance
             . ' but the actual DB value is different'
         );
+
+        $this->deleteAccount($account['id']);
     }
 
     public function testFailToCreateAccountAnonymously()
@@ -87,7 +107,7 @@ class CreateActionTest extends FunctionalTestCase
 
     protected function tearDown()
     {
-        if (!$this->deleteUser($this->baseUser->id)) {
+        if ( ! $this->deleteUser($this->baseUser->id)) {
             throw new ServerErrorHttpException('Can not delete temp user for tests: ' . $this->baseUser->id);
         }
         parent::tearDown();
