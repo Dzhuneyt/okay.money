@@ -3,6 +3,8 @@
 namespace rest\versions\shared\controllers;
 
 
+use yii\filters\auth\QueryParamAuth;
+
 class ActiveController extends \yii\rest\ActiveController
 {
 
@@ -16,4 +18,14 @@ class ActiveController extends \yii\rest\ActiveController
         'class'              => 'yii\rest\Serializer',
         'collectionEnvelope' => 'items',
     ];
+
+    public function behaviors()
+    {
+        $behaviors                  = parent::behaviors();
+        $behaviors['authenticator'] = [
+            'class' => QueryParamAuth::class,
+        ];
+
+        return $behaviors;
+    }
 }
