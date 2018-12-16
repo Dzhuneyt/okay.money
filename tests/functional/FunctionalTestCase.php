@@ -162,10 +162,13 @@ class FunctionalTestCase extends TestCase
     protected function loginAsUser($idUser = null)
     {
         if ($idUser != null) {
-            $token             = \Yii::$app->db->createCommand(
+            $token = \Yii::$app->db->createCommand(
                 'SELECT auth_key FROM user WHERE id=:id',
                 [':id' => $idUser]
             )->queryScalar();
+            if ( ! $token) {
+                throw new Exception('Can not login as user with ID ' . $idUser . '. Not found in DB');
+            }
             $this->accessToken = $token;
 
             return;

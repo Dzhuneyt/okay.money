@@ -183,15 +183,17 @@ class CreateActionTest extends FunctionalTestCase
 
         // Try to create a transaction with USER 1
         // but attach the transaction to the account of USER 2
-        $this->apiCall('v1/transactions', 'POST', [
-            'description' => $this->faker->text(),
-            'account_id'  => $account->id,
-            'sum'         => 5,
-        ]);
-
-        // Cleanup
-        $this->deleteAccount($account->id);
-        $this->deleteUser($user2->id);
+        try {
+            $this->apiCall('v1/transactions', 'POST', [
+                'description' => $this->faker->text(),
+                'account_id'  => $account->id,
+                'sum'         => 5,
+            ]);
+        } finally {
+            // Cleanup
+            $this->deleteAccount($account->id);
+            $this->deleteUser($user2->id);
+        }
     }
 
 }

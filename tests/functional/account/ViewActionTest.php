@@ -32,12 +32,10 @@ class ViewActionTest extends FunctionalTestCase
     }
 
 
-
-
     public function testGetMatadataOfOtherUserAccount()
     {
         // Create an account with USER 1
-        $newAccount = $this->createAccount();
+        $newAccount = $this->createAccount($this->baseUser->id);
         // Now login as a different user
         $user2 = $this->createUser();
         $this->loginAsUser($user2->id);
@@ -50,6 +48,7 @@ class ViewActionTest extends FunctionalTestCase
         } finally {
             // Cleanup
             $this->deleteUser($user2->id);
+            $this->deleteAccount($newAccount->id);
         }
     }
 
@@ -62,13 +61,13 @@ class ViewActionTest extends FunctionalTestCase
                 'name' => '[TEST] My account',
             ]
         );
-        $result = $this->apiCall('v1/accounts/' . $newAccount['id'], 'GET');
+        $result     = $this->apiCall('v1/accounts/' . $newAccount['id'], 'GET');
         $this->assertArrayHasKey('id', $result, 'Can not get metadata of your own account');
     }
 
     protected function tearDown()
     {
-        if (!$this->deleteUser($this->baseUser->id)) {
+        if ( ! $this->deleteUser($this->baseUser->id)) {
             throw new ServerErrorHttpException('Can not delete temp user for tests: ' . $this->baseUser->id);
         }
         parent::tearDown();

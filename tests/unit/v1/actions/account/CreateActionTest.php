@@ -1,13 +1,18 @@
 <?php
+/**
+ * Date: 16.12.2018 г.
+ * Time: 21:03
+ */
 
-namespace tests\unit;
+namespace tests\unit\v1\actions\account;
 
 
 use common\models\Account;
+use PHPUnit\Framework\TestCase;
 use rest\versions\v1\actions\account\CreateAction;
 use yii\web\ServerErrorHttpException;
 
-class CreateActionTest extends \PHPUnit\Framework\TestCase
+class CreateActionTest extends TestCase
 {
 
     /**
@@ -78,5 +83,4 @@ class CreateActionTest extends \PHPUnit\Framework\TestCase
 
         return $mock;
     }
-
 }

@@ -7,5 +7,13 @@
  * in the "unversioned" tests-local.php
  */
 return [
-
+    'components' => [
+        'db' => [
+            'class'    => 'yii\db\Connection',
+            'dsn'      => 'mysql:host=127.0.0.1;dbname=personal_finance_test',
+            'username' => 'root',
+            'password' => '',
+            'charset'  => 'utf8',
+        ],
+    ],
 ];

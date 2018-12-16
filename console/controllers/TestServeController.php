@@ -3,12 +3,21 @@
 namespace console\controllers;
 
 
-class ServerController extends \yii\console\controllers\ServeController
+class TestServeController extends \yii\console\controllers\ServeController
 {
     public $docroot = '@rest/web';
 
+    public function init()
+    {
+        parent::init();
+
+        $router = \Yii::getAlias('@rest/web/index-test.php');
+        $this->router = $router;
+    }
+
     /**
      * @param string $address
+     *
      * @return int
      */
     public function actionIndex($address = 'localhost:9009')
