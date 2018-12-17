@@ -8,25 +8,16 @@
 
 namespace tests\functional\account;
 
-
-use common\models\User;
 use tests\functional\FunctionalTestCase;
 use yii\web\ForbiddenHttpException;
-use yii\web\ServerErrorHttpException;
 
 class DeleteActionTest extends FunctionalTestCase
 {
-    /**
-     * @var User
-     */
-    private $baseUser;
 
     protected function setUp()
     {
         parent::setUp();
 
-        // Prerequisites for almost all tests
-        $this->baseUser = $this->createUser();
         $this->loginAsUser($this->baseUser->id);
     }
 
@@ -52,7 +43,7 @@ class DeleteActionTest extends FunctionalTestCase
                 'name' => '[TEST] My wallet',
             ]
         );
-        $user2   = $this->createUser();
+        $user2 = $this->createUser();
         $this->loginAsUser($user2->id);
         $this->expectException(ForbiddenHttpException::class);
         try {
@@ -61,14 +52,6 @@ class DeleteActionTest extends FunctionalTestCase
             $this->deleteAccount($account['id']);
             $this->deleteUser($user2->id);
         }
-    }
-
-    protected function tearDown()
-    {
-        if ( ! $this->deleteUser($this->baseUser->id)) {
-            throw new ServerErrorHttpException('Can not delete temp user for tests: ' . $this->baseUser->id);
-        }
-        parent::tearDown();
     }
 
 }

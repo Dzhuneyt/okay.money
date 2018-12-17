@@ -4,5 +4,13 @@
  * that are useful to your local machine only. This file is not versioned
  */
 return [
-
+    'components' => [
+        'db' => [
+            'class'    => 'yii\db\Connection',
+            'dsn'      => 'mysql:host=192.168.0.196;dbname=finance_test',
+            'username' => 'joni',
+            'password' => 'joni',
+            'charset'  => 'utf8',
+        ],
+    ],
 ];

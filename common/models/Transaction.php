@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "transaction".
@@ -11,6 +13,8 @@ use Yii;
  * @property string $description
  * @property double $sum
  * @property int $account_id
+ * @property int $created_at
+ * @property int $updated_at
  */
 class Transaction extends \yii\db\ActiveRecord
 {
@@ -22,6 +26,13 @@ class Transaction extends \yii\db\ActiveRecord
         return 'transaction';
     }
 
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            TimestampBehavior::class
+        ]);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -30,7 +41,7 @@ class Transaction extends \yii\db\ActiveRecord
         return [
             [['description'], 'string'],
             [['sum'], 'number'],
-            [['account_id'], 'integer'],
+            [['account_id', 'created_at', 'updated_at'], 'integer'],
         ];
     }
 
@@ -44,6 +55,8 @@ class Transaction extends \yii\db\ActiveRecord
             'description' => 'Description',
             'sum' => 'Sum',
             'account_id' => 'Account ID',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ];
     }
 }

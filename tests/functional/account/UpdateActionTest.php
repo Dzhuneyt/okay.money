@@ -15,17 +15,12 @@ use yii\web\ServerErrorHttpException;
 
 class UpdateActionTest extends FunctionalTestCase
 {
-    /**
-     * @var User
-     */
-    private $baseUser;
 
     protected function setUp()
     {
         parent::setUp();
 
         // Prerequisites for almost all tests
-        $this->baseUser = $this->createUser();
         $this->loginAsUser($this->baseUser->id);
     }
 
@@ -45,13 +40,5 @@ class UpdateActionTest extends FunctionalTestCase
             'name' => $newAccountName
         ]);
         $this->assertEquals($newAccountName, $result['name']);
-    }
-
-    protected function tearDown()
-    {
-        if (!$this->deleteUser($this->baseUser->id)) {
-            throw new ServerErrorHttpException('Can not delete temp user for tests: ' . $this->baseUser->id);
-        }
-        parent::tearDown();
     }
 }

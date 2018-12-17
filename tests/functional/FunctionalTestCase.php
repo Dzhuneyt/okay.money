@@ -23,6 +23,11 @@ class FunctionalTestCase extends TestCase
     // The result of `php yii server`
     private $baseUrl = 'http://localhost:9009/';
 
+    /**
+     * @var User
+     */
+    protected $baseUser;
+
     private $accessToken;
 
     /**
@@ -34,6 +39,16 @@ class FunctionalTestCase extends TestCase
     {
         parent::setUp();
         $this->faker = \Faker\Factory::create();
+        // Prerequisites for almost all tests
+        $this->baseUser = $this->createUser();
+    }
+
+    protected function tearDown()
+    {
+        if (!$this->deleteUser($this->baseUser->id)) {
+            throw new ServerErrorHttpException('Can not delete temp user for tests: ' . $this->baseUser->id);
+        }
+        parent::tearDown();
     }
 
     /**
@@ -131,13 +146,13 @@ class FunctionalTestCase extends TestCase
      */
     protected function createUser()
     {
-        $faker               = \Faker\Factory::create('en_US');
-        $user                = new User();
-        $user->username      = $faker->userName;
-        $user->auth_key      = md5(md5($faker->password));
+        $faker = \Faker\Factory::create('en_US');
+        $user = new User();
+        $user->username = $faker->userName;
+        $user->auth_key = md5(md5($faker->password));
         $user->password_hash = md5($faker->password);
-        $user->email         = $faker->email;
-        $user->status        = 10;
+        $user->email = $faker->email;
+        $user->status = 10;
         if ($user->save()) {
             return $user;
         } else {
@@ -148,7 +163,7 @@ class FunctionalTestCase extends TestCase
 
     protected function deleteUser($id)
     {
-        $user    = User::findOne($id);
+        $user = User::findOne($id);
         $deleted = $user->delete();
 
         return $deleted;
@@ -166,14 +181,14 @@ class FunctionalTestCase extends TestCase
                 'SELECT auth_key FROM user WHERE id=:id',
                 [':id' => $idUser]
             )->queryScalar();
-            if ( ! $token) {
+            if (!$token) {
                 throw new Exception('Can not login as user with ID ' . $idUser . '. Not found in DB');
             }
             $this->accessToken = $token;
 
             return;
         }
-        $accessToken       = $this->apiCall('v1/user/login', 'POST', [
+        $accessToken = $this->apiCall('v1/user/login', 'POST', [
             'username' => 'demo',
             'password' => 'demo',
         ]);
@@ -189,7 +204,7 @@ class FunctionalTestCase extends TestCase
      */
     protected function createAccount($ownerId = null)
     {
-        $account       = new Account();
+        $account = new Account();
         $account->name = $this->faker->text(50);
 
         if ($ownerId === null) {
@@ -202,12 +217,26 @@ class FunctionalTestCase extends TestCase
             $account->owner_id = $ownerId;
         }
 
-        if ( ! $account->save()) {
+        if (!$account->save()) {
             print_r($account->getErrors());
             throw new Exception('Can not create an account in DB for tests');
         }
 
         return $account;
+    }
+
+    protected function createTransaction($idAccount, $sum = null)
+    {
+        $transaction = new Transaction();
+        $transaction->account_id = $idAccount;
+        $transaction->description = $this->faker->text(50);
+        $transaction->sum = $sum === null ? $this->faker->numberBetween(1, 99) : $sum;
+        if (!$transaction->save()) {
+            print_r($transaction->getErrors());
+            throw new Exception('Can not create a transaction in DB for tests');
+        }
+
+        return $transaction;
     }
 
     protected function deleteAccount($id)

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "account".
@@ -26,9 +27,9 @@ class Account extends \yii\db\ActiveRecord
 
     public function behaviors()
     {
-        return [
-            TimestampBehavior::class,
-        ];
+        return ArrayHelper::merge(parent::behaviors(), [
+            TimestampBehavior::class
+        ]);
     }
 
     /**

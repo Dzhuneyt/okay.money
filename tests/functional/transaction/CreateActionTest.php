@@ -163,7 +163,7 @@ class CreateActionTest extends FunctionalTestCase
 
     public function testCanNotCreateTransactionInNonExistingAccount()
     {
-        $this->expectException(UnauthorizedHttpException::class);
+        $this->expectException(BadRequestHttpException::class);
         $this->apiCall('v1/transactions', 'POST', [
             'description' => $this->faker->text(),
             'account_id'  => 0,

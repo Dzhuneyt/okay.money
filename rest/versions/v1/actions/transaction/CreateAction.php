@@ -12,19 +12,19 @@ use yii\web\UnauthorizedHttpException;
 class CreateAction extends \yii\rest\CreateAction
 {
 
+
     public function init()
     {
         parent::init();
 
         $this->checkAccess = function () {
-            $accountId      = Yii::$app->request->getBodyParam('account_id');
-            $accountOwnerId = (int)(new Query())
-                ->select('owner_id')
-                ->from(Account::tableName())
-                ->where(['id' => $accountId])
-                ->scalar();
+            $accountId = Yii::$app->request->getBodyParam('account_id');
 
-            if ( ! $accountOwnerId || $accountOwnerId != Yii::$app->user->id) {
+            if (empty($accountId)) {
+                throw new BadRequestHttpException('Invalid parameter "account_id"');
+            }
+
+            if (!$this->doesUserOwnAccount(Yii::$app->user->id, $accountId)) {
                 throw new UnauthorizedHttpException(
                     'Can not create transactions in this account'
                 );
@@ -34,12 +34,8 @@ class CreateAction extends \yii\rest\CreateAction
 
     private function validateParams($params = [])
     {
-        if (
-            empty($params['sum'])
-            OR
-            floatval($params['sum']) <= 0
-        ) {
-            throw new BadRequestHttpException("Invalid parameter: sum");
+        if (empty($params['sum']) || floatval($params['sum']) <= 0) {
+            throw new BadRequestHttpException('Invalid parameter "sum"');
         }
     }
 
@@ -51,6 +47,15 @@ class CreateAction extends \yii\rest\CreateAction
         $params = $this->validateParams($params);
 
         return parent::run();
+    }
+
+    private function doesUserOwnAccount($idUser, $idAccount)
+    {
+        $account = Account::findOne($idAccount);
+        if (!$account) {
+            return false;
+        }
+        return intval($account->owner_id) === intval($idUser);
     }
 
 }

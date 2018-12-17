@@ -1,33 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: ubuntu
- * Date: 12/10/18
- * Time: 5:28 PM
- */
 
 namespace tests\functional\account;
 
 
-use common\models\User;
 use tests\functional\FunctionalTestCase;
 use yii\web\ForbiddenHttpException;
-use yii\web\ServerErrorHttpException;
 
 class ViewActionTest extends FunctionalTestCase
 {
 
-    /**
-     * @var User
-     */
-    private $baseUser;
 
     protected function setUp()
     {
         parent::setUp();
 
-        // Prerequisites for almost all tests
-        $this->baseUser = $this->createUser();
         $this->loginAsUser($this->baseUser->id);
     }
 
@@ -63,14 +49,6 @@ class ViewActionTest extends FunctionalTestCase
         );
         $result     = $this->apiCall('v1/accounts/' . $newAccount['id'], 'GET');
         $this->assertArrayHasKey('id', $result, 'Can not get metadata of your own account');
-    }
-
-    protected function tearDown()
-    {
-        if ( ! $this->deleteUser($this->baseUser->id)) {
-            throw new ServerErrorHttpException('Can not delete temp user for tests: ' . $this->baseUser->id);
-        }
-        parent::tearDown();
     }
 
 }
