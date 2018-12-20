@@ -57,6 +57,7 @@ return [
                     'controller' => [
                         'v1/account',
                         'v1/transaction',
+                        'v1/category',
 //                        'v2/post',
                     ]
                 ],

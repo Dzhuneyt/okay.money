@@ -38,7 +38,7 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
 
     public function behaviors()
     {
-        $behaviors                  = parent::behaviors();
+        $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => QueryParamAuth::class,
         ];
@@ -48,21 +48,35 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
 
     public function actions()
     {
-        return ArrayHelper::merge(
+        $actions = ArrayHelper::merge(
             parent::actions(),
             [
-                'index'  => [
-                    'class' => IndexAction::class
+                'index' => [
+                    'class' => IndexAction::class,
+                    'checkAccess' => null,
                 ],
                 'create' => [
-                    'class'       => CreateAction::class,
-                    'modelClass'  => $this->modelClass,
+                    'class' => CreateAction::class,
+                    'checkAccess' => null,
+                ],
+                'delete' => [
                     'checkAccess' => function ($action, $model = null, $params = []) {
                         return $this->checkAccess($action, $model, $params);
-                    },
-                    'scenario'    => $this->createScenario,
+                    }
                 ],
+                'update' => [
+                    'checkAccess' => function ($action, $model = null, $params = []) {
+                        return $this->checkAccess($action, $model, $params);
+                    }
+                ],
+                'view' => [
+                    'checkAccess' => function ($action, $model = null, $params = []) {
+                        return $this->checkAccess($action, $model, $params);
+                    }
+                ]
             ]
         );
+
+        return $actions;
     }
 }

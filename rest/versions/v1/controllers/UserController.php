@@ -4,12 +4,13 @@ namespace rest\versions\v1\controllers;
 
 use common\models\LoginForm;
 use rest\versions\shared\controllers\ActiveController;
+use yii\rest\Controller;
 
 /**
  * Class UserController
  * @package rest\versions\v1\controllers
  */
-class UserController extends ActiveController
+class UserController extends Controller
 {
     /**
      * This method implemented to demonstrate the receipt of the token.

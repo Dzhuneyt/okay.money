@@ -20,19 +20,15 @@ class IndexActionTest extends FunctionalTestCase
     {
         parent::setUp();
 
+        // Initial cleanup to prevent leftover rows from previous test
+        Account::deleteAll();
+
         // Prepare fixtures
-        $this->user = $this->createUser();
-        $this->loginAsUser($this->user->id);
+        $this->loginAsUser($this->baseUser->id);
 
         // Create 3 accounts for this user
         for ($i = 0; $i < 3; $i++) {
-            $this->accounts[] = $this->apiCall(
-                'v1/accounts',
-                'POST',
-                [
-                    'name' => '[TEST] My wallet',
-                ]
-            );
+            $this->accounts[] = $this->createAccount($this->baseUser->id);
         }
     }
 
@@ -61,13 +57,34 @@ class IndexActionTest extends FunctionalTestCase
         );
     }
 
+    public function testAccountBalanceReturnsCorrectFloatValues()
+    {
+        $account = $this->createAccount($this->baseUser->id);
+
+        $this->createTransaction($account->id, 5.5);
+        $this->createTransaction($account->id, 15.99);
+        $this->createTransaction($account->id, 25.003);
+
+        $accounts = $this->apiCall(
+            'v1/accounts',
+            'GET'
+        );
+
+        foreach ($accounts['items'] as $singleApiResult) {
+            if ($singleApiResult['id'] == $account->id) {
+                $this->assertEquals(number_format(5.5 + 15.99 + 25.003, 2), $singleApiResult['current_balance']);
+            }
+        }
+
+        $this->deleteAccount($account->id); // Cleanup
+    }
+
     protected function tearDown()
     {
         // Cleanup
         foreach ($this->accounts as $account) {
-            Account::deleteAll(['id' => $account['id']]);
+            $this->deleteAccount($account['id']);
         }
-        $this->deleteUser($this->user->id);
 
         parent::tearDown();
     }

@@ -3,7 +3,10 @@
 namespace rest\versions\shared\controllers;
 
 
+use yii\base\Exception;
 use yii\filters\auth\QueryParamAuth;
+use yii\web\NotFoundHttpException;
+use yii\web\UnauthorizedHttpException;
 
 class ActiveController extends \yii\rest\ActiveController
 {
@@ -15,13 +18,25 @@ class ActiveController extends \yii\rest\ActiveController
      * @var array
      */
     public $serializer = [
-        'class'              => 'yii\rest\Serializer',
+        'class' => 'yii\rest\Serializer',
         'collectionEnvelope' => 'items',
     ];
 
+    public function actions()
+    {
+        $actions = parent::actions();
+
+        foreach ($actions as $i => $action) {
+            $actions[$i]['checkAccess'] = function () {
+                throw new NotFoundHttpException('Not implemented');
+            };
+        }
+        return $actions;
+    }
+
     public function behaviors()
     {
-        $behaviors                  = parent::behaviors();
+        $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => QueryParamAuth::class,
         ];
