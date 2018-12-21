@@ -44,13 +44,13 @@ class Category extends \yii\db\ActiveRecord
         return [
             [['owner_id', 'created_at', 'updated_at'], 'integer'],
             [['description'], 'string'],
+            [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
-            [['owner_id'], 'unique'],
             [
                 ['owner_id'],
                 'exist',
                 'skipOnError' => true,
-                'targetClass' => User::className(),
+                'targetClass' => User::class,
                 'targetAttribute' => ['owner_id' => 'id']
             ],
         ];

@@ -3,6 +3,7 @@
 namespace tests\functional;
 
 use common\models\Account;
+use common\models\Category;
 use common\models\Transaction;
 use common\models\User;
 use Faker\Generator;
@@ -29,6 +30,12 @@ class FunctionalTestCase extends TestCase
     protected $baseUser;
 
     private $accessToken;
+
+    /**
+     * Stores the HTTP code (e.g. 200, 404) from the latest API call that was made
+     * @var
+     */
+    public $lastApiCallHttpResponseCode;
 
     /**
      * @var Generator
@@ -102,6 +109,8 @@ class FunctionalTestCase extends TestCase
             }
         }
 
+        $this->lastApiCallHttpResponseCode = $curl->responseCode;
+
         // List of status codes here http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
         switch ($curl->responseCode) {
 
@@ -121,7 +130,6 @@ class FunctionalTestCase extends TestCase
                 //404 Error logic here
                 throw new NotFoundHttpException("URL not found:" . $path);
             case 422:
-                var_dump($response);
                 throw new ServerErrorHttpException('Model validation failed - error 422: ' . print_r($response, true));
             case 500:
                 var_dump($response);
@@ -159,14 +167,6 @@ class FunctionalTestCase extends TestCase
             \Yii::error($user->getErrors());
             throw new ServerErrorHttpException('Can not create a test user');
         }
-    }
-
-    protected function deleteUser($id)
-    {
-        $user = User::findOne($id);
-        $deleted = $user->delete();
-
-        return $deleted;
     }
 
     protected function logout()
@@ -239,6 +239,28 @@ class FunctionalTestCase extends TestCase
         return $transaction;
     }
 
+    protected function createCategory($idOwner)
+    {
+        $category = new Category();
+        $category->owner_id = $idOwner;
+        $category->name = $this->faker->text(50);
+        $category->description = $this->faker->text(50);
+        if (!$category->save()) {
+            print_r($category->getErrors());
+            throw new Exception('Can not create a category in DB for tests');
+        }
+
+        return $category;
+    }
+
+    protected function deleteUser($id)
+    {
+        $user = User::findOne($id);
+        $deleted = $user->delete();
+
+        return $deleted;
+    }
+
     protected function deleteAccount($id)
     {
         Account::deleteAll(['id' => $id]);
@@ -247,5 +269,10 @@ class FunctionalTestCase extends TestCase
     protected function deleteTransaction($id)
     {
         Transaction::deleteAll(['id' => $id]);
+    }
+
+    protected function deleteCategory($id)
+    {
+        Category::deleteAll(['id' => $id]);
     }
 }

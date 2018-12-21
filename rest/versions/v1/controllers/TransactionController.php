@@ -63,11 +63,9 @@ class TransactionController extends ActiveController
                 'checkAccess' => $checkAccess
             ],
             'update' => [
-                'class' => UpdateAction::class,
-                'checkAccess' => $checkAccess
+                'checkAccess' => $checkAccess,
             ],
             'delete' => [
-                'class' => DeleteAction::class,
                 'checkAccess' => $checkAccess
             ],
             'index' => [
