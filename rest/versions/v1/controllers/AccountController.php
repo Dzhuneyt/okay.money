@@ -36,16 +36,6 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
         parent::checkAccess($action, $model, $params);
     }
 
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors();
-        $behaviors['authenticator'] = [
-            'class' => QueryParamAuth::class,
-        ];
-
-        return $behaviors;
-    }
-
     public function actions()
     {
         $actions = ArrayHelper::merge(
