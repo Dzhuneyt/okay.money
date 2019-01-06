@@ -9,6 +9,7 @@ use common\models\User;
 use tests\functional\FunctionalTestCase;
 use yii\db\Query;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\UnauthorizedHttpException;
 
 class CreateActionTest extends FunctionalTestCase
@@ -28,15 +29,13 @@ class CreateActionTest extends FunctionalTestCase
     {
         parent::setUp();
 
-        $this->user    = $this->createUser();
-        $this->account = $this->createAccount($this->user->id);
-        $this->loginAsUser($this->user->id);
+        $this->account = $this->createAccount($this->baseUser->id);
+        $this->loginAsUser($this->baseUser->id);
     }
 
     protected function tearDown()
     {
         $this->deleteAccount($this->account->id);
-        $this->deleteUser($this->user->id);
         parent::tearDown();
     }
 
@@ -163,7 +162,7 @@ class CreateActionTest extends FunctionalTestCase
 
     public function testCanNotCreateTransactionInNonExistingAccount()
     {
-        $this->expectException(BadRequestHttpException::class);
+        $this->expectException(ForbiddenHttpException::class);
         $this->apiCall('v1/transactions', 'POST', [
             'description' => $this->faker->text(),
             'account_id'  => 0,
@@ -179,7 +178,7 @@ class CreateActionTest extends FunctionalTestCase
         $account = $this->createAccount($user2->id);
 
         // Assertions
-        $this->expectException(UnauthorizedHttpException::class);
+        $this->expectException(ForbiddenHttpException::class);
 
         // Try to create a transaction with USER 1
         // but attach the transaction to the account of USER 2
@@ -194,6 +193,56 @@ class CreateActionTest extends FunctionalTestCase
             $this->deleteAccount($account->id);
             $this->deleteUser($user2->id);
         }
+    }
+
+    public function testCanCreateTransactionWithMyCategoryId()
+    {
+        $category = $this->createCategory($this->baseUser->id);
+
+        $transaction = $this->apiCall('v1/transactions', 'POST', [
+            'sum'         => 5,
+            'description' => $this->faker->text(),
+            'account_id'  => $this->account->id,
+            'category_id' => $category->id,
+        ]);
+
+        $actualTransaction = Transaction::findOne($transaction['id']);
+        $this->assertEquals($category->id, $actualTransaction->category_id,
+            'Transaction created with category ID but the actual category ID in DB saved differently');
+
+        // Cleanup
+        $this->deleteTransaction($transaction['id']);
+        $this->deleteCategory($category->id);
+    }
+
+    public function testCanNotCreateTransactionWithNonExistingCategory()
+    {
+        $this->expectException(ForbiddenHttpException::class);
+        $this->apiCall('v1/transactions', 'POST', [
+            'sum'         => 5,
+            'description' => $this->faker->text(),
+            'account_id'  => $this->account->id,
+            'category_id' => -1,
+        ]);
+    }
+
+    public function testCanNotCreateTransactionWithOtherPeopleCategory()
+    {
+        // Prerequisites
+        $stranger         = $this->createUser();
+        $strangerCategory = $this->createCategory($stranger->id);
+
+        // SUT
+        $this->expectException(ForbiddenHttpException::class);
+        $this->apiCall('v1/transactions', 'POST', [
+            'sum'         => 5,
+            'description' => $this->faker->text(),
+            'account_id'  => $this->account->id,
+            'category_id' => $strangerCategory->id,
+        ]);
+        // Cleanup
+        $this->deleteCategory($strangerCategory->id);
+        $this->deleteUser($stranger->id);
     }
 
 }

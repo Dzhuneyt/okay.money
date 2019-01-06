@@ -20,10 +20,6 @@ class CreateAction extends \yii\rest\CreateAction
 
     public function run()
     {
-        if ($this->checkAccess) {
-            call_user_func($this->checkAccess, $this->id);
-        }
-
         /* @var $model Account */
         $model = $this->createModel();
 

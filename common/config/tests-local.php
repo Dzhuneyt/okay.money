@@ -7,9 +7,9 @@ return [
     'components' => [
         'db' => [
             'class'    => 'yii\db\Connection',
-            'dsn'      => 'mysql:host=192.168.0.196;dbname=finance_test',
-            'username' => 'joni',
-            'password' => 'joni',
+            'dsn'   => 'mysql:host=127.0.0.1;dbname=personal_finance_test',
+            'username' => 'root',
+            'password' => '',
             'charset'  => 'utf8',
         ],
     ],

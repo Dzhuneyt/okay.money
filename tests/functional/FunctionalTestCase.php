@@ -52,7 +52,7 @@ class FunctionalTestCase extends TestCase
 
     protected function tearDown()
     {
-        if (!$this->deleteUser($this->baseUser->id)) {
+        if ( ! $this->deleteUser($this->baseUser->id)) {
             throw new ServerErrorHttpException('Can not delete temp user for tests: ' . $this->baseUser->id);
         }
         parent::tearDown();
@@ -103,7 +103,7 @@ class FunctionalTestCase extends TestCase
         if ($response !== false) {
             try {
                 $response = Json::decode($response, true);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 \Yii::error("Can not parse JSON response from API");
                 throw $e;
             }
@@ -121,26 +121,26 @@ class FunctionalTestCase extends TestCase
             case 204: // successfully deleted
                 return $response;
             case 400:
-                throw new BadRequestHttpException('Invalid request to API: ' . $method . ':' . $url);
+                throw new BadRequestHttpException('Invalid request to API: ' . $method . ':' . $url . '. Exception: ' . print_r($response['message'],
+                        true));
             case 401:
                 throw new UnauthorizedHttpException('Attempting to call an authenticated API with no token: ' . $method . " " . $url);
             case 403:
-                throw new ForbiddenHttpException('Unauthorized API call: ' . $url);
+                throw new ForbiddenHttpException('Unauthorized API call: ' . $url . '. Message: ' . $response['message']);
             case 404:
                 //404 Error logic here
                 throw new NotFoundHttpException("URL not found:" . $path);
             case 422:
                 throw new ServerErrorHttpException('Model validation failed - error 422: ' . print_r($response, true));
             case 500:
-                var_dump($response);
                 throw new ServerErrorHttpException('API call during test threw 500 Internal Server Error: ' . print_r($response,
                         true));
             default:
-                \Yii::error('Test error');
-                \Yii::error($url);
-                \Yii::error($method);
-                \Yii::error($curl->responseCode);
-                \Yii::error($response);
+                echo 'Unknown test failure. Possible bug with testing framework' . PHP_EOL;
+                var_dump(['url', $url]);
+                var_dump(['method', $method]);
+                var_dump(['Response code', $curl->responseCode]);
+                var_dump(['Response', $response]);
                 throw new ServerErrorHttpException('API call during test resulted in an unknown error code:' . print_r($curl->responseCode,
                         1));
                 break;
@@ -154,17 +154,17 @@ class FunctionalTestCase extends TestCase
      */
     protected function createUser()
     {
-        $faker = \Faker\Factory::create('en_US');
-        $user = new User();
-        $user->username = $faker->userName;
-        $user->auth_key = md5(md5($faker->password));
+        $faker               = \Faker\Factory::create('en_US');
+        $user                = new User();
+        $user->username      = $faker->userName;
+        $user->auth_key      = md5(md5($faker->password));
         $user->password_hash = md5($faker->password);
-        $user->email = $faker->email;
-        $user->status = 10;
+        $user->email         = $faker->email;
+        $user->status        = 10;
         if ($user->save()) {
             return $user;
         } else {
-            \Yii::error($user->getErrors());
+            print_r($user->getErrors());
             throw new ServerErrorHttpException('Can not create a test user');
         }
     }
@@ -181,14 +181,14 @@ class FunctionalTestCase extends TestCase
                 'SELECT auth_key FROM user WHERE id=:id',
                 [':id' => $idUser]
             )->queryScalar();
-            if (!$token) {
+            if ( ! $token) {
                 throw new Exception('Can not login as user with ID ' . $idUser . '. Not found in DB');
             }
             $this->accessToken = $token;
 
             return;
         }
-        $accessToken = $this->apiCall('v1/user/login', 'POST', [
+        $accessToken       = $this->apiCall('v1/user/login', 'POST', [
             'username' => 'demo',
             'password' => 'demo',
         ]);
@@ -204,7 +204,7 @@ class FunctionalTestCase extends TestCase
      */
     protected function createAccount($ownerId = null)
     {
-        $account = new Account();
+        $account       = new Account();
         $account->name = $this->faker->text(50);
 
         if ($ownerId === null) {
@@ -217,7 +217,7 @@ class FunctionalTestCase extends TestCase
             $account->owner_id = $ownerId;
         }
 
-        if (!$account->save()) {
+        if ( ! $account->save()) {
             print_r($account->getErrors());
             throw new Exception('Can not create an account in DB for tests');
         }
@@ -227,11 +227,11 @@ class FunctionalTestCase extends TestCase
 
     protected function createTransaction($idAccount, $sum = null)
     {
-        $transaction = new Transaction();
-        $transaction->account_id = $idAccount;
+        $transaction              = new Transaction();
+        $transaction->account_id  = $idAccount;
         $transaction->description = $this->faker->text(50);
-        $transaction->sum = $sum === null ? $this->faker->numberBetween(1, 99) : $sum;
-        if (!$transaction->save()) {
+        $transaction->sum         = $sum === null ? $this->faker->numberBetween(1, 99) : $sum;
+        if ( ! $transaction->save()) {
             print_r($transaction->getErrors());
             throw new Exception('Can not create a transaction in DB for tests');
         }
@@ -241,21 +241,23 @@ class FunctionalTestCase extends TestCase
 
     protected function createCategory($idOwner)
     {
-        $category = new Category();
-        $category->owner_id = $idOwner;
-        $category->name = $this->faker->text(50);
+        $category              = new Category();
+        $category->owner_id    = $idOwner;
+        $category->name        = $this->faker->text(50);
         $category->description = $this->faker->text(50);
-        if (!$category->save()) {
+        if ( ! $category->save()) {
             print_r($category->getErrors());
             throw new Exception('Can not create a category in DB for tests');
         }
+
+        $category->refresh();
 
         return $category;
     }
 
     protected function deleteUser($id)
     {
-        $user = User::findOne($id);
+        $user    = User::findOne($id);
         $deleted = $user->delete();
 
         return $deleted;

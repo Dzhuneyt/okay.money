@@ -5,5 +5,8 @@ return [
         'cache' => [
             'class' => 'yii\caching\DummyCache',
         ],
+        'user'=>[
+            'class'=>\yii\web\User::class
+        ],
     ],
 ];

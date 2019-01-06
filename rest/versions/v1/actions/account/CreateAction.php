@@ -4,6 +4,7 @@ namespace rest\versions\v1\actions\account;
 
 use common\models\Account;
 use Yii;
+use yii\db\ActiveRecord;
 use yii\helpers\Url;
 use yii\web\ServerErrorHttpException;
 
@@ -49,7 +50,7 @@ class CreateAction extends \yii\rest\CreateAction
         throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
     }
 
-    public function handleSuccess(Account &$model)
+    public function handleSuccess(ActiveRecord &$model)
     {
         $response = Yii::$app->getResponse();
         $response->setStatusCode(201);

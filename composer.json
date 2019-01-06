@@ -1,45 +1,61 @@
 {
-    "name": "githubjeka/rest-yii2",
-    "description": "Yii 2 Rest Api Template",
-    "keywords": ["yii2", "rest", "application template", "api"],
-    "homepage": "https://github.com/githubjeka/yii2-rest",
-    "type": "project",
-    "license": "BSD-4-Clause",
-    "authors": [
-        {
-            "name": "Evgeniy Tkachenko",
-            "email": "et.coder@gmail.com",
-            "role": "Developer"
-        }
+  "name": "githubjeka/rest-yii2",
+  "description": "Yii 2 Rest Api Template",
+  "keywords": [
+    "yii2",
+    "rest",
+    "application template",
+    "api"
+  ],
+  "homepage": "https://github.com/githubjeka/yii2-rest",
+  "type": "project",
+  "license": "BSD-4-Clause",
+  "authors": [
+    {
+      "name": "Evgeniy Tkachenko",
+      "email": "et.coder@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/githubjeka/yii2-rest/issues",
+    "source": "https://github.com/githubjeka/yii2-rest"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.1",
+    "yiisoft/yii2": "~2.0.6",
+    "yiisoft/yii2-bootstrap": "~2.0.0",
+    "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
+    "linslin/yii2-curl": "*"
+  },
+  "require-dev": {
+    "yiisoft/yii2-debug": "~2.0.0",
+    "yiisoft/yii2-gii": "~2.0.0",
+    "yiisoft/yii2-faker": "~2.0.0",
+    "phpunit/phpunit": "6.5"
+  },
+  "config": {
+    "process-timeout": 1800,
+    "fxp-asset": {
+      "enabled": false
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ],
+  "scripts": {
+    "start": "@php yii server",
+    "test-unit": [
+      "@composer install",
+      "sh vendor/bin/phpunit --configuration tests/unit/phpunit.xml --colors=auto"
     ],
-    "support": {
-        "issues": "https://github.com/githubjeka/yii2-rest/issues",
-        "source": "https://github.com/githubjeka/yii2-rest"
-    },
-    "minimum-stability": "dev",
-    "require": {
-        "php": ">=7.1",
-        "yiisoft/yii2": "~2.0.6",
-        "yiisoft/yii2-bootstrap": "~2.0.0",
-        "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
-        "linslin/yii2-curl": "*"
-    },
-    "require-dev": {
-        "yiisoft/yii2-debug": "~2.0.0",
-        "yiisoft/yii2-gii": "~2.0.0",
-        "yiisoft/yii2-faker": "~2.0.0",
-        "phpunit/phpunit": "6.5"
-    },
-    "config": {
-        "process-timeout": 1800,
-        "fxp-asset": {
-            "enabled": false
-        }
-    },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://asset-packagist.org"
-        }
+    "test-functional": [
+      "@composer install",
+      "sh vendor/bin/phpunit --configuration tests/functional/phpunit.xml --colors=auto"
     ]
+  }
 }

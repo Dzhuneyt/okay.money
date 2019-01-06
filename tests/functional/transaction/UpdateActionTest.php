@@ -4,6 +4,7 @@ namespace tests\functional\transaction;
 
 
 use tests\functional\FunctionalTestCase;
+use yii\web\ForbiddenHttpException;
 use yii\web\UnauthorizedHttpException;
 
 class UpdateActionTest extends FunctionalTestCase
@@ -30,7 +31,7 @@ class UpdateActionTest extends FunctionalTestCase
         $account = $this->createAccount($stranger->id);
         $transaction = $this->createTransaction($account->id);
 
-        $this->expectException(UnauthorizedHttpException::class);
+        $this->expectException(ForbiddenHttpException::class);
 
         $this->apiCall('v1/transactions/' . $transaction->id, 'PUT', ['sum' => 1]);
     }

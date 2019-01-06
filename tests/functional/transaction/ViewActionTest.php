@@ -4,6 +4,7 @@ namespace tests\functional\transaction;
 
 
 use tests\functional\FunctionalTestCase;
+use yii\web\ForbiddenHttpException;
 use yii\web\UnauthorizedHttpException;
 
 class ViewActionTest extends FunctionalTestCase
@@ -33,7 +34,7 @@ class ViewActionTest extends FunctionalTestCase
         $accountOfStranger = $this->createAccount($stranger->id);
         $strangerTransaction = $this->createTransaction($accountOfStranger->id);
 
-        $this->expectException(UnauthorizedHttpException::class);
+        $this->expectException(ForbiddenHttpException::class);
 
         try {
             $this->apiCall('v1/transactions/' . $strangerTransaction->id, 'GET');

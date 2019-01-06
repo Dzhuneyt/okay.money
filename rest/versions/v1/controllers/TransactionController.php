@@ -19,7 +19,7 @@ use rest\versions\v1\actions\transaction\UpdateAction;
 use rest\versions\v1\actions\transaction\ViewAction;
 use Yii;
 use yii\helpers\ArrayHelper;
-use yii\web\UnauthorizedHttpException;
+use yii\web\ForbiddenHttpException;
 
 class TransactionController extends ActiveController
 {
@@ -29,13 +29,13 @@ class TransactionController extends ActiveController
     {
         $model = Transaction::findOne($id);
 
-        if (!$model) {
+        if ( ! $model) {
             return false;
         }
 
         $account = Account::findOne($model->account_id);
 
-        if (!$account || $account->owner_id != Yii::$app->user->id) {
+        if ( ! $account || $account->owner_id != Yii::$app->user->id) {
             return false;
         }
 
@@ -48,18 +48,18 @@ class TransactionController extends ActiveController
 
         $checkAccess = function ($action, Transaction $model) {
             // Prevent touching other people's transaction
-            if (!$this->isMyTransaction($model->id)) {
-                throw new UnauthorizedHttpException();
+            if ( ! $this->isMyTransaction($model->id)) {
+                throw new ForbiddenHttpException();
             }
         };
 
         return ArrayHelper::merge($actions, [
             'create' => [
-                'class' => CreateAction::class,
+                'class'       => CreateAction::class,
                 'checkAccess' => null,
             ],
-            'view' => [
-                'class' => ViewAction::class,
+            'view'   => [
+                'class'       => ViewAction::class,
                 'checkAccess' => $checkAccess
             ],
             'update' => [
@@ -68,8 +68,8 @@ class TransactionController extends ActiveController
             'delete' => [
                 'checkAccess' => $checkAccess
             ],
-            'index' => [
-                'class' => IndexAction::class,
+            'index'  => [
+                'class'       => IndexAction::class,
                 'checkAccess' => null,
             ],
         ]);

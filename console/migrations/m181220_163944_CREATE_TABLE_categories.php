@@ -19,7 +19,7 @@ class m181220_163944_CREATE_TABLE_categories extends Migration
             'description' => $this->text(),
             'created_at' => $this->integer(11),
             'updated_at' => $this->integer(11),
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createIndex('category_owner_id', 'category', 'owner_id', true);
 

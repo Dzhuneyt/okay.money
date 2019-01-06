@@ -6,9 +6,69 @@ use common\models\Account;
 use common\models\Transaction;
 use rest\versions\shared\helpers\BaseDataProvider;
 use Yii;
+use yii\db\ActiveQuery;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 
 class IndexAction extends \yii\rest\IndexAction
 {
+    private function validateParams()
+    {
+        $type = Yii::$app->request->getQueryParam('type');
+        if ( ! empty($type) && ! in_array($type, ['income', 'expense'])) {
+            throw new BadRequestHttpException('Invalid parameter "type". Possible values: income, expense. Provided: ' . $type);
+        }
+
+        $accountIds = Yii::$app->request->getQueryParam('account_ids');
+        if ( ! empty($accountIds)) {
+            if ( ! is_array($accountIds)) {
+                throw new BadRequestHttpException('Filter "account_ids" must be an array');
+            }
+            // API response is an error if the client tries to filter
+            // by non existing or not owned account IDs
+            $ownedAccountIds = Account::find()
+                                      ->where([
+                                          'id'       => $accountIds,
+                                          'owner_id' => Yii::$app->user->id,
+                                      ])
+                                      ->select('id')
+                                      ->column();
+
+            $notOwnedAccountIds = array_diff($accountIds, $ownedAccountIds);
+
+            if ( ! empty($notOwnedAccountIds)) {
+                throw new ForbiddenHttpException(
+                    'The filter "account_ids" included some invalid values: '
+                    . implode(', ', $notOwnedAccountIds));
+            }
+        }
+    }
+
+    public function run()
+    {
+        $this->validateParams();
+
+        return parent::run();
+    }
+
+    private function getBaseQuery(): ActiveQuery
+    {
+        return Transaction::find()
+                          ->select('t.*')
+                          ->alias('t')
+                          ->innerJoin(
+                              [
+                                  // Get accounts of transactions
+                                  'a' => Account::tableName()
+                              ],
+                              // Get account of each transaction
+                              't.account_id=a.id AND owner_id=:idUser',
+                              [
+                                  // Params for JOIN
+                                  ':idUser' => Yii::$app->user->id
+                              ]
+                          );
+    }
 
     protected function prepareDataProvider()
     {
@@ -17,25 +77,43 @@ class IndexAction extends \yii\rest\IndexAction
             $requestParams = Yii::$app->getRequest()->getQueryParams();
         }
 
-        $query = Transaction::find()->alias('t')
-            ->innerJoin(['a' => Account::tableName()], 't.account_id=a.id AND owner_id=:idUser',
-                [':idUser' => Yii::$app->user->id])
-            // Get only the transactions from accounts of the current user
-            ->andWhere(['owner_id' => Yii::$app->user->id]);
+        $query = $this->getBaseQuery();
+
+        $query = $this->applyFiltersToQuery($query);
 
         return Yii::createObject([
-            'class' => BaseDataProvider::class,
+            'class'        => BaseDataProvider::class,
             'rowFormatter' => function ($row) {
                 return $row;
             },
-            'query' => $query,
-            'pagination' => [
+            'query'        => $query,
+            'pagination'   => [
                 'params' => $requestParams,
             ],
-            'sort' => [
+            'sort'         => [
                 'params' => $requestParams,
             ],
         ]);
+    }
+
+    private function applyFiltersToQuery(ActiveQuery $query): ActiveQuery
+    {
+        $type = Yii::$app->request->getQueryParam('type');
+        switch ($type) {
+            case 'income':
+                $query->andWhere('t.sum > 0');
+                break;
+            case 'expense':
+                $query->andWhere('t.sum < 0');
+                break;
+        }
+
+        $accountIds = Yii::$app->request->getQueryParam('account_ids');
+        if ( ! empty($accountIds) && is_array($accountIds)) {
+            $query->andWhere(['account_id' => $accountIds]);
+        }
+
+        return $query;
     }
 
 }

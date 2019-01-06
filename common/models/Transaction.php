@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\ArrayHelper;
 
@@ -13,6 +12,7 @@ use yii\helpers\ArrayHelper;
  * @property string $description
  * @property double $sum
  * @property int $account_id
+ * @property int $category_id
  * @property int $created_at
  * @property int $updated_at
  */
@@ -42,6 +42,24 @@ class Transaction extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['sum'], 'number'],
             [['account_id', 'created_at', 'updated_at'], 'integer'],
+            [['category_id'], 'integer', 'skipOnEmpty' => true],
+            [
+                ['category_id'],
+                function () {
+                    if ( ! $this->category_id) {
+                        return; // Don't check null
+                    }
+                    $exists = Category::find()
+                                      ->where([
+                                          'id' => $this->category_id
+                                      ])
+                                      ->exists();
+
+                    if ( ! $exists) {
+                        $this->addError('category_id', 'Invalid category_id');
+                    }
+                }
+            ],
         ];
     }
 
@@ -51,12 +69,13 @@ class Transaction extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
+            'id'          => 'ID',
             'description' => 'Description',
-            'sum' => 'Sum',
-            'account_id' => 'Account ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'sum'         => 'Sum',
+            'account_id'  => 'Account ID',
+            'category_id' => 'Category ID',
+            'created_at'  => 'Created At',
+            'updated_at'  => 'Updated At',
         ];
     }
 }
