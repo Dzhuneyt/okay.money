@@ -22,6 +22,11 @@ $config = yii\helpers\ArrayHelper::merge(
     require(__DIR__ . '/../../common/config/tests-local.php')
 );
 
-$application = new yii\web\Application($config);
-$application->run();
+try {
+    $application = new yii\web\Application($config);
+    $application->run();
+} catch (\yii\base\InvalidConfigException $e) {
+    echo 'Can not launch application. Invalid configuration';
+    http_response_code(500);
+}
 
