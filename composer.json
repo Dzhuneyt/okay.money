@@ -51,11 +51,11 @@
     "start": "@php yii server",
     "test-unit": [
       "@composer install",
-      "sh vendor/bin/phpunit --configuration tests/unit/phpunit.xml --colors=auto"
+      "./vendor/bin/phpunit --configuration tests/unit/phpunit.xml --colors=auto"
     ],
     "test-functional": [
       "@composer install",
-      "sh vendor/bin/phpunit --configuration tests/functional/phpunit.xml --colors=auto"
+      "./vendor/bin/phpunit --configuration tests/functional/phpunit.xml --colors=auto"
     ]
   }
 }
