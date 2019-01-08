@@ -32,7 +32,7 @@ return [
         ],
         'setExecutable' => [
             'yii',
-            'tests/codeception/bin/yii',
+            'vendor/bin/phpunit',
         ],
         'setCookieValidationKey' => [
             'backend/config/main-local.php',
