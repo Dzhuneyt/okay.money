@@ -1,6 +1,6 @@
 language: php
 php:
-  - 5.6
+  - 7.1
 
 # faster builds on new travis setup not using sudo
 sudo: false
@@ -13,8 +13,6 @@ cache:
 install:
  - travis_retry composer self-update && composer --version
  - travis_retry composer update --dev --prefer-dist --no-interaction
-# codeception
- - travis_retry composer global require "codeception/codeception=2.0.*" "codeception/specify=*" "codeception/verify=*"
 # setup application:
  - |
    php init --env=Development
