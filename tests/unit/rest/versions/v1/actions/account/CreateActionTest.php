@@ -4,7 +4,7 @@
  * Time: 21:03
  */
 
-namespace tests\unit\v1\actions\account;
+namespace tests\unit\rest\versions\v1\actions\account;
 
 
 use common\models\Account;

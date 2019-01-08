@@ -1,15 +1,12 @@
 <?php
-/**
- * Date: 16.12.2018 г.
- * Time: 20:52
- */
 
-namespace tests\unit\shared\controllers;
+namespace tests\unit\rest\versions\shared\controllers;
 
 
 use PHPUnit\Framework\TestCase;
 use yii\filters\auth\QueryParamAuth;
 use yii\rest\Serializer;
+use yii\web\NotFoundHttpException;
 
 class ActiveControllerTest extends TestCase
 {
@@ -44,5 +41,21 @@ class ActiveControllerTest extends TestCase
 
         $this->assertEquals(Serializer::class, $mock->serializer['class']);
         $this->assertEquals('items', $mock->serializer['collectionEnvelope']);
+    }
+
+    public function testActionsReturnNotFoundByDefaultUnlessOverriden()
+    {
+        $mock = $this->getMock();
+
+        foreach ($mock->actions() as $action) {
+            $this->assertArrayHasKey('checkAccess', $action);
+            try {
+                call_user_func($action['checkAccess']);
+            } catch (NotFoundHttpException $e) {
+                // This is the expected behavior
+            } catch (\Exception $e) {
+                $this->fail('One of the default actions in ActiveController returned a response instead of error');
+            }
+        }
     }
 }
