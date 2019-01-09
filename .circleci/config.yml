@@ -23,6 +23,10 @@ jobs:
 
     steps:
       - checkout
+      - run: sudo apt install -y libsqlite3-dev zlib1g-dev
+      - run: |
+          sudo docker-php-ext-install pdo_mysql
+          sudo docker-php-ext-enable pdo_mysql
 
       # Download and cache dependencies
       - restore_cache:
@@ -32,10 +36,6 @@ jobs:
             - v1-dependencies-
 
       - run: composer install -n --prefer-dist
-      - run: sudo apt install -y libsqlite3-dev zlib1g-dev
-      - run: |
-          sudo docker-php-ext-install pdo_mysql
-          sudo docker-php-ext-enable pdo_mysql
 
       - save_cache:
           paths:
@@ -62,4 +62,4 @@ jobs:
 
       - run:
           name: Functional tests
-          command: composer test-functional --verbose
+          command: composer test-functional
