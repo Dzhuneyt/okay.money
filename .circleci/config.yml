@@ -6,8 +6,13 @@ version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
+      # Base version where the app runs
       - image: circleci/php:7.1-browsers
+      - image: tkuchiki/delayed-mysql
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: ''
+          MYSQL_DATABASE: circleci
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -27,11 +32,34 @@ jobs:
             - v1-dependencies-
 
       - run: composer install -n --prefer-dist
+      - run: sudo apt install -y libsqlite3-dev zlib1g-dev
+      - run: |
+          sudo docker-php-ext-install pdo_mysql
+          sudo docker-php-ext-enable pdo_mysql
 
       - save_cache:
           paths:
             - ./vendor
           key: v1-dependencies-{{ checksum "composer.json" }}
 
-      # run tests!
-      - run: composer test-unit
+      # Run unit tests
+      - run:
+          name: Run unit tests
+          command: composer test-unit
+      - run:
+          name: Init app for CircleCI functional tests
+          command: php init --env=CircleCI --overwrite=y
+      - run:
+          name: Start lite server for functional tests (will auto-kill after 15 minutes)
+          command: timeout 1800 php yii server --test
+          background: true
+
+      #- run: php requirements.php
+      - run:
+          name: Wait for DB
+          # preinstalled in circleci/* docker image
+          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s -wait-retry-interval=5s
+
+      - run:
+          name: Functional tests
+          command: composer test-functional --verbose

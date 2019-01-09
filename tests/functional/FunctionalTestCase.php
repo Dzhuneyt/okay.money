@@ -22,7 +22,7 @@ class FunctionalTestCase extends TestCase
 {
 
     // The result of `php yii server`
-    private $baseUrl = 'http://localhost:9009/';
+    private $baseUrl = 'http://127.0.0.1:9009/';
 
     /**
      * @var User
