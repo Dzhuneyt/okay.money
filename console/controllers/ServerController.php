@@ -15,7 +15,7 @@ class ServerController extends \yii\console\controllers\ServeController
 
     public function options($actionID)
     {
-        $options   = parent::options($actionID);
+        $options = parent::options($actionID);
         $options[] = 'test';
 
         return $options;
