@@ -3,6 +3,7 @@
 namespace tests\unit\helpers;
 
 
+use common\models\User;
 use PHPUnit\Framework\TestCase;
 use yii\web\ServerErrorHttpException;
 
@@ -26,6 +27,16 @@ abstract class BaseCreateActionUnitTest extends TestCase
      * @var null
      */
     protected $modelClass = null;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $userMock = $this->getMockBuilder(User::class)
+            ->setMethods([])
+            ->getMock();
+        \Yii::$app->set('user', $userMock);
+    }
 
     /**
      * @throws \yii\base\InvalidConfigException
