@@ -12,31 +12,31 @@ use yii\web\ForbiddenHttpException;
 
 class IndexAction extends \yii\rest\IndexAction
 {
-    private function validateParams()
+    public function validateParams()
     {
         $type = Yii::$app->request->getQueryParam('type');
-        if ( ! empty($type) && ! in_array($type, ['income', 'expense'])) {
+        if (!empty($type) && !in_array($type, ['income', 'expense'])) {
             throw new BadRequestHttpException('Invalid parameter "type". Possible values: income, expense. Provided: ' . $type);
         }
 
         $accountIds = Yii::$app->request->getQueryParam('account_ids');
-        if ( ! empty($accountIds)) {
-            if ( ! is_array($accountIds)) {
+        if (!empty($accountIds)) {
+            if (!is_array($accountIds)) {
                 throw new BadRequestHttpException('Filter "account_ids" must be an array');
             }
             // API response is an error if the client tries to filter
             // by non existing or not owned account IDs
             $ownedAccountIds = Account::find()
-                                      ->where([
-                                          'id'       => $accountIds,
-                                          'owner_id' => Yii::$app->user->id,
-                                      ])
-                                      ->select('id')
-                                      ->column();
+                ->where([
+                    'id' => $accountIds,
+                    'owner_id' => Yii::$app->user->id,
+                ])
+                ->select('id')
+                ->column();
 
             $notOwnedAccountIds = array_diff($accountIds, $ownedAccountIds);
 
-            if ( ! empty($notOwnedAccountIds)) {
+            if (!empty($notOwnedAccountIds)) {
                 throw new ForbiddenHttpException(
                     'The filter "account_ids" included some invalid values: '
                     . implode(', ', $notOwnedAccountIds));
@@ -54,20 +54,20 @@ class IndexAction extends \yii\rest\IndexAction
     private function getBaseQuery(): ActiveQuery
     {
         return Transaction::find()
-                          ->select('t.*')
-                          ->alias('t')
-                          ->innerJoin(
-                              [
-                                  // Get accounts of transactions
-                                  'a' => Account::tableName()
-                              ],
-                              // Get account of each transaction
-                              't.account_id=a.id AND owner_id=:idUser',
-                              [
-                                  // Params for JOIN
-                                  ':idUser' => Yii::$app->user->id
-                              ]
-                          );
+            ->select('t.*')
+            ->alias('t')
+            ->innerJoin(
+                [
+                    // Get accounts of transactions
+                    'a' => Account::tableName()
+                ],
+                // Get account of each transaction
+                't.account_id=a.id AND owner_id=:idUser',
+                [
+                    // Params for JOIN
+                    ':idUser' => Yii::$app->user->id
+                ]
+            );
     }
 
     protected function prepareDataProvider()
@@ -82,15 +82,15 @@ class IndexAction extends \yii\rest\IndexAction
         $query = $this->applyFiltersToQuery($query);
 
         return Yii::createObject([
-            'class'        => BaseDataProvider::class,
+            'class' => BaseDataProvider::class,
             'rowFormatter' => function ($row) {
                 return $row;
             },
-            'query'        => $query,
-            'pagination'   => [
+            'query' => $query,
+            'pagination' => [
                 'params' => $requestParams,
             ],
-            'sort'         => [
+            'sort' => [
                 'params' => $requestParams,
             ],
         ]);
@@ -109,7 +109,7 @@ class IndexAction extends \yii\rest\IndexAction
         }
 
         $accountIds = Yii::$app->request->getQueryParam('account_ids');
-        if ( ! empty($accountIds) && is_array($accountIds)) {
+        if (!empty($accountIds) && is_array($accountIds)) {
             $query->andWhere(['account_id' => $accountIds]);
         }
 

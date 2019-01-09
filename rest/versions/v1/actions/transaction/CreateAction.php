@@ -15,48 +15,52 @@ use yii\web\ServerErrorHttpException;
 class CreateAction extends \yii\rest\CreateAction
 {
 
-    private function validateParams($params = [])
+    public function init()
     {
-        if (empty(Yii::$app->request->getBodyParam('account_id'))) {
+        parent::init();
+
+        $this->checkAccess = function () {
+            $idUser = Yii::$app->user->id;
+            $idAccount = Yii::$app->request->getBodyParam('account_id');
+            if (!$this->doesUserOwnAccount($idUser, $idAccount)) {
+                throw new ForbiddenHttpException(
+                    'Can not create transactions in this account'
+                );
+            }
+
+            $idCategory = Yii::$app->request->getBodyParam('category_id');
+            if (!empty($idCategory)) {
+                // Null is valid value, so only check if not null
+                if (!$this->doesUserOwnCategory($idUser, $idCategory)) {
+                    throw new ForbiddenHttpException(
+                        'Can not create transactions in this category'
+                    );
+                }
+            }
+        };
+    }
+
+    public function validateParams($params = [])
+    {
+        if (!isset($params['account_id']) || empty($params['account_id'])) {
             throw new BadRequestHttpException('Invalid parameter "account_id"');
         }
 
         if (empty($params['sum']) || floatval($params['sum']) <= 0) {
             throw new BadRequestHttpException('Invalid parameter "sum"');
         }
-        if ( ! empty($params['category_id'])) {
-            $categoryId = $params['category_id'];
-            $category   = Category::findOne($categoryId);
-            if ( ! $category) {
+        if (!empty($params['category_id'])) {
+            if (!$this->getCategoryModel($params['category_id'])) {
                 throw new BadRequestHttpException('Invalid parameter "category_id"');
-            }
-        }
-    }
-
-    private function checkAccess()
-    {
-        $idUser    = Yii::$app->user->id;
-        $idAccount = Yii::$app->request->getBodyParam('account_id');
-        if ( ! $this->doesUserOwnAccount($idUser, $idAccount)) {
-            throw new ForbiddenHttpException(
-                'Can not create transactions in this account'
-            );
-        }
-
-        $idCategory = Yii::$app->request->getBodyParam('category_id');
-        if ( ! empty($idCategory)) {
-            // Null is valid value, so only check if not null
-            if ( ! $this->doesUserOwnCategory($idUser, $idCategory)) {
-                throw new ForbiddenHttpException(
-                    'Can not create transactions in this category'
-                );
             }
         }
     }
 
     public function run()
     {
-        $this->checkAccess();
+        if ($this->checkAccess) {
+            call_user_func($this->checkAccess, $this->id);
+        }
 
         $params = \Yii::$app->request->getBodyParams();
         $this->validateParams($params);
@@ -70,14 +74,19 @@ class CreateAction extends \yii\rest\CreateAction
         if ($model->save()) {
             $model->refresh();
             $this->handleSuccess($model);
-        } elseif ( ! $model->hasErrors()) {
+        } elseif (!$model->hasErrors()) {
             $this->handleError();
         }
 
         return $model;
     }
 
-    private function doesUserOwnAccount($idUser, $idAccount): bool
+    protected function getCategoryModel($id)
+    {
+        return Category::findOne($id);
+    }
+
+    protected function doesUserOwnAccount($idUser, $idAccount): bool
     {
         $account = Account::findOne($idAccount);
 
@@ -87,14 +96,14 @@ class CreateAction extends \yii\rest\CreateAction
     private function doesUserOwnCategory($idUser, $idCategory): bool
     {
         return Category::find()
-                       ->where([
-                           'id'       => $idCategory,
-                           'owner_id' => $idUser,
-                       ])
-                       ->exists();
+            ->where([
+                'id' => $idCategory,
+                'owner_id' => $idUser,
+            ])
+            ->exists();
     }
 
-    private function createModel()
+    public function createModel()
     {
         return new $this->modelClass([
             'scenario' => $this->scenario,

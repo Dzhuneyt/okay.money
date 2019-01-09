@@ -2,7 +2,7 @@
 
 namespace rest\versions\v1\controllers;
 
-use common\models\LoginForm;
+use common\models\Login;
 use rest\versions\shared\controllers\ActiveController;
 use yii\rest\Controller;
 
@@ -20,7 +20,7 @@ class UserController extends Controller
      */
     public function actionLogin()
     {
-        $model = new LoginForm();
+        $model = new Login();
 
         if ($model->load(\Yii::$app->getRequest()->getBodyParams(), '') && $model->login()) {
             return \Yii::$app->user->identity->getAuthKey();
