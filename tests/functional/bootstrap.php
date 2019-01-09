@@ -8,12 +8,12 @@ require(__DIR__ . '/../../common/config/bootstrap.php');
 require(__DIR__ . '/../../console/config/bootstrap.php');
 
 $config = yii\helpers\ArrayHelper::merge(
-    require(__DIR__ . '/../../common/config/main.php'),
-    require(__DIR__ . '/../../common/config/main-local.php'),
-    require(__DIR__ . '/../../rest/config/main.php'),
-    require(__DIR__ . '/../../rest/config/main-local.php'),
-    require(__DIR__ . '/../../common/config/tests.php'),
-    require(__DIR__ . '/../../common/config/tests-local.php')
+    requireIfExists(__DIR__ . '/../../common/config/main.php'),
+    requireIfExists(__DIR__ . '/../../common/config/main-local.php'),
+    requireIfExists(__DIR__ . '/../../rest/config/main.php'),
+    requireIfExists(__DIR__ . '/../../rest/config/main-local.php'),
+    requireIfExists(__DIR__ . '/../../common/config/tests.php'),
+    requireIfExists(__DIR__ . '/../../common/config/tests-local.php')
 );
 
 // Execute migrations every time before tests

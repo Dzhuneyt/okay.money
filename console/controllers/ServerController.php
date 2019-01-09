@@ -21,7 +21,7 @@ class ServerController extends \yii\console\controllers\ServeController
         return $options;
     }
 
-    public function actionIndex($address = 'localhost')
+    public function actionIndex($address = '127.0.0.1')
     {
         if ($this->test) {
             if ($this->port === 8080) {

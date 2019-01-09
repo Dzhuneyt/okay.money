@@ -32,10 +32,25 @@ return [
         ],
         'setExecutable' => [
             'yii',
-            'tests/codeception/bin/yii',
+            'vendor/bin/phpunit',
         ],
-        'setCookieValidationKey' => [
-            'backend/config/main-local.php',
+//        'setCookieValidationKey' => [
+//            'backend/config/main-local.php',
+//        ],
+    ],
+    'CircleCI' => [
+        'path' => 'circleci',
+        'setWritable' => [
+            'backend/runtime',
+            'backend/web/assets',
+            'rest/runtime',
         ],
+        'setExecutable' => [
+            'yii',
+            'vendor/bin/phpunit',
+        ],
+//        'setCookieValidationKey' => [
+//            'backend/config/main-local.php',
+//        ],
     ],
 ];
