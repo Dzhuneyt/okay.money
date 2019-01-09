@@ -26,3 +26,6 @@
 
 ## Deploying to production
 TBD
+
+## Build status:
+[![CircleCI](https://circleci.com/gh/Dzhuneyt/Personal-Finance.svg?style=shield&circle-token=eabf99331ae05bba76733a2865a779f24fa5bb73)](https://circleci.com/gh/Dzhuneyt/Personal-Finance)
