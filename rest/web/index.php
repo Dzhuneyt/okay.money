@@ -22,7 +22,11 @@ try {
     $application = new yii\web\Application($config);
     $application->run();
 } catch (\yii\base\InvalidConfigException $e) {
-    echo 'Can not launch application. Invalid configuration';
+    if (YII_DEBUG) {
+        throw $e;
+    } else {
+        echo 'Can not launch application. Invalid configuration';
+    }
     http_response_code(500);
 }
 

@@ -225,12 +225,18 @@ class FunctionalTestCase extends TestCase
         return $account;
     }
 
-    protected function createTransaction($idAccount, $sum = null)
+    protected function createTransaction($idAccount, $sum = null, $idCategory = null)
     {
+        $ownerId = Account::findOne($idAccount)->owner_id;
+
         $transaction              = new Transaction();
         $transaction->account_id  = $idAccount;
         $transaction->description = $this->faker->text(50);
         $transaction->sum         = $sum === null ? $this->faker->numberBetween(1, 99) : $sum;
+        $transaction->category_id =
+            $idCategory === null
+                ? $this->createCategory($ownerId)->id
+                : $idCategory;
         if ( ! $transaction->save()) {
             print_r($transaction->getErrors());
             throw new Exception('Can not create a transaction in DB for tests');
@@ -257,6 +263,18 @@ class FunctionalTestCase extends TestCase
 
     protected function deleteUser($id)
     {
+        // Get user's accounts and categories
+        $userAccountIds  = Account::find()
+                                  ->where(['owner_id' => $id])
+                                  ->select('id')
+                                  ->column();
+        $userCategoryIds = Category::find()
+                                   ->where(['owner_id' => $id])
+                                   ->select('id')
+                                   ->column();
+
+        // Delete transactions from these accounts
+        Transaction::deleteAll(['category_id' => $userCategoryIds]);
         $user    = User::findOne($id);
         $deleted = $user->delete();
 

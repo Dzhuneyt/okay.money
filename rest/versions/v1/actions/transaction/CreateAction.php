@@ -42,11 +42,19 @@ class CreateAction extends \yii\rest\CreateAction
 
     public function validateParams($params = [])
     {
-        if (!isset($params['account_id']) || empty($params['account_id'])) {
-            throw new BadRequestHttpException('Invalid parameter "account_id"');
+        $requiredParams = [
+            'account_id',
+            'category_id',
+            'sum',
+        ];
+
+        foreach ($requiredParams as $requiredParam) {
+            if (!isset($params[$requiredParam]) || empty($params[$requiredParam])) {
+                throw new BadRequestHttpException('Invalid parameter "' . $requiredParam . '"');
+            }
         }
 
-        if (empty($params['sum']) || floatval($params['sum']) <= 0) {
+        if (floatval($params['sum']) <= 0) {
             throw new BadRequestHttpException('Invalid parameter "sum"');
         }
         if (!empty($params['category_id'])) {
