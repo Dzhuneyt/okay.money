@@ -52,7 +52,7 @@ class FunctionalTestCase extends TestCase
 
     protected function tearDown()
     {
-        if (!$this->deleteUser($this->baseUser->id)) {
+        if ( ! $this->deleteUser($this->baseUser->id)) {
             throw new ServerErrorHttpException('Can not delete temp user for tests: ' . $this->baseUser->id);
         }
         parent::tearDown();
@@ -154,13 +154,13 @@ class FunctionalTestCase extends TestCase
      */
     protected function createUser()
     {
-        $faker = \Faker\Factory::create('en_US');
-        $user = new User();
-        $user->username = $faker->userName;
-        $user->auth_key = md5(md5($faker->password));
+        $faker               = \Faker\Factory::create('en_US');
+        $user                = new User();
+        $user->username      = $faker->userName;
+        $user->auth_key      = md5(md5($faker->password));
         $user->password_hash = md5($faker->password);
-        $user->email = $faker->email;
-        $user->status = 10;
+        $user->email         = $faker->email;
+        $user->status        = 10;
         if ($user->save()) {
             return $user;
         } else {
@@ -181,14 +181,14 @@ class FunctionalTestCase extends TestCase
                 'SELECT auth_key FROM user WHERE id=:id',
                 [':id' => $idUser]
             )->queryScalar();
-            if (!$token) {
+            if ( ! $token) {
                 throw new Exception('Can not login as user with ID ' . $idUser . '. Not found in DB');
             }
             $this->accessToken = $token;
 
             return;
         }
-        $accessToken = $this->apiCall('v1/user/login', 'POST', [
+        $accessToken       = $this->apiCall('v1/user/login', 'POST', [
             'username' => 'demo',
             'password' => 'demo',
         ]);
@@ -204,7 +204,7 @@ class FunctionalTestCase extends TestCase
      */
     protected function createAccount($ownerId = null)
     {
-        $account = new Account();
+        $account       = new Account();
         $account->name = $this->faker->text(50);
 
         if ($ownerId === null) {
@@ -217,7 +217,7 @@ class FunctionalTestCase extends TestCase
             $account->owner_id = $ownerId;
         }
 
-        if (!$account->save()) {
+        if ( ! $account->save()) {
             print_r($account->getErrors());
             throw new Exception('Can not create an account in DB for tests');
         }
@@ -229,15 +229,15 @@ class FunctionalTestCase extends TestCase
     {
         $ownerId = Account::findOne($idAccount)->owner_id;
 
-        $transaction = new Transaction();
-        $transaction->account_id = $idAccount;
+        $transaction              = new Transaction();
+        $transaction->account_id  = $idAccount;
         $transaction->description = $this->faker->text(50);
-        $transaction->sum = $sum === null ? $this->faker->numberBetween(1, 99) : $sum;
+        $transaction->sum         = $sum === null ? $this->faker->numberBetween(1, 99) : $sum;
         $transaction->category_id =
             $idCategory === null
                 ? $this->createCategory($ownerId)->id
                 : $idCategory;
-        if (!$transaction->save()) {
+        if ( ! $transaction->save()) {
             print_r($transaction->getErrors());
             throw new Exception('Can not create a transaction in DB for tests');
         }
@@ -247,11 +247,11 @@ class FunctionalTestCase extends TestCase
 
     protected function createCategory($idOwner)
     {
-        $category = new Category();
-        $category->owner_id = $idOwner;
-        $category->name = $this->faker->text(50);
+        $category              = new Category();
+        $category->owner_id    = $idOwner;
+        $category->name        = $this->faker->text(50);
         $category->description = $this->faker->text(50);
-        if (!$category->save()) {
+        if ( ! $category->save()) {
             print_r($category->getErrors());
             throw new Exception('Can not create a category in DB for tests');
         }
@@ -263,7 +263,19 @@ class FunctionalTestCase extends TestCase
 
     protected function deleteUser($id)
     {
-        $user = User::findOne($id);
+        // Get user's accounts and categories
+        $userAccountIds  = Account::find()
+                                  ->where(['owner_id' => $id])
+                                  ->select('id')
+                                  ->column();
+        $userCategoryIds = Category::find()
+                                   ->where(['owner_id' => $id])
+                                   ->select('id')
+                                   ->column();
+
+        // Delete transactions from these accounts
+        Transaction::deleteAll(['category_id' => $userCategoryIds]);
+        $user    = User::findOne($id);
         $deleted = $user->delete();
 
         return $deleted;

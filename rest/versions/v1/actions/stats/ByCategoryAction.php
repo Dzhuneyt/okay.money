@@ -8,7 +8,6 @@ use common\models\Category;
 use common\models\Transaction;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\db\Expression;
 use yii\db\Query;
 use yii\web\BadRequestHttpException;
 
@@ -65,6 +64,7 @@ class ByCategoryAction extends \yii\base\Action
                 [':end' => $this->getEndDate()]
             );
         }
+
         return $query;
     }
 
@@ -78,9 +78,10 @@ class ByCategoryAction extends \yii\base\Action
 
         $result = [];
         foreach ($rows as $idCategory => $row) {
-            $idCategory = intval($idCategory);
+            $idCategory          = intval($idCategory);
             $result[$idCategory] = floatval($row);
         }
+
         return $result;
     }
 
@@ -94,7 +95,7 @@ class ByCategoryAction extends \yii\base\Action
 
         $result = [];
         foreach ($rows as $idCategory => $row) {
-            $idCategory = intval($idCategory);
+            $idCategory          = intval($idCategory);
             $result[$idCategory] = floatval($row);
         }
 
@@ -104,30 +105,31 @@ class ByCategoryAction extends \yii\base\Action
     private function getBalancesByCategory()
     {
         $myCategories = Category::find()
-            ->andWhere(['owner_id' => Yii::$app->user->id])
-            ->select('id')
-            ->column();
+                                ->andWhere(['owner_id' => Yii::$app->user->id])
+                                ->select('id')
+                                ->column();
 
 //        $myAccounts = Account::find()
 //            ->andWhere(['owner_id' => Yii::$app->user->id])
 //            ->select('id')
 //            ->column();
 
-        $incomes = $this->getCategoryIncomes();
+        $incomes  = $this->getCategoryIncomes();
         $expenses = $this->getCategoryExpenses();
 
         $result = [];
         foreach ($myCategories as $myCategory) {
-            $income = isset($incomes[$myCategory]) ? $incomes[$myCategory] : 0;
+            $income  = isset($incomes[$myCategory]) ? $incomes[$myCategory] : 0;
             $expense = isset($expenses[$myCategory]) ? $expenses[$myCategory] : 0;
 
             $result[] = [
-                'id' => intval($myCategory),
-                'income_for_period' => $income,
-                'expense_for_period' => $expense,
-                'difference_for_period' => floatval($income + $expense),
+                'id'                    => intval($myCategory),
+                'income_for_period'     => floatval(number_format($income, 2)),
+                'expense_for_period'    => floatval(number_format($expense, 2)),
+                'difference_for_period' => floatval(number_format($income + $expense, 2)),
             ];
         }
+
         return $result;
     }
 
@@ -138,7 +140,7 @@ class ByCategoryAction extends \yii\base\Action
         $response = [
             'categories' => $this->getBalancesByCategory(),
             'start_date' => $this->getStartDate(),
-            'end_date' => $this->getEndDate(),
+            'end_date'   => $this->getEndDate(),
         ];
 
         return $response;
@@ -177,17 +179,17 @@ class ByCategoryAction extends \yii\base\Action
         $modelClass = $this->modelClass;
 
         $query = $modelClass::find();
-        if (!empty($filter)) {
+        if ( ! empty($filter)) {
             $query->andWhere($filter);
         }
 
         return Yii::createObject([
-            'class' => ActiveDataProvider::class,
-            'query' => $query,
+            'class'      => ActiveDataProvider::class,
+            'query'      => $query,
             'pagination' => [
                 'params' => $requestParams,
             ],
-            'sort' => [
+            'sort'       => [
                 'params' => $requestParams,
             ],
         ]);
@@ -204,8 +206,8 @@ class ByCategoryAction extends \yii\base\Action
 
         foreach ($dateParams as $dateParam) {
             $isEmpty = empty($params[$dateParam]);
-            $isValid = !empty($params[$dateParam]) ? $this->dateHelper->isValidDate($params[$dateParam]) : false;
-            if (!$isEmpty && !$isValid) {
+            $isValid = ! empty($params[$dateParam]) ? $this->dateHelper->isValidDate($params[$dateParam]) : false;
+            if ( ! $isEmpty && ! $isValid) {
                 throw new BadRequestHttpException("Invalid formatted parameter '{$dateParam}'. Please, provide a value using the format: Y-m-d H:i:s");
             }
         }
