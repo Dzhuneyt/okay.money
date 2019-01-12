@@ -28,7 +28,33 @@ class CreateActionTest extends BaseCreateActionUnitTest
         $mock->validateParams([]);
     }
 
-    public function testValidatesParamSum()
+    /**
+     * @depends testValidatesParamAccountId
+     * @throws BadRequestHttpException
+     */
+    public function testValidatesParamCategory()
+    {
+        /**
+         * @var $mock CreateAction
+         */
+        $mock = $this->getMockBuilder($this->actionClass)
+            ->disableOriginalConstructor()
+            ->setMethods(['run'])
+            ->getMock();
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessageRegExp('(category)');
+        $mock->validateParams([
+            'account_id' => 1,
+            'sum' => 5
+        ]);
+    }
+
+    /**
+     * @depends testValidatesParamCategory
+     * @throws BadRequestHttpException
+     */
+    public function testValidatesParamSumNegative()
     {
         /**
          * @var $mock CreateAction
@@ -42,7 +68,31 @@ class CreateActionTest extends BaseCreateActionUnitTest
         $this->expectExceptionMessageRegExp('(sum)');
         $mock->validateParams([
             'account_id' => 1,
+            'category_id' => 1,
             'sum' => -5
+        ]);
+    }
+
+    /**
+     * @depends testValidatesParamCategory
+     * @throws BadRequestHttpException
+     */
+    public function testValidatesParamSumMissing()
+    {
+        /**
+         * @var $mock CreateAction
+         */
+        $mock = $this->getMockBuilder($this->actionClass)
+            ->disableOriginalConstructor()
+            ->setMethods(['run'])
+            ->getMock();
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessageRegExp('(sum)');
+        $mock->validateParams([
+            'account_id' => 1,
+            'category_id' => 1,
+            'sum' => null,
         ]);
     }
 

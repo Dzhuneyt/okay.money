@@ -4,6 +4,7 @@ namespace tests\functional\transaction;
 
 
 use common\models\Account;
+use common\models\Category;
 use common\models\Transaction;
 use common\models\User;
 use tests\functional\FunctionalTestCase;
@@ -25,11 +26,18 @@ class CreateActionTest extends FunctionalTestCase
      */
     private $account;
 
+    /**
+     * @var Category
+     */
+    private $category;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->account = $this->createAccount($this->baseUser->id);
+        $this->category = $this->createCategory($this->baseUser->id);
+
         $this->loginAsUser($this->baseUser->id);
     }
 
@@ -41,15 +49,25 @@ class CreateActionTest extends FunctionalTestCase
 
     public function testCreateTransactionSuccess()
     {
+        $category = $this->createCategory($this->baseUser->id);
+
         $transaction = $this->apiCall('v1/transactions', 'POST', [
-            'sum'         => 5,
+            'sum' => 5,
             'description' => $this->faker->text(),
-            'account_id'  => $this->account->id
+            'account_id' => $this->account->id,
+            'category_id' => $category->id,
         ]);
         $this->assertNotNull($transaction['id'], 'Transaction can not be created');
+    }
 
-        // Cleanup
-        $this->deleteTransaction($transaction['id']);
+    public function testCanNotCreateTransactionsWithoutCategory()
+    {
+        $this->expectException(BadRequestHttpException::class);
+        $this->apiCall('v1/transactions', 'POST', [
+            'sum' => 5,
+            'description' => $this->faker->text(),
+            'account_id' => $this->account->id
+        ]);
     }
 
     public function testCanNotCreateTransactionsAnonymously()
@@ -57,20 +75,27 @@ class CreateActionTest extends FunctionalTestCase
         $this->logout();
         $this->expectException(UnauthorizedHttpException::class);
         $this->apiCall('v1/transactions', 'POST', [
-            'sum'         => 9.99,
+            'sum' => 9.99,
             'description' => $this->faker->text(),
-            'account_id'  => $this->account->id
+            'account_id' => $this->account->id
         ]);
     }
 
+    /**
+     * @depends testCreateTransactionSuccess
+     * @throws ForbiddenHttpException
+     * @throws \yii\base\Exception
+     * @throws \yii\web\NotFoundHttpException
+     * @throws \yii\web\ServerErrorHttpException
+     */
     public function testCanCreateTransactionWithFloatValue()
     {
         $TRANSACTION_SUM_FLOAT = 123.45;
-
         $transaction = $this->apiCall('v1/transactions', 'POST', [
-            'sum'         => $TRANSACTION_SUM_FLOAT,
+            'sum' => $TRANSACTION_SUM_FLOAT,
             'description' => $this->faker->text(),
-            'account_id'  => $this->account->id
+            'account_id' => $this->account->id,
+            'category_id' => $this->category->id,
         ]);
 
         $actualValue = (new Query())
@@ -89,14 +114,22 @@ class CreateActionTest extends FunctionalTestCase
         $this->deleteTransaction($transaction['id']);
     }
 
+    /**
+     * @depends testCreateTransactionSuccess
+     * @throws ForbiddenHttpException
+     * @throws \yii\base\Exception
+     * @throws \yii\web\NotFoundHttpException
+     * @throws \yii\web\ServerErrorHttpException
+     */
     public function testTransactionGoesInCorrectAccount()
     {
         $ACCOUNT_ID = $this->account->id;
 
         $transaction = $this->apiCall('v1/transactions', 'POST', [
-            'sum'         => 5,
+            'sum' => 5,
             'description' => $this->faker->text(),
-            'account_id'  => $ACCOUNT_ID
+            'account_id' => $ACCOUNT_ID,
+            'category_id' => $this->category->id,
         ]);
 
         $actualValue = (new Query())
@@ -115,14 +148,22 @@ class CreateActionTest extends FunctionalTestCase
         $this->deleteTransaction($transaction['id']);
     }
 
+    /**
+     * @depends testCreateTransactionSuccess
+     * @throws ForbiddenHttpException
+     * @throws \yii\base\Exception
+     * @throws \yii\web\NotFoundHttpException
+     * @throws \yii\web\ServerErrorHttpException
+     */
     public function testTransactionTextIsSaved()
     {
         $TRANSACTION_TEXT = 'SAMPLE TRANSACTION TEXT';
 
         $transaction = $this->apiCall('v1/transactions', 'POST', [
-            'sum'         => 5,
+            'sum' => 5,
             'description' => $TRANSACTION_TEXT,
-            'account_id'  => $this->account->id
+            'account_id' => $this->account->id,
+            'category_id' => $this->category->id,
         ]);
 
         $actualValue = (new Query())
@@ -146,7 +187,7 @@ class CreateActionTest extends FunctionalTestCase
         $this->expectException(BadRequestHttpException::class);
         $this->apiCall('v1/transactions', 'POST', [
             'description' => $this->faker->text(),
-            'account_id'  => $this->account->id
+            'account_id' => $this->account->id
         ]);
     }
 
@@ -155,8 +196,8 @@ class CreateActionTest extends FunctionalTestCase
         $this->expectException(BadRequestHttpException::class);
         $this->apiCall('v1/transactions', 'POST', [
             'description' => $this->faker->text(),
-            'account_id'  => $this->account->id,
-            'sum'         => -1,
+            'account_id' => $this->account->id,
+            'sum' => -1,
         ]);
     }
 
@@ -165,8 +206,8 @@ class CreateActionTest extends FunctionalTestCase
         $this->expectException(ForbiddenHttpException::class);
         $this->apiCall('v1/transactions', 'POST', [
             'description' => $this->faker->text(),
-            'account_id'  => 0,
-            'sum'         => 5,
+            'account_id' => 0,
+            'sum' => 5,
         ]);
     }
 
@@ -174,7 +215,7 @@ class CreateActionTest extends FunctionalTestCase
     {
         // Prerequisites
         // Create a second user and an account for that user
-        $user2   = $this->createUser();
+        $user2 = $this->createUser();
         $account = $this->createAccount($user2->id);
 
         // Assertions
@@ -185,8 +226,8 @@ class CreateActionTest extends FunctionalTestCase
         try {
             $this->apiCall('v1/transactions', 'POST', [
                 'description' => $this->faker->text(),
-                'account_id'  => $account->id,
-                'sum'         => 5,
+                'account_id' => $account->id,
+                'sum' => 5,
             ]);
         } finally {
             // Cleanup
@@ -200,9 +241,9 @@ class CreateActionTest extends FunctionalTestCase
         $category = $this->createCategory($this->baseUser->id);
 
         $transaction = $this->apiCall('v1/transactions', 'POST', [
-            'sum'         => 5,
+            'sum' => 5,
             'description' => $this->faker->text(),
-            'account_id'  => $this->account->id,
+            'account_id' => $this->account->id,
             'category_id' => $category->id,
         ]);
 
@@ -219,9 +260,9 @@ class CreateActionTest extends FunctionalTestCase
     {
         $this->expectException(ForbiddenHttpException::class);
         $this->apiCall('v1/transactions', 'POST', [
-            'sum'         => 5,
+            'sum' => 5,
             'description' => $this->faker->text(),
-            'account_id'  => $this->account->id,
+            'account_id' => $this->account->id,
             'category_id' => -1,
         ]);
     }
@@ -229,15 +270,15 @@ class CreateActionTest extends FunctionalTestCase
     public function testCanNotCreateTransactionWithOtherPeopleCategory()
     {
         // Prerequisites
-        $stranger         = $this->createUser();
+        $stranger = $this->createUser();
         $strangerCategory = $this->createCategory($stranger->id);
 
         // SUT
         $this->expectException(ForbiddenHttpException::class);
         $this->apiCall('v1/transactions', 'POST', [
-            'sum'         => 5,
+            'sum' => 5,
             'description' => $this->faker->text(),
-            'account_id'  => $this->account->id,
+            'account_id' => $this->account->id,
             'category_id' => $strangerCategory->id,
         ]);
         // Cleanup

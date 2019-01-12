@@ -58,8 +58,12 @@ return [
                         'v1/account',
                         'v1/transaction',
                         'v1/category',
+                        'v1/stats',
 //                        'v2/post',
-                    ]
+                    ],
+                    'extraPatterns' => [
+                        'GET by_category' => 'by_category'
+                    ],
                 ],
                 'OPTIONS v1/user/login' => 'v1/user/login',
                 'POST v1/user/login' => 'v1/user/login',
