@@ -7,7 +7,6 @@ use common\models\Account;
 use common\models\Category;
 use common\models\Transaction;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\db\Query;
 use yii\web\BadRequestHttpException;
 
@@ -51,8 +50,6 @@ class ByCategoryAction extends \yii\base\Action
             ->addParams([':idUser' => Yii::$app->user->id]);
 
         if ($this->getStartDate()) {
-            Yii::error(Yii::$app->request->url);
-            Yii::error($this->getStartDate());
             $query->andWhere(
                 'FROM_UNIXTIME(t.created_at) > :start',
                 [':start' => $this->getStartDate()]
@@ -144,55 +141,6 @@ class ByCategoryAction extends \yii\base\Action
         ];
 
         return $response;
-    }
-
-    /**
-     * @return mixed|object|ActiveDataProvider
-     * @throws \yii\base\InvalidConfigException
-     * @deprecated
-     * @TODO Delete this method
-     */
-    public function runExperimental()
-    {
-
-        $requestParams = Yii::$app->getRequest()->getBodyParams();
-        if (empty($requestParams)) {
-            $requestParams = Yii::$app->getRequest()->getQueryParams();
-        }
-
-        $filter = null;
-        if ($this->dataFilter !== null) {
-            $this->dataFilter = Yii::createObject($this->dataFilter);
-            if ($this->dataFilter->load($requestParams)) {
-                $filter = $this->dataFilter->build();
-                if ($filter === false) {
-                    return $this->dataFilter;
-                }
-            }
-        }
-
-        if ($this->prepareDataProvider !== null) {
-            return call_user_func($this->prepareDataProvider, $this, $filter);
-        }
-
-        /* @var $modelClass \yii\db\BaseActiveRecord */
-        $modelClass = $this->modelClass;
-
-        $query = $modelClass::find();
-        if ( ! empty($filter)) {
-            $query->andWhere($filter);
-        }
-
-        return Yii::createObject([
-            'class'      => ActiveDataProvider::class,
-            'query'      => $query,
-            'pagination' => [
-                'params' => $requestParams,
-            ],
-            'sort'       => [
-                'params' => $requestParams,
-            ],
-        ]);
     }
 
     public function validateParams()
