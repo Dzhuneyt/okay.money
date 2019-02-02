@@ -1,6 +1,8 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, inject, TestBed} from '@angular/core/testing';
 
 import {HomeComponent} from './home.component';
+import {HttpClientModule} from "@angular/common/http";
+import {HttpClientTestingModule, HttpTestingController} from "@angular/common/http/testing";
 
 describe('HomeComponent', () => {
     let component: HomeComponent;
@@ -8,7 +10,11 @@ describe('HomeComponent', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [HomeComponent]
+            declarations: [HomeComponent],
+            imports: [
+                HttpClientModule,
+                HttpClientTestingModule,
+            ],
         })
             .compileComponents();
     }));
@@ -18,6 +24,10 @@ describe('HomeComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
+
+    afterEach(inject([HttpTestingController], (backend: HttpTestingController) => {
+        backend.verify();
+    }));
 
     it('should create', () => {
         expect(component).toBeTruthy();

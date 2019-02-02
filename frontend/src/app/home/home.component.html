@@ -1,3 +1,5 @@
-<p>
-    home works!
-</p>
+<div *ngFor="let item of items">
+    <h1>{{item.name}}</h1>
+    {{item.starting_balance}}
+    {{item|json}}
+</div>

@@ -1,5 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {BackendService} from "../backend.service";
+import {take} from "rxjs/operators";
+
+interface Account {
+    id?: number;
+    name: string;
+    starting_balance: number;
+    current_balance: number;
+}
 
 @Component({
     selector: 'app-home',
@@ -7,6 +15,7 @@ import {BackendService} from "../backend.service";
     styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
+    public items: Account[] = [];
 
     constructor(
         private backend: BackendService,
@@ -14,10 +23,12 @@ export class HomeComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.backend.request('v1/accounts', 'get').subscribe(result => {
-            result['items'];
-            console.log(result);
-        });
+        this.backend
+            .request('v1/accounts', 'get')
+            .pipe(take(1))
+            .subscribe(result => {
+                this.items = result['items'];
+            });
     }
 
 }
