@@ -19,11 +19,12 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/mysql:9.4
 
-    working_directory: ~/repo
+    working_directory: ~/repo/backend
 
     steps:
-      - checkout
-      - run: sudo apt install -y libsqlite3-dev zlib1g-dev
+      - checkout:
+          path: ~/repo
+      - run: sudo apt install -qq libsqlite3-dev zlib1g-dev
       - run: |
           sudo docker-php-ext-install pdo_mysql
           sudo docker-php-ext-enable pdo_mysql
@@ -31,16 +32,16 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "composer.json" }}
+            - v1-dependencies-{{ checksum "backend/composer.json" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: composer install -n --prefer-dist
+      - run: composer install -n --prefer-dist --quiet --optimize-autoloader
 
       - save_cache:
           paths:
             - ./vendor
-          key: v1-dependencies-{{ checksum "composer.json" }}
+          key: v1-dependencies-{{ checksum "backend/composer.json" }}
 
       # Run unit tests
       - run:
