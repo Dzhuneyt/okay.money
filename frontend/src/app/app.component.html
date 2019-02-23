@@ -1,1 +1,11 @@
-<router-outlet></router-outlet>
+<app-header></app-header>
+
+<mat-sidenav-container class="example-container">
+    <mat-sidenav mode="side" [(opened)]="menuService.isOpened">
+        Sidenav content
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <router-outlet></router-outlet>
+    </mat-sidenav-content>
+</mat-sidenav-container>
+

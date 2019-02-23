@@ -3,18 +3,22 @@ import {
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatToolbarModule
 } from "@angular/material";
 
-const USED_ANGULAR_MATERIAL_COMPONENTS = [
+export const USED_ANGULAR_MATERIAL_COMPONENTS = [
     MatCardModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
     MatInputModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatIconModule,
+    MatToolbarModule,
 ];
 
 @NgModule({

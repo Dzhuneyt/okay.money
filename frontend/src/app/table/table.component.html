@@ -1,0 +1,17 @@
+<mat-table [dataSource]="currentPageItems">
+
+    <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column.code">
+        <mat-header-cell *matHeaderCellDef> {{column.label}} </mat-header-cell>
+        <mat-cell *matCellDef="let element" mat-cell> {{element[column.code]}} </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumnCodes"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumnCodes;"></mat-row>
+</mat-table>
+
+<mat-paginator [length]="totalCount"
+               [pageSize]="pageSize"
+               [pageSizeOptions]="[]"
+               [hidePageSize]="true"
+               (page)="goToPage($event.pageIndex)">
+</mat-paginator>

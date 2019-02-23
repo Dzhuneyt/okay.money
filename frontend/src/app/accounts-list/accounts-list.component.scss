@@ -1,0 +1,11 @@
+::ng-deep .mat-column-current_balance {
+  max-width: 100px;
+
+  &.mat-header-cell {
+    text-align: center;
+  }
+
+  &.mat-cell {
+    text-align: center;
+  }
+}
