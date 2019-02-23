@@ -22,7 +22,6 @@ class AccountHelper extends BaseObject
                                ->select('id')
                                ->andWhere(['owner_id' => $idUser])
                                ->column();
-        \Yii::error('Sample log mesasge');
 
         $accountBallances = (new Query())
             ->select('account_id, SUM(sum) AS sum')

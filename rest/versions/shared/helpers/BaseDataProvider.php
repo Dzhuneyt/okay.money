@@ -9,6 +9,22 @@ class BaseDataProvider extends ActiveDataProvider
 {
     public $rowFormatter;
 
+    public function getPagination()
+    {
+        $pagination = parent::getPagination();
+
+
+        if (isset($pagination->params['page']) && $pagination->params['page']) {
+            $pagination->page = $pagination->params['page'];
+        }
+
+        if (isset($pagination->params['page_size']) && $pagination->params['page_size']) {
+            $pagination->pageSize = $pagination->params['page_size'];
+        }
+
+        return $pagination;
+    }
+
     protected function prepareModels()
     {
         $originalModels = parent::prepareModels();
