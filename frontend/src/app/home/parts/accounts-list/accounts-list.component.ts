@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {BackendService} from "../backend.service";
+import {BackendService} from "../../../backend.service";
 import {map, take} from "rxjs/operators";
-import {TableColumn} from "../table/table.component";
+import {TableColumn} from "../../../table/table.component";
 
 @Component({
     selector: 'app-accounts-list',

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {TableColumn} from "../table/table.component";
+import {TableColumn} from "../../../table/table.component";
 import {from} from "rxjs";
 
 @Component({
