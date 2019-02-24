@@ -16,7 +16,7 @@ class ActiveController extends \yii\rest\ActiveController
      * @var array
      */
     public $serializer = [
-        'class'              => 'yii\rest\Serializer',
+        'class' => 'yii\rest\Serializer',
         'collectionEnvelope' => 'items',
     ];
 
@@ -38,7 +38,7 @@ class ActiveController extends \yii\rest\ActiveController
 
     public function behaviors()
     {
-        $behaviors                  = parent::behaviors();
+        $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => QueryParamAuth::class,
         ];

@@ -5,6 +5,7 @@ namespace tests\unit\rest\versions\shared\controllers;
 
 use PHPUnit\Framework\TestCase;
 use yii\filters\auth\QueryParamAuth;
+use yii\rest\OptionsAction;
 use yii\rest\Serializer;
 use yii\web\NotFoundHttpException;
 
@@ -18,9 +19,9 @@ class ActiveControllerTest extends TestCase
     {
         /* @var $mock \rest\versions\shared\controllers\ActiveController */
         $mock = $this->getMockBuilder(\rest\versions\shared\controllers\ActiveController::class)
-                     ->disableOriginalConstructor()
-                     ->setMethods(null)
-                     ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(null)
+            ->getMock();
 
         return $mock;
     }
@@ -48,7 +49,15 @@ class ActiveControllerTest extends TestCase
         $mock = $this->getMock();
 
         foreach ($mock->actions() as $action) {
-            $this->assertArrayHasKey('checkAccess', $action);
+            if ($action['class'] === OptionsAction::class) {
+                continue;
+            }
+            $this->assertArrayHasKey(
+                'checkAccess',
+                $action,
+                'There is at least one action that does not define a checkAccess function. Action was: ' . print_r($action,
+                    true)
+            );
             try {
                 call_user_func($action['checkAccess']);
             } catch (NotFoundHttpException $e) {
