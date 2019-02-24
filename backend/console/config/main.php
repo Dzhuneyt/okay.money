@@ -10,6 +10,9 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log', 'gii'],
     'controllerNamespace' => 'console\controllers',
+    'controllerMap' => [
+        'fixture' => \console\controllers\FixtureController::class,
+    ],
     'modules' => [
         'gii' => 'yii\gii\Module',
     ],

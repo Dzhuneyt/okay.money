@@ -79,6 +79,28 @@ class IndexActionTest extends FunctionalTestCase
         $this->deleteAccount($account->id); // Cleanup
     }
 
+    public function testAccountBalanceConsidersStartingBalance()
+    {
+        $account = $this->createAccount($this->baseUser->id);
+        $account->starting_balance = 5;
+        $account->save(false);
+
+        $this->createTransaction($account->id, 3);
+
+        $accounts = $this->apiCall(
+            'v1/accounts',
+            'GET'
+        );
+
+        foreach ($accounts['items'] as $singleApiResult) {
+            if ($singleApiResult['id'] == $account->id) {
+                $this->assertEquals(8, $singleApiResult['current_balance']);
+            }
+        }
+
+        $this->deleteAccount($account->id); // Cleanup
+    }
+
     protected function tearDown()
     {
         // Cleanup

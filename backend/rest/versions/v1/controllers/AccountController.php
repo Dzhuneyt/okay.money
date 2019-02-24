@@ -18,6 +18,9 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
     public function checkAccess($action, $model = null, $params = [])
     {
         switch ($action) {
+            case 'options':
+                return true;
+                break;
             case 'delete':
             case 'view':
                 // Prevent getting or deleting other people's accounts
@@ -40,12 +43,12 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
         $actions = ArrayHelper::merge(
             parent::actions(),
             [
-                'index' => [
-                    'class' => IndexAction::class,
+                'index'  => [
+                    'class'       => IndexAction::class,
                     'checkAccess' => null,
                 ],
                 'create' => [
-                    'class' => CreateAction::class,
+                    'class'       => CreateAction::class,
                     'checkAccess' => null,
                 ],
                 'delete' => [
@@ -58,7 +61,7 @@ class AccountController extends \rest\versions\shared\controllers\ActiveControll
                         return $this->checkAccess($action, $model, $params);
                     }
                 ],
-                'view' => [
+                'view'   => [
                     'checkAccess' => function ($action, $model = null, $params = []) {
                         return $this->checkAccess($action, $model, $params);
                     }

@@ -1,0 +1,10 @@
+:host {
+  display: block;
+  padding: 1em;
+}
+
+// Override the material design card title CSS because
+// by default it has some extra left spacing (expects always an avatar)
+::ng-deep mat-card-header .mat-card-header-text {
+  margin: 0 16px 0 0;
+}

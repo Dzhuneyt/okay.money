@@ -14,7 +14,7 @@ class UserController extends Controller
     /**
      * This method implemented to demonstrate the receipt of the token.
      * Do not use it on production systems.
-     * @return string AuthKey or model with errors
+     * @return array with 'auth_key' (string) or 'errors' (array)
      * @throws \yii\base\InvalidConfigException
      */
     public function actionLogin()
@@ -22,9 +22,13 @@ class UserController extends Controller
         $model = new Login();
 
         if ($model->load(\Yii::$app->getRequest()->getBodyParams(), '') && $model->login()) {
-            return \Yii::$app->user->identity->getAuthKey();
+            return [
+                'auth_key' => \Yii::$app->user->identity->getAuthKey()
+            ];
         } else {
-            return $model;
+            return [
+                'errors' => $model->getErrors()
+            ];
         }
     }
 

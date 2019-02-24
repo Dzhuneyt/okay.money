@@ -25,10 +25,14 @@ class ActiveController extends \yii\rest\ActiveController
         $actions = parent::actions();
 
         foreach ($actions as $i => $action) {
+            if ($i === 'options') {
+                continue;
+            }
             $actions[$i]['checkAccess'] = function () {
                 throw new NotFoundHttpException('Not implemented');
             };
         }
+
         return $actions;
     }
 

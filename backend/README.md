@@ -22,6 +22,36 @@
 
 `composer test-unit`
 
+
+#### Consuming fixtures inside a functional test
+Fixtures can be consumed (loaded and unloaded) inside functional test files as well. For example:
+
+    class MyTest extends tests\functional\FunctionalTestCase {
+    
+        public function fixtures()
+        {
+            // Define the fixtures that will be
+            // available for consuming in the scope
+            // of the current test file
+            return [
+                'account' => [
+                    'class' => AccountFixture::class,
+                ],
+            ];
+        }
+        
+        public function testSomeFunctionality(){
+            // Consume a fixture to test DB
+            $this->getFixture('account')->load();
+            
+            // SUT here
+
+            // Cleanup consumed fixture from test DB
+            $this->getFixture('account')->unload();
+        }
+    }
+
+
 ---
 
 ## Deploying to production
@@ -29,3 +59,19 @@ TBD
 
 ## Build status:
 [![CircleCI](https://circleci.com/gh/Dzhuneyt/Personal-Finance.svg?style=shield&circle-token=eabf99331ae05bba76733a2865a779f24fa5bb73)](https://circleci.com/gh/Dzhuneyt/Personal-Finance)
+
+
+## Miscellaneous
+
+### Using yii2-faker to create fixtures with sample data 
+
+Create a fixture for 15 fake users, 15 fake accounts, etc
+
+```php yii fixture/generate-all --count=15```
+
+The above command will generate the fixture "data" files (/tests/fixtures/data). Those files are not actually used until you decide to load them into the database.
+
+### Loading fixtures into the database for development purposes
+
+```php yii fixture/load "*"```
+
