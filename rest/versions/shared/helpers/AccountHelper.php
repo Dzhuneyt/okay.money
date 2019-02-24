@@ -24,15 +24,16 @@ class AccountHelper extends BaseObject
                                ->column();
 
         $accountBallances = (new Query())
-            ->select('account_id, SUM(sum) AS sum')
-            ->from(Transaction::tableName())
+            ->select('a.id, SUM(t.sum) AS sum')
+            ->from(['t'=>Transaction::tableName()])
+            ->innerJoin(['a'=>Account::tableName()], 'a.id=t.account_id')
             ->where(['account_id' => $myAccountIds])
-            ->groupBy('account_id')
+            ->groupBy('a.id')
             ->all();
 
         $findBallanceByAccountId = function ($accountId) use ($accountBallances) {
             foreach ($accountBallances as $ballanceRow) {
-                if ($ballanceRow['account_id'] == $accountId) {
+                if ($ballanceRow['id'] == $accountId) {
                     return floatval(number_format($ballanceRow['sum'], 2));
                 }
             }

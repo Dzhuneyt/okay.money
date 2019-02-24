@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use yii\base\Exception;
 use yii\db\Query;
 use yii\helpers\Json;
+use yii\test\FixtureTrait;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -20,6 +21,7 @@ use yii\web\UnauthorizedHttpException;
 
 class FunctionalTestCase extends TestCase
 {
+    use FixtureTrait;
 
     // The result of `php yii server`
     private $baseUrl = 'http://127.0.0.1:9009/';
