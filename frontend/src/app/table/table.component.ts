@@ -3,59 +3,61 @@ import {from, Observable} from "rxjs";
 import {take} from "rxjs/operators";
 
 export interface TableColumn {
-    code: string;
-    label: string;
+  code: string;
+  label: string;
 }
 
 export interface TablePaginationResponse {
-    items: any[],
-    totalCount: number,
+  items: any[],
+  totalCount: number,
 }
 
 @Component({
-    selector: 'app-table',
-    templateUrl: './table.component.html',
-    styleUrls: ['./table.component.scss']
+  selector: 'app-table',
+  templateUrl: './table.component.html',
+  styleUrls: ['./table.component.scss']
 })
 export class TableComponent implements OnInit {
 
-    public currentPageItems = [];
+  public currentPageItems = [];
 
-    @Input() displayedColumns: TableColumn[] = [];
-    @Input() pageSize: number = 20;
+  @Input() displayedColumns: TableColumn[] = [];
+  @Input() pageSize: number = 20;
 
-    public totalCount = 0;
+  public totalCount = 0;
 
-    constructor() {
-    }
+  public currentPage = 0;
 
-    get displayedColumnCodes() {
-        const items: string[] = [];
-        this.displayedColumns.forEach(tableColumn => {
-            items.push(tableColumn.code);
-        });
-        return items;
-    }
+  constructor() {
+  }
 
-    @Input() pagination: (page: number, pageSize: number) => Observable<TablePaginationResponse> = (pageToFetch: number) => {
-        console.log('Fetching page ' + pageToFetch + '. Not implemented');
-        return from([{
-            totalCount: 0,
-            items: []
-        }]);
-    };
+  get displayedColumnCodes() {
+    const items: string[] = [];
+    this.displayedColumns.forEach(tableColumn => {
+      items.push(tableColumn.code);
+    });
+    return items;
+  }
 
-    ngOnInit() {
-        this.goToPage(0);
-    }
+  @Input() pagination: (page: number, pageSize: number) => Observable<TablePaginationResponse> = (pageToFetch: number) => {
+    console.log('Fetching page ' + pageToFetch + '. Not implemented');
+    return from([{
+      totalCount: 0,
+      items: []
+    }]);
+  };
 
-    public goToPage(page: number) {
-        console.log(page);
-        this.pagination(page, this.pageSize)
-            .pipe(take(1))
-            .subscribe((res: TablePaginationResponse) => {
-                this.currentPageItems = res.items;
-                this.totalCount = res.totalCount;
-            });
-    }
+  ngOnInit() {
+    this.goToPage(0);
+  }
+
+  public goToPage(page: number) {
+    this.pagination(page, this.pageSize)
+      .pipe(take(1))
+      .subscribe((res: TablePaginationResponse) => {
+        this.currentPageItems = res.items;
+        this.totalCount = res.totalCount;
+        this.currentPage = page;
+      });
+  }
 }

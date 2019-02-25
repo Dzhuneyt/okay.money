@@ -3,6 +3,7 @@ import {BackendService} from "../backend.service";
 import {LocalStorage} from "@ngx-pwa/local-storage";
 import {MatSnackBar} from "@angular/material";
 import {Observable, Observer} from "rxjs";
+import {Router} from "@angular/router";
 
 @Component({
     selector: 'app-login',
@@ -17,9 +18,10 @@ export class LoginComponent implements OnInit {
     public showSpinner = false;
 
     constructor(
-        private backendService: BackendService,
-        private localStorage: LocalStorage,
-        private snackar: MatSnackBar,
+      private backendService: BackendService,
+      private localStorage: LocalStorage,
+      private snackar: MatSnackBar,
+      private router: Router,
     ) {
     }
 
@@ -53,6 +55,8 @@ export class LoginComponent implements OnInit {
                         this.snackar.open('Login successful');
 
                         // TODO redirect to homepage
+
+                      this.router.navigate(['/home']);
 
                         observer.next(true);
                         observer.complete();

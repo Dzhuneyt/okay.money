@@ -1,17 +1,24 @@
-<mat-table [dataSource]="currentPageItems">
+<mat-table *ngIf="currentPageItems.length" [dataSource]="currentPageItems">
 
-    <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column.code">
-        <mat-header-cell *matHeaderCellDef> {{column.label}} </mat-header-cell>
-        <mat-cell *matCellDef="let element" mat-cell> {{element[column.code]}} </mat-cell>
-    </ng-container>
+  <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column.code">
+    <mat-header-cell *matHeaderCellDef> {{column.label}} </mat-header-cell>
+    <mat-cell *matCellDef="let element" mat-cell> {{element[column.code]}} </mat-cell>
+  </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumnCodes"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumnCodes;"></mat-row>
+  <mat-header-row *matHeaderRowDef="displayedColumnCodes"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumnCodes;"></mat-row>
 </mat-table>
 
-<mat-paginator [length]="totalCount"
-               [pageSize]="pageSize"
-               [pageSizeOptions]="[]"
-               [hidePageSize]="true"
-               (page)="goToPage($event.pageIndex)">
+<div *ngIf="!currentPageItems.length">
+  No results
+</div>
+
+<!--Hide the pagination when there are no results on the first page -->
+<mat-paginator
+  *ngIf="!(currentPage===0 && !currentPageItems.length)"
+  [length]="totalCount"
+  [pageSize]="pageSize"
+  [pageSizeOptions]="[]"
+  [hidePageSize]="true"
+  (page)="goToPage($event.pageIndex)">
 </mat-paginator>

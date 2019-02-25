@@ -75,3 +75,14 @@ The above command will generate the fixture "data" files (/tests/fixtures/data).
 
 ```php yii fixture/load "*"```
 
+
+## Commands
+
+#### Create a user "demo" with password "password"
+`php yii user/create demo password`
+
+#### Get the auth key for the user with username "demo"
+`php yii user/get-auth-key demo`
+
+#### Delete a user with username "demo"
+`php yii user/delete demo`

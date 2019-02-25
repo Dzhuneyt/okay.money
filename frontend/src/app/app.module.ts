@@ -15,6 +15,8 @@ import {AccountsListComponent} from "./home/parts/accounts-list/accounts-list.co
 import {RouterModule, Routes} from "@angular/router";
 import {UiKitModule} from "./ui-kit/ui-kit.module";
 import {TransactionListComponent} from "./home/parts/transaction-list/transaction-list.component";
+import {AddAccountComponent} from "./home/parts/add-account/add-account.component";
+import {DialogService} from "./services/dialog.service";
 
 const routes: Routes = [
   {
@@ -33,6 +35,7 @@ const routes: Routes = [
     HomeComponent,
     LoginComponent,
     AccountsListComponent,
+    AddAccountComponent,
     TransactionListComponent,
   ],
   imports: [
@@ -49,6 +52,10 @@ const routes: Routes = [
   ],
   providers: [
     BackendService,
+    DialogService,
+  ],
+  entryComponents: [
+    AddAccountComponent,
   ],
   bootstrap: [AppComponent]
 })
