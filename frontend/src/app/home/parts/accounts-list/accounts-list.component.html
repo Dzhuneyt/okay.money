@@ -1,4 +1,6 @@
 <app-table
-        [displayedColumns]="displayedColumns"
-        [pagination]="rowFetchers"
+  #table
+  [displayedColumns]="displayedColumns"
+  [pageSize]="10"
+  [pagination]="rowFetchers"
 ></app-table>

@@ -1,54 +1,60 @@
-import {Component, OnInit} from '@angular/core';
-import {BackendService} from "../../../backend.service";
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {BackendService} from "../../../services/backend.service";
 import {map, take} from "rxjs/operators";
-import {TableColumn} from "../../../table/table.component";
+import {TableColumn, TableComponent} from "../../../table/table.component";
 
 @Component({
-    selector: 'app-accounts-list',
-    templateUrl: './accounts-list.component.html',
-    styleUrls: ['./accounts-list.component.scss']
+  selector: 'app-accounts-list',
+  templateUrl: './accounts-list.component.html',
+  styleUrls: ['./accounts-list.component.scss']
 })
 export class AccountsListComponent implements OnInit {
 
-    public displayedColumns: TableColumn[] = [
+  @ViewChild(TableComponent) table: TableComponent;
+
+  public displayedColumns: TableColumn[] = [
+    {
+      label: 'Name',
+      code: 'name',
+    },
+    {
+      label: 'Current balance',
+      code: 'current_balance',
+    }
+  ];
+
+  constructor(
+    private backend: BackendService,
+  ) {
+  }
+
+  public goToPage(page?: number) {
+    this.table.goToPage(page === null ? this.table.currentPage : page);
+  }
+
+  public rowFetchers = (page: number, pageSize: number) => {
+    return this.backend
+      .request(
+        'v1/accounts',
+        'get',
         {
-            label: 'Name',
-            code: 'name',
-        },
-        {
-            label: 'Current balance',
-            code: 'current_balance',
+          page: page,
+          page_size: pageSize,
         }
-    ];
+      )
+      .pipe(
+        take(1),
+        map(result => {
+          return {
+            items: result['items'],
+            totalCount: result['_meta']['totalCount']
+          }
+        })
+      );
+  };
 
-    constructor(
-        private backend: BackendService,
-    ) {
-    }
+  ngOnInit() {
 
-    public rowFetchers = (page: number, pageSize: number) => {
-        return this.backend
-            .request(
-                'v1/accounts',
-                'get',
-                {
-                    page: page,
-                    page_size: pageSize,
-                }
-            )
-            .pipe(
-                take(1),
-                map(result => {
-                    return {
-                        items: result['items'],
-                        totalCount: result['_meta']['totalCount']
-                    }
-                })
-            );
-    };
-
-    ngOnInit() {
-
-    }
+  }
 
 }

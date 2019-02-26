@@ -2,17 +2,17 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {LoginComponent} from './login.component';
 import {
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
-    MatSnackBar,
-    MatSnackBarModule
+  MatCardModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatProgressSpinnerModule,
+  MatSnackBar,
+  MatSnackBarModule
 } from "@angular/material";
 import {FormsModule} from "@angular/forms";
 import {HttpClientTestingModule} from "@angular/common/http/testing";
 import {NoopAnimationsModule} from "@angular/platform-browser/animations";
-import {BackendService} from "../backend.service";
+import {BackendService} from "../services/backend.service";
 import {from} from "rxjs";
 import {LocalStorage} from "@ngx-pwa/local-storage";
 
