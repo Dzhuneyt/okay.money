@@ -31,8 +31,16 @@ class RestModule extends Module implements BootstrapInterface
                     'OPTIONS <action:\w+>' => 'options',
                 ],
             ],
-            "OPTIONS {$moduleId}/user/login" => 'v1/user/login',
-            'POST user/login' => 'user/login',
+            [
+                'class' => 'yii\rest\UrlRule',
+                'pluralize' => false,
+                'controller' => [
+                    $moduleId . '/user',
+                ],
+                'extraPatterns' => [
+                    'POST login' => 'login',
+                ],
+            ],
         ]);
 
 //        var_dump($app->getUrlManager()->rules);

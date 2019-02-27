@@ -162,6 +162,11 @@ class FunctionalTestCase extends TestCase
                 $result,
                 'Preflight request returned some body'
             );
+            $this->assertEquals(
+                200,
+                $this->lastApiCallHttpResponseCode,
+                'Preflight request returned a bad HTTP code: ' . $path
+            );
         } catch (Exception $exception) {
             $this->fail('Failed making a preflight request for path: ' . $path . '. Error: ' . $exception->getMessage());
         }
