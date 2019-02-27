@@ -25,6 +25,7 @@ class RestModule extends Module implements BootstrapInterface
                     $moduleId . '/transaction',
                     $moduleId . '/category',
                     $moduleId . '/stats',
+                    $moduleId . '/user',
                 ],
                 'extraPatterns' => [
                     'GET by_category' => 'by_category',
@@ -39,6 +40,7 @@ class RestModule extends Module implements BootstrapInterface
                 ],
                 'extraPatterns' => [
                     'POST login' => 'login',
+                    'OPTIONS <action:\w+>' => 'options',
                 ],
             ],
         ]);

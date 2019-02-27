@@ -65,15 +65,19 @@ TBD
 
 ### Using yii2-faker to create fixtures with sample data 
 
-Create a fixture for 15 fake users, 15 fake accounts, etc
+    php yii fixture/generate user --count=15
+    php yii fixture/generate category --count=1500 // Will distribute them randomly across users when loaded to DB
+    php yii fixture/generate account --count=1500 // Will distribute them randomly across users when loaded to DB
+    php yii fixture/generate transaction --count=3000 // Will distribute them randomly across users, accounts and categories
 
-```php yii fixture/generate-all --count=15```
-
-The above command will generate the fixture "data" files (/tests/fixtures/data). Those files are not actually used until you decide to load them into the database.
+The above command will generate the fixture "data" files (/fixtures/data). Those files are not actually used until you decide to load them into the database.
 
 ### Loading fixtures into the database for development purposes
 
-```php yii fixture/load "*"```
+    php yii fixture/load "User"
+    php yii fixture/load "Category"
+    php yii fixture/load "Account"
+    php yii fixture/load "Transaction"
 
 
 ## Commands

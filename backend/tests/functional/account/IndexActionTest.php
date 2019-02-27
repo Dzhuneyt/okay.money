@@ -79,6 +79,28 @@ class IndexActionTest extends FunctionalTestCase
         $this->deleteAccount($account->id); // Cleanup
     }
 
+    public function testAccountListingReturnsRoundedValues()
+    {
+        $RANDOM_FLOAT = 3.456789012345;
+        $RANDOM_STARTING_BALANCE = 1.23456;
+        $ROUNDED_FLOAT = $RANDOM_FLOAT + $RANDOM_STARTING_BALANCE;
+
+        Account::deleteAll();
+        $account = $this->createAccount($this->baseUser->id);
+        $account->starting_balance = 1.23456;
+        $account->save(false);
+
+        $this->createTransaction($account->id, $RANDOM_FLOAT);
+        $accounts = $this->apiCall(
+            'v1/accounts',
+            'GET'
+        );
+        $this->assertEquals(
+            number_format($ROUNDED_FLOAT, 2),
+            $accounts['items'][0]['current_balance']
+        );
+    }
+
     public function testAccountBalanceConsidersStartingBalance()
     {
         $account = $this->createAccount($this->baseUser->id);

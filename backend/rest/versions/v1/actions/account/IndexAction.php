@@ -34,29 +34,30 @@ class IndexAction extends \yii\rest\IndexAction
 
         $accountsBaseQuery = Account::find()
             // Get only the accounts of the current user
-                                    ->andWhere(['owner_id' => $idUser]);
+            ->andWhere(['owner_id' => $idUser]);
 
         $accountBallances = $this
             ->accountHelper
             ->getAccountBalancesByUser($idUser);
 
         return Yii::createObject([
-            'class'        => BaseDataProvider::class,
+            'class' => BaseDataProvider::class,
             'rowFormatter' => function ($row) use ($accountBallances) {
                 $row = $row->toArray();
                 unset($row['owner_id']);
 
                 if (isset($accountBallances[$row['id']])) {
-                    $row['current_balance'] = floatval($row['starting_balance']) + $accountBallances[$row['id']];
+                    $row['current_balance'] = number_format(floatval($row['starting_balance']) + $accountBallances[$row['id']],
+                        2);
                 }
 
                 return $row;
             },
-            'query'        => $accountsBaseQuery,
-            'pagination'   => [
+            'query' => $accountsBaseQuery,
+            'pagination' => [
                 'params' => $requestParams,
             ],
-            'sort'         => [
+            'sort' => [
                 'params' => $requestParams,
             ],
         ]);
