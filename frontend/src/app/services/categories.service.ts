@@ -31,12 +31,7 @@ export class CategoriesService {
    * @param idCategory
    */
   public getName(idCategory: number) {
-    return this.getList().pipe(
-      map(
-        categories => categories.find(
-          cat => cat['id'] === idCategory
-        )
-      ),
+    return this.backend.request('v1/categories/' + idCategory, 'GET').pipe(
       map(
         category => category['name']
       )

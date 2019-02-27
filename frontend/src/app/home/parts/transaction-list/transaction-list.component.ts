@@ -20,6 +20,10 @@ export class TransactionListComponent implements OnInit {
     {
       label: 'Category',
       code: 'category_name',
+    },
+    {
+      label: 'Description',
+      code: 'description',
     }
   ];
 
