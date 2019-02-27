@@ -2,7 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {LocalStorage} from "@ngx-pwa/local-storage";
-import {flatMap} from "rxjs/operators";
+import {catchError, flatMap} from "rxjs/operators";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ export class BackendService {
   constructor(
     private http: HttpClient,
     private localStorage: LocalStorage,
+    private router: Router,
   ) {
   }
 
@@ -28,7 +30,16 @@ export class BackendService {
         return this.http.request(method, absoluteUrl, {
           body: bodyParams,
           params: queryParams,
-        });
+        }).pipe(
+          catchError(err => {
+            console.log(err);
+            if (err.status === 401) {
+              // Unauthorized
+              this.router.navigate(['/login']);
+            }
+            throw err;
+          })
+        );
       }));
   }
 }
