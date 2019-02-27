@@ -4,6 +4,7 @@ namespace rest\versions\shared\controllers;
 
 
 use yii\filters\auth\QueryParamAuth;
+use yii\filters\Cors;
 use yii\web\NotFoundHttpException;
 
 class ActiveController extends \yii\rest\ActiveController
@@ -44,6 +45,9 @@ class ActiveController extends \yii\rest\ActiveController
             'except' => [
                 'options'
             ]
+        ];
+        $behaviors['cors'] = [
+            'class' => Cors::class,
         ];
 
         return $behaviors;
