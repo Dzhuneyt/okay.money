@@ -56,4 +56,9 @@ class IndexActionTest extends FunctionalTestCase
         $this->deleteUser($stranger->id); // Cleanup
     }
 
+    public function testPreflight()
+    {
+        $this->assertPreflightrequest('v1/categories');
+    }
+
 }

@@ -41,6 +41,9 @@ class ActiveController extends \yii\rest\ActiveController
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => QueryParamAuth::class,
+            'except' => [
+                'options'
+            ]
         ];
 
         return $behaviors;

@@ -10,7 +10,7 @@ $params = array_merge(
 return [
     'id'         => 'rest-api',
     'basePath'   => dirname(__DIR__),
-    'bootstrap'  => ['log'],
+    'bootstrap' => ['log', 'v1'],
     'modules'    => [
         'v1' => [
             'class' => 'rest\versions\v1\RestModule'
@@ -48,28 +48,9 @@ return [
             ],
         ],
         'urlManager' => [
-            'enablePrettyUrl'     => true,
+            'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
-            'showScriptName'      => false,
-            'rules'               => [
-                [
-                    'class'         => 'yii\rest\UrlRule',
-                    'controller'    => [
-                        'v1/account',
-                        'v1/transaction',
-                        'v1/category',
-                        'v1/stats',
-//                        'v2/post',
-                    ],
-                    'extraPatterns' => [
-                        'GET by_category' => 'by_category'
-                    ],
-                ],
-                'OPTIONS v1/user/login' => 'v1/user/login',
-                'POST v1/user/login'    => 'v1/user/login',
-                'POST v2/user/login'    => 'v2/user/login',
-                'OPTIONS v2/user/login' => 'v2/user/login',
-            ],
+            'showScriptName' => false,
         ],
     ],
     'params'     => $params,

@@ -36,6 +36,11 @@ class ByCategoryActionTest extends FunctionalTestCase
         $this->assertArrayHasKey('categories', $result);
     }
 
+    public function testPreflight()
+    {
+        $this->assertPreflightrequest('v1/stats/by_category');
+    }
+
     /**
      * @throws \yii\base\Exception
      * @throws \yii\web\ForbiddenHttpException
@@ -47,9 +52,9 @@ class ByCategoryActionTest extends FunctionalTestCase
     {
 
         // Prerequisites. Prepare fake data
-        $stranger         = $this->createUser();
+        $stranger = $this->createUser();
         $strangerCategory = $this->createCategory($stranger->id);
-        $strangerAccount  = $this->createAccount($stranger->id);
+        $strangerAccount = $this->createAccount($stranger->id);
         $this->createTransaction($strangerAccount->id, null, $strangerCategory->id);
         $this->createTransaction($strangerAccount->id, null, $strangerCategory->id);
         $this->createTransaction($strangerAccount->id, null, $strangerCategory->id);
@@ -64,9 +69,9 @@ class ByCategoryActionTest extends FunctionalTestCase
 
         // Assertions
         $myCategoriesIds = Category::find()
-                                   ->select('id')
-                                   ->andWhere(['owner_id' => $this->baseUser->id])
-                                   ->column();
+            ->select('id')
+            ->andWhere(['owner_id' => $this->baseUser->id])
+            ->column();
 
         foreach ($result['categories'] as $category) {
             $this->assertTrue(
@@ -192,36 +197,36 @@ class ByCategoryActionTest extends FunctionalTestCase
 
     public function testFilterStartDate()
     {
-        $SUM_INCLUDED_IN_FILTER   = 3 + 3 + 3;
+        $SUM_INCLUDED_IN_FILTER = 3 + 3 + 3;
         $SUM_EXCLUDED_FROM_FILTER = 18;
 
-        $account  = $this->createAccount($this->baseUser->id);
+        $account = $this->createAccount($this->baseUser->id);
         $category = $this->createCategory($this->baseUser->id);
 
         // Create a transaction that is some time before the filtered "start_date"
         // This transaction should be EXCLUDED from the API response
-        $transactionBefore             = $this->createTransaction($account->id, $SUM_EXCLUDED_FROM_FILTER,
+        $transactionBefore = $this->createTransaction($account->id, $SUM_EXCLUDED_FROM_FILTER,
             $category->id);
         $transactionBefore->created_at = new Expression('UNIX_TIMESTAMP("2018-01-01 05:59:57")');
         $transactionBefore->save(false);
-        $transactionBefore             = $this->createTransaction($account->id, $SUM_EXCLUDED_FROM_FILTER,
+        $transactionBefore = $this->createTransaction($account->id, $SUM_EXCLUDED_FROM_FILTER,
             $category->id);
         $transactionBefore->created_at = new Expression('UNIX_TIMESTAMP("2018-01-01 05:59:58")');
         $transactionBefore->save(false);
-        $transactionBefore             = $this->createTransaction($account->id, $SUM_EXCLUDED_FROM_FILTER,
+        $transactionBefore = $this->createTransaction($account->id, $SUM_EXCLUDED_FROM_FILTER,
             $category->id);
         $transactionBefore->created_at = new Expression('UNIX_TIMESTAMP("2018-01-01 05:59:59")');
         $transactionBefore->save(false);
 
         // Create a transaction that is some time after the filtered "start_date"
         // This transaction should be INCLUDED in the API response
-        $transactionAfter             = $this->createTransaction($account->id, 3, $category->id);
+        $transactionAfter = $this->createTransaction($account->id, 3, $category->id);
         $transactionAfter->created_at = new Expression('UNIX_TIMESTAMP("2018-01-01 06:00:01")');
         $transactionAfter->save(false);
-        $transactionAfter             = $this->createTransaction($account->id, 3, $category->id);
+        $transactionAfter = $this->createTransaction($account->id, 3, $category->id);
         $transactionAfter->created_at = new Expression('UNIX_TIMESTAMP("2018-01-01 06:00:02")');
         $transactionAfter->save(false);
-        $transactionAfter             = $this->createTransaction($account->id, 3, $category->id);
+        $transactionAfter = $this->createTransaction($account->id, 3, $category->id);
         $transactionAfter->created_at = new Expression('UNIX_TIMESTAMP("2018-01-01 06:00:03")');
         $transactionAfter->save(false);
 
@@ -245,16 +250,16 @@ class ByCategoryActionTest extends FunctionalTestCase
      */
     public function testFilterEndDate()
     {
-        $INCOMES_IN_DATE_RANGE      = 99;
-        $EXPENSES_IN_DATE_RANGE     = -13;
+        $INCOMES_IN_DATE_RANGE = 99;
+        $EXPENSES_IN_DATE_RANGE = -13;
         $INCOMES_OUTSIDE_DATE_RANGE = 15;
 
-        $account  = $this->createAccount($this->baseUser->id);
+        $account = $this->createAccount($this->baseUser->id);
         $category = $this->createCategory($this->baseUser->id);
 
         // Create a transaction that is some time before the filtered "end_date"
         // This transaction should be INCLUDED from the API response
-        $transactionInRange             = $this->createTransaction(
+        $transactionInRange = $this->createTransaction(
             $account->id,
             $INCOMES_IN_DATE_RANGE,
             $category->id
@@ -262,7 +267,7 @@ class ByCategoryActionTest extends FunctionalTestCase
         $transactionInRange->created_at = new Expression('UNIX_TIMESTAMP("2018-01-01 05:59:57")');
         $transactionInRange->save(false);
 
-        $transactionInRange             = $this->createTransaction(
+        $transactionInRange = $this->createTransaction(
             $account->id,
             $EXPENSES_IN_DATE_RANGE,
             $category->id
@@ -272,7 +277,7 @@ class ByCategoryActionTest extends FunctionalTestCase
 
         // Create a transaction that is some time after the filtered "end_date"
         // This transaction should be EXCLUDED in the API response
-        $transactionOutsideRange             = $this->createTransaction(
+        $transactionOutsideRange = $this->createTransaction(
             $account->id,
             $INCOMES_OUTSIDE_DATE_RANGE,
             $category->id);
@@ -305,11 +310,11 @@ class ByCategoryActionTest extends FunctionalTestCase
     {
         $SUM_INCLUDED_IN_FILTER = 99.99;
 
-        $account  = $this->createAccount($this->baseUser->id);
+        $account = $this->createAccount($this->baseUser->id);
         $category = $this->createCategory($this->baseUser->id);
 
         // Create a transaction that is between the filtered timestamps (will be considered in API response)
-        $transactionInsideRange             = $this->createTransaction(
+        $transactionInsideRange = $this->createTransaction(
             $account->id,
             $SUM_INCLUDED_IN_FILTER,
             $category->id
@@ -319,7 +324,7 @@ class ByCategoryActionTest extends FunctionalTestCase
 
         // Create some more transactions that are outside of the filtered date range
         for ($i = 0; $i < 3; $i++) {
-            $transactionOutsideRange             = $this->createTransaction(
+            $transactionOutsideRange = $this->createTransaction(
                 $account->id,
                 null, // Random amount
                 $category->id);
@@ -328,7 +333,7 @@ class ByCategoryActionTest extends FunctionalTestCase
             $transactionOutsideRange->save(false);
         }
         for ($i = 0; $i < 3; $i++) {
-            $transactionOutsideRange             = $this->createTransaction(
+            $transactionOutsideRange = $this->createTransaction(
                 $account->id,
                 null, // Random amount
                 $category->id);
@@ -341,7 +346,7 @@ class ByCategoryActionTest extends FunctionalTestCase
         $results = $this->apiCall('v1/stats/by_category', 'GET', [
             // Include transactions only between 5 and 6 am
             'start_date' => '2018-01-01 05:00:00',
-            'end_date'   => '2018-01-01 06:00:00',
+            'end_date' => '2018-01-01 06:00:00',
         ]);
 
         foreach ($results['categories'] as $result) {
@@ -365,7 +370,7 @@ class ByCategoryActionTest extends FunctionalTestCase
      */
     private function _seedSomeTransactionsInAccount(): Category
     {
-        $myAccount  = $this->createAccount($this->baseUser->id);
+        $myAccount = $this->createAccount($this->baseUser->id);
         $myCategory = $this->createCategory($this->baseUser->id);
         $this->createTransaction($myAccount->id, -3, $myCategory->id);
         $this->createTransaction($myAccount->id, -5, $myCategory->id);

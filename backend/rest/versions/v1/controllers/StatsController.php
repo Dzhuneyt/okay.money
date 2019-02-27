@@ -6,6 +6,7 @@ namespace rest\versions\v1\controllers;
 use rest\versions\v1\actions\stats\ByCategoryAction;
 use yii\filters\auth\QueryParamAuth;
 use yii\rest\Controller;
+use yii\rest\OptionsAction;
 
 class StatsController extends Controller
 {
@@ -16,6 +17,9 @@ class StatsController extends Controller
             'by_category' => [
                 'class' => ByCategoryAction::class,
             ],
+            'options' => [
+                'class' => OptionsAction::class,
+            ],
         ];
     }
 
@@ -24,6 +28,9 @@ class StatsController extends Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => QueryParamAuth::class,
+            'except' => [
+                'options'
+            ]
         ];
 
         return $behaviors;

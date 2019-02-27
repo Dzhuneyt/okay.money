@@ -101,6 +101,11 @@ class IndexActionTest extends FunctionalTestCase
         $this->deleteAccount($account->id); // Cleanup
     }
 
+    public function testPreflight()
+    {
+        $this->assertPreflightrequest('v1/accounts');
+    }
+
     protected function tearDown()
     {
         // Cleanup
