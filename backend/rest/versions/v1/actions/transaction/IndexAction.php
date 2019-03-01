@@ -91,6 +91,9 @@ class IndexAction extends \yii\rest\IndexAction
                 'params' => $requestParams,
             ],
             'sort' => [
+                'defaultOrder' => [
+                    'created_at' => SORT_DESC
+                ],
                 'params' => $requestParams,
             ],
         ]);
