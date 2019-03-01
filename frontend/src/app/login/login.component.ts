@@ -6,70 +6,74 @@ import {Observable, Observer} from "rxjs";
 import {Router} from "@angular/router";
 
 @Component({
-    selector: 'app-login',
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.scss']
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
 
-    username: string;
-    password: string;
+  username: string;
+  password: string;
 
-    public showSpinner = false;
+  public showSpinner = false;
 
-    constructor(
-      private backendService: BackendService,
-      private localStorage: LocalStorage,
-      private snackar: MatSnackBar,
-      private router: Router,
-    ) {
-    }
+  constructor(
+    private backendService: BackendService,
+    private localStorage: LocalStorage,
+    private snackar: MatSnackBar,
+    private router: Router,
+  ) {
+  }
 
-    ngOnInit() {
-    }
+  ngOnInit() {
+  }
 
-    login(): Observable<boolean> {
-        return Observable.create((observer: Observer<boolean>) => {
-            this.showSpinner = true;
-            this.backendService
-                .request('v1/user/login', 'post', {}, {
-                    username: this.username,
-                    password: this.password,
-                })
-                .subscribe(result => {
-                    console.log('Login success');
-                    this.showSpinner = false;
+  login(): Observable<boolean> {
+    return Observable.create((observer: Observer<boolean>) => {
+      this.showSpinner = true;
+      this.backendService
+        .request('v1/user/login', 'post', {}, {
+          username: this.username,
+          password: this.password,
+        })
+        .subscribe(result => {
+          console.log('Login success');
+          this.showSpinner = false;
 
-                    if (result.hasOwnProperty('errors')) {
-                        console.error('Login failed with errors', result);
-                        this.snackar.open('Login failed');
+          if (result.hasOwnProperty('errors')) {
+            console.error('Login failed with errors', result);
+            this.snackar.open('Login failed');
 
-                        observer.next(false);
-                        observer.complete();
+            observer.next(false);
+            observer.complete();
 
-                        return;
-                    }
+            return;
+          }
 
-                    const authKey = result['auth_key'];
-                    this.localStorage.setItem('auth_key', authKey).subscribe(() => {
-                        this.snackar.open('Login successful');
+          const authKey = result['auth_key'];
+          this.localStorage.setItem('auth_key', authKey).subscribe(() => {
+            this.snackar.open('Login successful', null, {
+              duration: 1000,
+            });
 
-                        // TODO redirect to homepage
+            // TODO redirect to homepage
 
-                      this.router.navigate(['/home']);
+            this.router.navigate(['/home']);
 
-                        observer.next(true);
-                        observer.complete();
-                    });
-                }, (result) => {
-                    console.error('Login failed with errors', result);
-                    this.snackar.open('Login failed');
-                    this.showSpinner = false;
+            observer.next(true);
+            observer.complete();
+          });
+        }, (result) => {
+          console.error('Login failed with errors', result);
+          this.snackar.open('Login failed', null, {
+            duration: 1000,
+          });
+          this.showSpinner = false;
 
-                    observer.next(false);
-                    observer.complete();
-                });
+          observer.next(false);
+          observer.complete();
         });
-    }
+    });
+  }
 
 }

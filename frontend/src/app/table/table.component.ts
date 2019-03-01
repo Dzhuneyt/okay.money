@@ -2,9 +2,15 @@ import {Component, Input, OnInit} from '@angular/core';
 import {from, Observable} from "rxjs";
 import {take} from "rxjs/operators";
 
+export enum TableColumnType {
+  standard = "standard", // default
+  dateTime = "datetime",
+}
+
 export interface TableColumn {
   code: string;
   label: string;
+  type?: TableColumnType
 }
 
 export interface TablePaginationResponse {

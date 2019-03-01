@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {TableColumn} from "../../../table/table.component";
+import {TableColumn, TableColumnType} from "../../../table/table.component";
 import {concatMap, map} from "rxjs/operators";
 import {BackendService} from "../../../services/backend.service";
 import {CategoriesService} from "../../../services/categories.service";
@@ -14,6 +14,11 @@ export class TransactionListComponent implements OnInit {
 
   public displayedColumns: TableColumn[] = [
     {
+      label: 'Date',
+      code: 'created_at',
+      type: TableColumnType.dateTime,
+    },
+    {
       label: 'Amount',
       code: 'sum',
     },
@@ -24,7 +29,7 @@ export class TransactionListComponent implements OnInit {
     {
       label: 'Description',
       code: 'description',
-    }
+    },
   ];
 
   constructor(
@@ -45,6 +50,7 @@ export class TransactionListComponent implements OnInit {
         {
           page: page,
           page_size: pageSize,
+          sort: '-created_at'
         }
       )
       .pipe(
@@ -58,6 +64,9 @@ export class TransactionListComponent implements OnInit {
           return Observable.create(observer => {
             const observables = [];
             items.forEach(item => {
+              // Convert ot JS suitable date object
+              item['created_at'] = parseInt(item['created_at'] + `000`, 10);
+
               observables.push(this.categories
                 .getName(item['category_id']).pipe(map(a => {
                   item['category_name'] = a;
