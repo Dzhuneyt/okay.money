@@ -19,49 +19,51 @@ import {AddAccountComponent} from "./home/parts/add-account/add-account.componen
 import {DialogService} from "./services/dialog.service";
 import {AccountsService} from "./services/accounts.service";
 import {CategoriesService} from "./services/categories.service";
+import {ChartsModule} from "ng2-charts";
 
 const routes: Routes = [
-  {
-    path: 'login',
-    component: LoginComponent,
-  },
-  {
-    path: 'home',
-    component: HomeComponent,
-  }
+    {
+        path: 'login',
+        component: LoginComponent,
+    },
+    {
+        path: 'home',
+        component: HomeComponent,
+    }
 ];
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    LoginComponent,
-    AccountsListComponent,
-    AddAccountComponent,
-    TransactionListComponent,
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    FlexLayoutModule,
-    HttpClientModule,
-    RouterModule.forRoot(routes),
-    BrowserAnimationsModule,
-    MaterialComponentsModule,
-    UiKitModule,
+    declarations: [
+        AppComponent,
+        HomeComponent,
+        LoginComponent,
+        AccountsListComponent,
+        AddAccountComponent,
+        TransactionListComponent,
+    ],
+    imports: [
+        BrowserModule,
+        FormsModule,
+        FlexLayoutModule,
+        HttpClientModule,
+        RouterModule.forRoot(routes),
+        BrowserAnimationsModule,
+        MaterialComponentsModule,
+        ChartsModule,
+        UiKitModule,
 
-    HeaderModule,
-  ],
-  providers: [
-    BackendService,
-    DialogService,
-    AccountsService,
-    CategoriesService,
-  ],
-  entryComponents: [
-    AddAccountComponent,
-  ],
-  bootstrap: [AppComponent]
+        HeaderModule,
+    ],
+    providers: [
+        BackendService,
+        DialogService,
+        AccountsService,
+        CategoriesService,
+    ],
+    entryComponents: [
+        AddAccountComponent,
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 }
