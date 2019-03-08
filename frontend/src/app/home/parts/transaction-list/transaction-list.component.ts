@@ -1,9 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {TableColumn, TableColumnType} from "../../../table/table.component";
-import {concatMap, map} from "rxjs/operators";
+import {map} from "rxjs/operators";
 import {BackendService} from "../../../services/backend.service";
 import {CategoriesService} from "../../../services/categories.service";
-import {forkJoin, Observable} from "rxjs";
 
 @Component({
   selector: 'app-transaction-list',
@@ -60,24 +59,12 @@ export class TransactionListComponent implements OnInit {
           return apiResult;
         }),
         map(apiResult => apiResult['items']),
-        concatMap(items => {
-          return Observable.create(observer => {
-            const observables = [];
-            items.forEach(item => {
-              // Convert ot JS suitable date object
-              item['created_at'] = parseInt(item['created_at'] + `000`, 10);
-
-              observables.push(this.categories
-                .getName(item['category_id']).pipe(map(a => {
-                  item['category_name'] = a;
-                })));
-            });
-
-            return forkJoin(observables).subscribe(() => {
-              observer.next(items);
-              observer.complete();
-            })
+          map(items => {
+              items.forEach(item => {
+                  item['created_at'] = parseInt(item['created_at'] + `000`, 10);
+                  item['category_name'] = item['category']['name'];
           });
+              return items;
         }),
         map(items => {
           return {

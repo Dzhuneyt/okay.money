@@ -49,10 +49,10 @@ class IndexActionTest extends FunctionalTestCase
     public function testCanListOnlyMyTransactions()
     {
         // Prepare 1 "my" transaction and 1 "other guy" transaction
-        $otherGuy = $this->createUser();
+        $otherGuy        = $this->createUser();
         $otherGuyAccount = $this->createAccount($otherGuy->id);
 
-        $myTransaction = $this->createTransaction($this->account->id);
+        $myTransaction        = $this->createTransaction($this->account->id);
         $otherGuysTransaction = $this->createTransaction($otherGuyAccount->id);
 
         // SUT
@@ -108,8 +108,8 @@ class IndexActionTest extends FunctionalTestCase
 
     public function testTypeFilterReturnsCorrectlyExpensesOnly()
     {
-        $idAccount = $this->account->id;
-        $tmpTransactions = [];
+        $idAccount         = $this->account->id;
+        $tmpTransactions   = [];
         $tmpTransactions[] = $this->createTransaction($idAccount, -5);
         $tmpTransactions[] = $this->createTransaction($idAccount, 1);
         $tmpTransactions[] = $this->createTransaction($idAccount, 99);
@@ -135,8 +135,8 @@ class IndexActionTest extends FunctionalTestCase
 
     public function testTypeFilterReturnsCorrectlyIncomesOnly()
     {
-        $idAccount = $this->account->id;
-        $tmpTransactions = [];
+        $idAccount         = $this->account->id;
+        $tmpTransactions   = [];
         $tmpTransactions[] = $this->createTransaction($idAccount, -5);
         $tmpTransactions[] = $this->createTransaction($idAccount, 1);
         $tmpTransactions[] = $this->createTransaction($idAccount, 99);
@@ -177,9 +177,9 @@ class IndexActionTest extends FunctionalTestCase
     {
         // Make sure there is some valid data to be
         // returned by the API... generally
-        $account1 = $this->createAccount($this->baseUser->id);
+        $account1     = $this->createAccount($this->baseUser->id);
         $transaction1 = $this->createTransaction($account1->id, 5);
-        $account2 = $this->createAccount($this->baseUser->id);
+        $account2     = $this->createAccount($this->baseUser->id);
         $transaction2 = $this->createTransaction($account2->id, 5);
 
         // SUT
@@ -207,13 +207,13 @@ class IndexActionTest extends FunctionalTestCase
 
     public function testAccountIdsFilterWithNotOwnedAccountIdsError()
     {
-        $account1 = $this->createAccount($this->baseUser->id);
+        $account1     = $this->createAccount($this->baseUser->id);
         $transaction1 = $this->createTransaction($account1->id, 5);
-        $account2 = $this->createAccount($this->baseUser->id);
+        $account2     = $this->createAccount($this->baseUser->id);
         $transaction2 = $this->createTransaction($account2->id, 5);
 
-        $stranger = $this->createUser();
-        $strangerAccount = $this->createAccount($stranger->id);
+        $stranger            = $this->createUser();
+        $strangerAccount     = $this->createAccount($stranger->id);
         $strangerTransaction = $this->createTransaction($strangerAccount->id);
 
         // SUT
@@ -288,6 +288,45 @@ class IndexActionTest extends FunctionalTestCase
     public function testPreflight()
     {
         $this->assertPreflightrequest('v1/transactions');
+    }
+
+    public function testListingReturnsAccountNames()
+    {
+        $account = $this->createAccount($this->baseUser->id);
+        $this->createTransaction($account->id, 5);
+        $this->createTransaction($account->id, 5);
+        $this->createTransaction($account->id, 5);
+
+        $items = $this->apiCall(
+            'v1/transactions',
+            'GET',
+            [
+                'account_ids' => [
+                    $account->id,
+                ]
+            ]
+        );
+
+        foreach ($items['items'] as $item) {
+            $this->assertEquals($account->name, $item['account']['name']);
+        }
+    }
+
+    public function testListingReturnsAccountNames2()
+    {
+        $category = $this->createCategory($this->baseUser->id);
+        $this->createTransaction($this->account->id, 5, $category->id);
+        $this->createTransaction($this->account->id, 5, $category->id);
+        $this->createTransaction($this->account->id, 5, $category->id);
+
+        $items = $this->apiCall(
+            'v1/transactions',
+            'GET'
+        );
+
+        foreach ($items['items'] as $item) {
+            $this->assertEquals($category->name, $item['category']['name']);
+        }
     }
 
 }
