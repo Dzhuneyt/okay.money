@@ -267,7 +267,7 @@ class IndexActionTest extends FunctionalTestCase
         );
         foreach ($items['items'] as $item) {
             $this->assertTrue(
-                in_array($item['account_id'], [$account1->id, $account2->id]),
+                in_array($item['account']['id'], [$account1->id, $account2->id]),
                 'Filtering by "account_id" - transactions from other accounts were returned'
             );
         }
