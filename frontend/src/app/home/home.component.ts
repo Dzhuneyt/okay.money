@@ -5,7 +5,7 @@ import {AddAccountComponent} from "./parts/add-account/add-account.component";
 import {DialogService} from "../services/dialog.service";
 import {AccountsListComponent} from "./parts/accounts-list/accounts-list.component";
 import {CategoriesService} from "../services/categories.service";
-import {ChartDataSets, ChartOptions} from "chart.js";
+import {ChartData, ChartDataSets, ChartOptions} from "chart.js";
 
 interface Account {
     id?: number;
@@ -48,6 +48,9 @@ export class HomeComponent implements OnInit {
     public statsByCategoryPeriod = 'weekly';
     private categoryInfos: CategoryStats[] = [];
 
+    public categoryStatsDataSetsProp: ChartDataSets[] = [];
+    public categoryLabels = [];
+
     constructor(
         private backend: BackendService,
         private MatDialog: MatDialog,
@@ -58,7 +61,7 @@ export class HomeComponent implements OnInit {
     ) {
     }
 
-    get categoryStatsDataSets(): ChartDataSets[] {
+    categoryStatsDataSets(): ChartDataSets[] {
         const expenses = this.categoryInfos.map(elem => elem.expense_for_period);
         const incomes = this.categoryInfos.map(elem => elem.income_for_period);
         return [
@@ -73,7 +76,7 @@ export class HomeComponent implements OnInit {
         ];
     }
 
-    get categoryStatsLabels() {
+    categoryStatsLabels() {
         return this.categoryInfos.map(elem => elem.name ? elem.name : elem.id);
     }
 
@@ -108,6 +111,8 @@ export class HomeComponent implements OnInit {
                     cat['name'] = foundCategory['name'];
                     return cat;
                 });
+                this.categoryStatsDataSetsProp = this.categoryStatsDataSets();
+                this.categoryLabels = this.categoryStatsLabels();
                 this.elementRef.detectChanges();
             });
         });

@@ -35,10 +35,10 @@
             </mat-form-field>
         </mat-card-header>
         <mat-card-content>
-            <canvas *ngIf="categoryStatsLabels.length>0"
+            <canvas *ngIf="categoryLabels.length>0"
                     [chartType]="doughnutChartType"
-                    [datasets]="categoryStatsDataSets"
-                    [labels]="categoryStatsLabels"
+                    [datasets]="categoryStatsDataSetsProp"
+                    [labels]="categoryLabels"
                     [options]="chartOptions"
                     baseChart></canvas>
         </mat-card-content>
