@@ -1,21 +1,27 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {from, Observable} from "rxjs";
-import {take} from "rxjs/operators";
+import {from, Observable} from 'rxjs';
+import {take} from 'rxjs/operators';
 
 export enum TableColumnType {
-  standard = "standard", // default
-  dateTime = "datetime",
+  standard = 'standard', // default
+  dateTime = 'datetime',
 }
 
 export interface TableColumn {
   code: string;
   label: string;
-  type?: TableColumnType
+  type?: TableColumnType;
 }
 
 export interface TablePaginationResponse {
-  items: any[],
-  totalCount: number,
+  items: any[];
+  totalCount: number;
+}
+
+export interface TableAction {
+  label: string;
+  icon: string;
+  onClick: Function;
 }
 
 @Component({
@@ -28,7 +34,8 @@ export class TableComponent implements OnInit {
   public currentPageItems = [];
 
   @Input() displayedColumns: TableColumn[] = [];
-  @Input() pageSize: number = 20;
+  @Input() pageSize = 20;
+  @Input() actions: TableAction[] = [];
 
   public totalCount = 0;
 
@@ -42,6 +49,10 @@ export class TableComponent implements OnInit {
     this.displayedColumns.forEach(tableColumn => {
       items.push(tableColumn.code);
     });
+
+    if (this.actions.length > 0) {
+      items.push('actions');
+    }
     return items;
   }
 

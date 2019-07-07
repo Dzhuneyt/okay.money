@@ -18,6 +18,21 @@
     </mat-cell>
   </ng-container>
 
+  <ng-container *ngIf="actions.length>0" [matColumnDef]="'actions'">
+    <!--These handle the actual header and cell rendering-->
+    <mat-header-cell *matHeaderCellDef> Actions</mat-header-cell>
+
+    <!--Here follow the different types of columns, e.g. datetime-->
+
+    <mat-cell *matCellDef="let element" mat-cell>
+      <button (click)="action.onClick()"
+              *ngFor="let action of actions"
+              mat-icon-button>
+        <mat-icon>{{action.icon}}</mat-icon>
+      </button>
+    </mat-cell>
+  </ng-container>
+
   <!--Don't touch these. They are just "definitions"-->
   <mat-header-row *matHeaderRowDef="displayedColumnCodes"></mat-header-row>
   <mat-row *matRowDef="let row; columns: displayedColumnCodes;"></mat-row>

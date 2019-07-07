@@ -20,7 +20,7 @@ import {DialogService} from './services/dialog.service';
 import {AccountsService} from './services/accounts.service';
 import {CategoriesService} from './services/categories.service';
 import {ChartsModule} from 'ng2-charts';
-import {StatsByCategoryComponent} from "src/app/stats-by-category/stats-by-category.component";
+import {StatsByCategoryComponent} from 'src/app/stats-by-category/stats-by-category.component';
 
 const routes: Routes = [
   {
@@ -30,6 +30,10 @@ const routes: Routes = [
   {
     path: 'home',
     component: HomeComponent,
+  },
+  {
+    path: 'transactions',
+    component: TransactionListComponent,
   }
 ];
 

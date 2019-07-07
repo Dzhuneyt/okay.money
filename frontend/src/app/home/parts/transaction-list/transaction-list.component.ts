@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {TableColumn, TableColumnType} from "../../../table/table.component";
-import {map} from "rxjs/operators";
-import {BackendService} from "../../../services/backend.service";
-import {CategoriesService} from "../../../services/categories.service";
+import {TableAction, TableColumn, TableColumnType} from 'src/app/table/table.component';
+import {map} from 'rxjs/operators';
+import {BackendService} from 'src/app/services/backend.service';
+import {CategoriesService} from 'src/app/services/categories.service';
 
 @Component({
   selector: 'app-transaction-list',
@@ -28,6 +28,23 @@ export class TransactionListComponent implements OnInit {
     {
       label: 'Description',
       code: 'description',
+    },
+  ];
+
+  public tableActions: TableAction[] = [
+    {
+      label: 'Edit',
+      icon: 'edit',
+      onClick: () => {
+        console.log(this);
+      }
+    },
+    {
+      label: 'Delete',
+      icon: 'delete',
+      onClick: () => {
+        console.log(this);
+      }
     },
   ];
 
@@ -59,21 +76,21 @@ export class TransactionListComponent implements OnInit {
           return apiResult;
         }),
         map(apiResult => apiResult['items']),
-          map(items => {
-              items.forEach(item => {
-                  item['created_at'] = parseInt(item['created_at'] + `000`, 10);
-                  item['category_name'] = item['category']['name'];
+        map(items => {
+          items.forEach(item => {
+            item['created_at'] = parseInt(item['created_at'] + `000`, 10);
+            item['category_name'] = item['category']['name'];
           });
-              return items;
+          return items;
         }),
         map(items => {
           return {
             items: items,
             totalCount: totalCount
-          }
+          };
         })
-      )
+      );
 
-  };
+  }
 
 }
