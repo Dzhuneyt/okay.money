@@ -1,0 +1,18 @@
+<mat-tab-group #tabs>
+  <mat-tab label="Incomes">
+    <canvas #chart *ngIf="categoryLabels.length>0"
+            [chartType]="doughnutChartType"
+            [datasets]="this.dataSets.income"
+            [labels]="categoryLabels"
+            [options]="chartOptions"
+            baseChart></canvas>
+  </mat-tab>
+  <mat-tab label="Expenses">
+    <canvas *ngIf="categoryLabels.length>0"
+            [chartType]="doughnutChartType"
+            [datasets]="this.dataSets.expenses"
+            [labels]="categoryLabels"
+            [options]="chartOptions"
+            baseChart></canvas>
+  </mat-tab>
+</mat-tab-group>

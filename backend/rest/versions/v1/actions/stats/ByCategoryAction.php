@@ -7,13 +7,16 @@ use common\models\Account;
 use common\models\Category;
 use common\models\Transaction;
 use Yii;
+use yii\base\Action;
 use yii\db\Query;
 use yii\web\BadRequestHttpException;
+
+
 
 /**
  * @property Date dateHelper
  */
-class ByCategoryAction extends \yii\base\Action
+class ByCategoryAction extends Action
 {
     public $dateHelper;
 
@@ -75,7 +78,7 @@ class ByCategoryAction extends \yii\base\Action
 
         $result = [];
         foreach ($rows as $idCategory => $row) {
-            $idCategory          = intval($idCategory);
+            $idCategory = intval($idCategory);
             $result[$idCategory] = floatval($row);
         }
 
@@ -92,7 +95,7 @@ class ByCategoryAction extends \yii\base\Action
 
         $result = [];
         foreach ($rows as $idCategory => $row) {
-            $idCategory          = intval($idCategory);
+            $idCategory = intval($idCategory);
             $result[$idCategory] = floatval($row);
         }
 
@@ -111,18 +114,18 @@ class ByCategoryAction extends \yii\base\Action
 //            ->select('id')
 //            ->column();
 
-        $incomes  = $this->getCategoryIncomes();
+        $incomes = $this->getCategoryIncomes();
         $expenses = $this->getCategoryExpenses();
 
         $result = [];
         foreach ($myCategories as $myCategory) {
-            $income  = isset($incomes[$myCategory]) ? $incomes[$myCategory] : 0;
+            $income = isset($incomes[$myCategory]) ? $incomes[$myCategory] : 0;
             $expense = isset($expenses[$myCategory]) ? $expenses[$myCategory] : 0;
 
             $result[] = [
-                'id'                    => intval($myCategory),
-                'income_for_period'     => floatval(number_format($income, 2)),
-                'expense_for_period'    => floatval(number_format($expense, 2)),
+                'id' => intval($myCategory),
+                'income_for_period' => floatval(number_format($income, 2)),
+                'expense_for_period' => floatval(number_format($expense, 2)),
                 'difference_for_period' => floatval(number_format($income + $expense, 2)),
             ];
         }
@@ -137,7 +140,7 @@ class ByCategoryAction extends \yii\base\Action
         $response = [
             'categories' => $this->getBalancesByCategory(),
             'start_date' => $this->getStartDate(),
-            'end_date'   => $this->getEndDate(),
+            'end_date' => $this->getEndDate(),
         ];
 
         return $response;
@@ -150,12 +153,13 @@ class ByCategoryAction extends \yii\base\Action
             'end_date',
         ];
 
-        $params = Yii::$app->getRequest()->getQueryParams();
+        $params = Yii::$app->getRequest()
+                           ->getQueryParams();
 
         foreach ($dateParams as $dateParam) {
             $isEmpty = empty($params[$dateParam]);
-            $isValid = ! empty($params[$dateParam]) ? $this->dateHelper->isValidDate($params[$dateParam]) : false;
-            if ( ! $isEmpty && ! $isValid) {
+            $isValid = !empty($params[$dateParam]) ? $this->dateHelper->isValidDate($params[$dateParam]) : false;
+            if (!$isEmpty && !$isValid) {
                 throw new BadRequestHttpException("Invalid formatted parameter '{$dateParam}'. Please, provide a value using the format: Y-m-d H:i:s");
             }
         }

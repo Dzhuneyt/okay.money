@@ -14,3 +14,7 @@ Thumbs.db
 
 # Mac DS_Store Files
 .DS_Store
+
+
+node_modules
+package-lock.json
