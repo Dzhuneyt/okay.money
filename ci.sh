@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
 
-npm run installDeps && npm run beMigrations && concurrently 'npm run beLiteServer' 'npm run beLiteServerForTests' 'npm run feLiteServer'
+#npm run installDeps
+#php init --env=CircleCI --overwrite=y
+#npm run beMigrations
+#npx concurrently 'npm run beLiteServerForTests' 'npm run feLiteServer'

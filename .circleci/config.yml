@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  build:
+  build_backend:
     docker:
       # Base version where the app runs
       - image: circleci/php:7.1-browsers
@@ -64,3 +64,30 @@ jobs:
       - run:
           name: Functional tests
           command: composer test-functional
+
+  build_frontend:
+    docker:
+      - image: circleci/node:8-browsers
+
+    working_directory: ~/repo/frontend
+
+    steps:
+      - checkout:
+          path: ~/repo
+      - restore_cache:
+          key: AngularCircleCI-{{ .Branch }}-{{ checksum "package.json" }}
+      - run: npm install
+      - save_cache:
+          key: AngularCircleCI-{{ .Branch }}-{{ checksum "package.json" }}
+          paths:
+            - "node_modules"
+      - run: xvfb-run -a npm run build
+#      - run: xvfb-run -a npm run test -- --single-run --no-progress --browser=ChromeNoSandbox
+#      - run: xvfb-run -a npm run e2e -- --no-progress --config=protractor-ci.conf.js
+
+workflows:
+  version: 2
+  backend_and_frontend:
+    jobs:
+      - build_backend
+      - build_frontend
