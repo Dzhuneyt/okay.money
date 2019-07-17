@@ -1,10 +1,13 @@
 <mat-toolbar color="primary">
-    <mat-toolbar-row>
-        <mat-icon (click)="toggleMenu()" class="hamburger">menu</mat-icon>
-        <span>Finance</span>
-        <span class="example-spacer"></span>
-        <mat-icon class="navbar-icon">account_balance</mat-icon>
-        <mat-icon class="navbar-icon">account_box</mat-icon>
-        <mat-icon class="navbar-icon">exit_to_app</mat-icon>
-    </mat-toolbar-row>
+  <mat-toolbar-row>
+    <mat-icon (click)="toggleMenu()" class="hamburger">menu</mat-icon>
+    <span>Finance</span>
+    <span class="example-spacer"></span>
+    <mat-icon [routerLink]="['/home']" class="navbar-icon" routerLinkActive="true">account_balance</mat-icon>
+    <mat-icon [routerLink]="['/profile']" class="navbar-icon" routerLinkActive="true">person</mat-icon>
+    <mat-icon (click)="logout()" *ngIf="isLoggedIn" class="navbar-icon">exit_to_app
+    </mat-icon>
+    <mat-icon *ngIf="!isLoggedIn" [routerLink]="['/login']" class="navbar-icon" routerLinkActive="true">lock_open
+    </mat-icon>
+  </mat-toolbar-row>
 </mat-toolbar>

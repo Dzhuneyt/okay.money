@@ -4,6 +4,7 @@ import {LocalStorage} from "@ngx-pwa/local-storage";
 import {MatSnackBar} from "@angular/material";
 import {Observable, Observer} from "rxjs";
 import {Router} from "@angular/router";
+import {UserService} from "src/app/services/user.service";
 
 @Component({
   selector: 'app-login',
@@ -19,6 +20,7 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private backendService: BackendService,
+    private userService: UserService,
     private localStorage: LocalStorage,
     private snackar: MatSnackBar,
     private router: Router,
@@ -50,8 +52,10 @@ export class LoginComponent implements OnInit {
             return;
           }
 
+
           const authKey = result['auth_key'];
           this.localStorage.setItem('auth_key', authKey).subscribe(() => {
+            this.userService.setIsLoggedIn(true);
             this.snackar.open('Login successful', null, {
               duration: 1000,
             });

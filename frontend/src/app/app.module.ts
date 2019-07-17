@@ -21,6 +21,8 @@ import {AccountsService} from './services/accounts.service';
 import {CategoriesService} from './services/categories.service';
 import {ChartsModule} from 'ng2-charts';
 import {StatsByCategoryComponent} from 'src/app/stats-by-category/stats-by-category.component';
+import {UserService} from "src/app/services/user.service";
+import {CommonModule} from "@angular/common";
 
 const routes: Routes = [
   {
@@ -49,6 +51,7 @@ const routes: Routes = [
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     FormsModule,
     FlexLayoutModule,
     HttpClientModule,
@@ -65,6 +68,7 @@ const routes: Routes = [
     DialogService,
     AccountsService,
     CategoriesService,
+    UserService,
   ],
   entryComponents: [
     AddAccountComponent,

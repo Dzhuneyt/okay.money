@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {LocalStorage} from "@ngx-pwa/local-storage";
-import {catchError, flatMap} from "rxjs/operators";
-import {Router} from "@angular/router";
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {LocalStorage} from '@ngx-pwa/local-storage';
+import {catchError, flatMap} from 'rxjs/operators';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'

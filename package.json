@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm run installDeps && npm run beMigrations && concurrently 'npm run beLiteServer' 'npm run beLiteServerForTests' 'npm run feLiteServer'",
-    "ci": "./ci.sh",
     "tests": "npm run installDeps && npm run beMigrations && concurrently 'npm run feUnitTests' 'npm run beUnitTests && npm run beFunctionalTests'",
     "installDeps": "concurrently 'npm run installDepsBackend' 'npm run installDepsFrontend'",
     "installDepsBackend": "cd backend && composer install -q --prefer-dist",
