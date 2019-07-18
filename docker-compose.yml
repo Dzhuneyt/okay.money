@@ -8,3 +8,6 @@ services:
       - "./backend:/app"
     ports:
       - "8081:80"
+  frontend:
+    build:
+      context: frontend
