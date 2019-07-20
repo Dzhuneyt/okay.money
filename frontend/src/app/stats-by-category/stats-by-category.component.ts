@@ -1,6 +1,5 @@
-import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
-import {ChartOptions, ChartType} from 'chart.js';
-import {BaseChartDirective} from 'ng2-charts';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChartOptions} from 'chart.js';
 import {BackendService} from 'src/app/services/backend.service';
 import {CategoriesService} from 'src/app/services/categories.service';
 
@@ -18,6 +17,21 @@ interface CategoryStats {
   expense_for_period: number;
 }
 
+const chartOptions: ChartOptions = {
+  responsive: true,
+  tooltips: {
+    enabled: true,
+  },
+  legend: {
+    display: true,
+    position: 'right',
+  },
+  hover: {
+    intersect: false,
+    mode: 'nearest'
+  },
+};
+
 @Component({
   selector: 'app-stats-by-category',
   templateUrl: './stats-by-category.component.html',
@@ -25,28 +39,34 @@ interface CategoryStats {
 })
 export class StatsByCategoryComponent implements OnInit {
 
-  @ViewChild(BaseChartDirective) public chart: BaseChartDirective;
-  public categoryLabels = [];
+  /**
+   * Holds an array of datasets for both charts
+   * See https://valor-software.com/ng2-charts/ and https://www.chartjs.org/docs/latest/
+   */
   public dataSets = {
     income: [],
     expenses: [],
   };
-  public doughnutChartType: ChartType = 'pie';
-  public chartOptions: ChartOptions = {
-    responsive: true,
-    tooltips: {
-      enabled: true,
-    },
-    legend: {
-      display: true,
-      position: 'bottom'
-    },
-    hover: {
-      intersect: false,
-      mode: 'nearest'
-    }
-  };
+
+  // Static param
+  public readonly chartOptions = chartOptions;
   private categoryInfos: CategoryStats[] = [];
+
+  /**
+   * Boolean flags used in *ngIf to decide whether or not to show a given chart
+   */
+  public showChart = {
+    income: false,
+    expense: false,
+  };
+
+  /**
+   * Holds the "legends" for both charts
+   */
+  public legends = {
+    income: [],
+    expsense: [],
+  };
 
   constructor(
     private elementRef: ChangeDetectorRef,
@@ -56,16 +76,70 @@ export class StatsByCategoryComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getStatsByCategory();
+    this.statsPeriodChange('weekly');
   }
 
   categoryStatsLabels() {
     return this.categoryInfos.map(elem => elem.name ? elem.name : elem.id);
   }
 
-  private getStatsByCategory() {
-    this.backend.request('v1/stats/by_category').subscribe(apiResult => {
+  /**
+   * Triggered when the user changes the "period" dropdown
+   */
+  public statsPeriodChange(value: 'monthly' | 'weekly' | 'half_year') {
+    let startDate = null;
+    let endDate = null;
+
+    switch (value) {
+      case 'weekly':
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - 7);
+        endDate = new Date();
+        break;
+      case 'monthly':
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - 30);
+        endDate = new Date();
+        break;
+      case 'half_year':
+        startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - 6);
+        endDate = new Date();
+        break;
+    }
+
+    console.log(startDate, endDate);
+
+    this.getStatsByCategory(startDate, endDate);
+  }
+
+  private toggleCharts(show: boolean = null) {
+    if (show === null) {
+      this.showChart.income = !this.showChart.income;
+      this.showChart.expense = !this.showChart.expense;
+      return;
+    } else {
+      this.showChart.income = show;
+      this.showChart.expense = show;
+    }
+    this.elementRef.detectChanges();
+  }
+
+  private getStatsByCategory(startDate: Date = null, endDate: Date = null) {
+    this.toggleCharts(false);
+
+    const params = {};
+
+    if (startDate !== null) {
+      params['start_date'] = this.formatDate(startDate);
+    }
+    if (endDate !== null) {
+      params['end_date'] = this.formatDate(endDate);
+    }
+    this.backend.request('v1/stats/by_category', 'GET', params).subscribe(apiResult => {
       this.categories.getList().subscribe(items => {
+
+        // Extract and fill category names for each stats object
         this.categoryInfos = apiResult['categories'].map(cat => {
           const foundCategory = items.find(item => {
             return item['id'] === cat['id'];
@@ -74,22 +148,46 @@ export class StatsByCategoryComponent implements OnInit {
           return cat;
         });
 
+        this.legends.income = this.categoryInfos
+          .filter(elem => {
+            return elem.income_for_period > 0;
+          })
+          .map(elem => elem.name ? elem.name : elem.id);
+        this.legends.expsense = this.categoryInfos
+          .filter(elem => {
+            return elem.expense_for_period < 0;
+          })
+          .map(elem => elem.name ? elem.name : elem.id);
+
         this.dataSets.expenses = [
           {
             label: 'Expenses',
-            data: this.categoryInfos.map(elem => elem.expense_for_period)
+            data: this.categoryInfos
+              .filter(elem => elem.expense_for_period < 0)
+              .map(elem => elem.expense_for_period),
           }
         ];
         this.dataSets.income = [
           {
             label: 'Income',
-            data: this.categoryInfos.map(elem => elem.income_for_period),
+            data: this.categoryInfos
+              .filter(elem => elem.income_for_period > 0)
+              .map(elem => elem.income_for_period),
           }
         ];
-        this.categoryLabels = this.categoryStatsLabels();
-        this.elementRef.detectChanges();
+
+        this.toggleCharts(true);
       });
     });
   }
 
+  private formatDate(date) {
+    const d = date;
+    return d.getFullYear() + '-' +
+      ('00' + (d.getMonth() + 1)).slice(-2) + '-' +
+      ('00' + d.getDate()).slice(-2) + ' ' +
+      ('00' + d.getHours()).slice(-2) + ':' +
+      ('00' + d.getMinutes()).slice(-2) + ':' +
+      ('00' + d.getSeconds()).slice(-2);
+  }
 }

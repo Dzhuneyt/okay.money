@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {MenuService} from '../../menu.service';
 import {UserService} from 'src/app/services/user.service';
 import {tap} from 'rxjs/operators';
-import {Router} from "@angular/router";
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-header',

@@ -45,7 +45,7 @@ class TransactionFixture extends ActiveFixture
                 $randomCategory = $userCategories[array_rand($userCategories)];
                 $randomAccount = $userAccounts[array_rand($userAccounts)];
 
-                $timestamp = $faker->dateTime()
+                $timestamp = $faker->dateTimeBetween('-6 months', 'now')
                                    ->getTimestamp();
 
                 $data[] = [

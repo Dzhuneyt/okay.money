@@ -4,7 +4,7 @@
     <span>Finance</span>
     <span class="example-spacer"></span>
     <mat-icon [routerLink]="['/home']" class="navbar-icon" routerLinkActive="true">account_balance</mat-icon>
-    <mat-icon [routerLink]="['/profile']" class="navbar-icon" routerLinkActive="true">person</mat-icon>
+    <!--    <mat-icon [routerLink]="['/profile']" class="navbar-icon" routerLinkActive="true">person</mat-icon>-->
     <mat-icon (click)="logout()" *ngIf="isLoggedIn" class="navbar-icon">exit_to_app
     </mat-icon>
     <mat-icon *ngIf="!isLoggedIn" [routerLink]="['/login']" class="navbar-icon" routerLinkActive="true">lock_open

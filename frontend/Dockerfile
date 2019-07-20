@@ -9,4 +9,5 @@ RUN npm ci --no-audit && \
 
 FROM nginx:alpine
 
+EXPOSE 80
 COPY --from=builder /app/dist/* /usr/share/nginx/html/

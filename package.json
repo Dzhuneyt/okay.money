@@ -10,12 +10,13 @@
     "installDepsBackend": "cd backend && composer install -q --prefer-dist",
     "installDepsFrontend": "cd frontend && npm i -q --no-audit",
     "beMigrations": "cd backend && php yii migrate --interactive=0",
-    "feLiteServer": "cd frontend && npm run start",
+    "feLiteServer": "cd frontend && npm run serve",
     "feUnitTests": "echo 'TO BE IMPLEMENTED' && exit 0; cd frontend && npm run test:cli",
     "beLiteServer": "cd backend && php yii server",
     "beLiteServerForTests": "cd backend && php yii server --test",
     "beUnitTests": "cd backend && php ./vendor/bin/phpunit -c ./tests/unit/phpunit.xml",
-    "beFunctionalTests": "cd backend && php ./vendor/bin/phpunit -c ./tests/functional/phpunit.xml"
+    "beFunctionalTests": "cd backend && php ./vendor/bin/phpunit -c ./tests/functional/phpunit.xml",
+    "beSeedDB": "cd backend && php yii fixture/load '*' --interactive=0"
   },
   "repository": {
     "type": "git",

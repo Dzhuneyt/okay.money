@@ -28,13 +28,12 @@ export class CategoriesService {
 
   /**
    * Find the name of the category from the given ID
-   * @param idCategory
    */
   public getName(idCategory: number) {
     return this.backend.request('v1/categories/' + idCategory, 'GET').pipe(
       map(
         category => category['name']
       )
-    )
+    );
   }
 }
