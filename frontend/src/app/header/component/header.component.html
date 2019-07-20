@@ -1,10 +1,10 @@
 <mat-toolbar color="primary">
   <mat-toolbar-row>
-    <!-- add later -->
     <button aria-label="Home page"
-            *ngIf="false"
+            (click)="toggleMenu()"
+            class="hamburger"
             mat-icon-button>
-      <mat-icon (click)="toggleMenu()" class="hamburger">menu</mat-icon>
+      <mat-icon>menu</mat-icon>
     </button>
     <span>Finance</span>
     <span class="example-spacer"></span>

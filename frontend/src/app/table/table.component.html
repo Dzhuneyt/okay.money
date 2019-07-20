@@ -25,7 +25,7 @@
     <!--Here follow the different types of columns, e.g. datetime-->
 
     <mat-cell *matCellDef="let element" mat-cell>
-      <button (click)="action.onClick()"
+      <button (click)="action.onClick(element)"
               *ngFor="let action of actions"
               mat-icon-button>
         <mat-icon>{{action.icon}}</mat-icon>

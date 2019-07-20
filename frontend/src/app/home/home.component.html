@@ -5,23 +5,26 @@
   fxLayoutAlign="space-between"
   fxLayoutGap="1em"
 >
-  <mat-card class="example-card" fxFlex>
+  <mat-card class="example-card" fxFlex="50%" fxGrow="1" fxShrink="0">
     <mat-card-header>
       <mat-card-title>
-        Accounts
+        Account balances
       </mat-card-title>
 
-      <mat-icon (click)="openAddAccountModal()" class="clickable" fxFlex fxLayoutAlign="end center">add_circle
-      </mat-icon>
+      <span fxFlex fxLayoutAlign="end center">
+        <button (click)="openAddAccountModal()" mat-button>
+          <mat-icon>add_circle</mat-icon>
+        </button>
+      </span>
     </mat-card-header>
     <mat-card-content>
       <app-accounts-list #appAccountList></app-accounts-list>
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="example-card" fxFlex>
+  <mat-card class="example-card" fxFlex="50%" fxGrow="1" fxShrink="1">
     <mat-card-header>
-      <mat-card-title>By category</mat-card-title>
+      <mat-card-title>Cash flow breakdown by category</mat-card-title>
     </mat-card-header>
     <mat-card-content>
 
@@ -33,13 +36,13 @@
 
 </div>
 
-<div class="row-divider">
-  <mat-card class="example-card">
-    <mat-card-header>
-      <mat-card-title>Latest transactions</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <app-transaction-list></app-transaction-list>
-    </mat-card-content>
-  </mat-card>
-</div>
+<!--<div class="row-divider">-->
+<!--  <mat-card class="example-card">-->
+<!--    <mat-card-header>-->
+<!--      <mat-card-title>Latest transactions</mat-card-title>-->
+<!--    </mat-card-header>-->
+<!--    <mat-card-content>-->
+<!--      <app-transaction-list></app-transaction-list>-->
+<!--    </mat-card-content>-->
+<!--  </mat-card>-->
+<!--</div>-->

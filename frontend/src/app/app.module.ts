@@ -21,8 +21,11 @@ import {AccountsService} from './services/accounts.service';
 import {CategoriesService} from './services/categories.service';
 import {ChartsModule} from 'ng2-charts';
 import {StatsByCategoryComponent} from 'src/app/stats-by-category/stats-by-category.component';
-import {UserService} from "src/app/services/user.service";
-import {CommonModule} from "@angular/common";
+import {UserService} from 'src/app/services/user.service';
+import {CommonModule} from '@angular/common';
+import {SidenavComponent} from 'src/app/sidenav/sidenav.component';
+import {MatListModule} from '@angular/material';
+import {TransactionDeleteModalComponent} from 'src/app/transaction-delete-modal/transaction-delete-modal.component';
 
 const routes: Routes = [
   {
@@ -48,6 +51,8 @@ const routes: Routes = [
     AddAccountComponent,
     TransactionListComponent,
     StatsByCategoryComponent,
+    SidenavComponent,
+    TransactionDeleteModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -62,6 +67,7 @@ const routes: Routes = [
     UiKitModule,
 
     HeaderModule,
+    MatListModule,
   ],
   providers: [
     BackendService,
@@ -72,6 +78,7 @@ const routes: Routes = [
   ],
   entryComponents: [
     AddAccountComponent,
+    TransactionDeleteModalComponent,
   ],
   bootstrap: [AppComponent]
 })

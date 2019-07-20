@@ -1,6 +1,6 @@
 import {Injectable, TemplateRef} from '@angular/core';
-import {MatDialog, MatDialogConfig} from "@angular/material";
-import {ComponentType} from "@angular/cdk/portal";
+import {MatDialog, MatDialogConfig} from '@angular/material';
+import {ComponentType} from '@angular/cdk/portal';
 
 @Injectable({
   providedIn: 'root'
@@ -14,10 +14,6 @@ export class DialogService {
    * A wrapper around the standard MatDialog.open() method
    * Allows passing custom callback functions that will be executed
    * when the dialog is clased (either with Confirm or Cancel buttons)
-   *
-   * @param componentOrTemplateRef
-   * @param config
-   * @param onDialogClose
    */
   open(
     componentOrTemplateRef: ComponentType<any> | TemplateRef<any>,

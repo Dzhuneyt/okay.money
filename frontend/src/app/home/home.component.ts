@@ -24,11 +24,6 @@ export class HomeComponent implements OnInit {
   ) {
   }
 
-  public statsPeriodChange(event) {
-    console.log(event);
-    // @TODO trigger API call
-  }
-
   ngOnInit() {
 
   }

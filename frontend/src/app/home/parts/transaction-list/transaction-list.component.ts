@@ -3,6 +3,9 @@ import {TableAction, TableColumn, TableColumnType} from 'src/app/table/table.com
 import {map} from 'rxjs/operators';
 import {BackendService} from 'src/app/services/backend.service';
 import {CategoriesService} from 'src/app/services/categories.service';
+import {DialogService} from "src/app/services/dialog.service";
+import {TransactionDeleteModalComponent} from "src/app/transaction-delete-modal/transaction-delete-modal.component";
+import {TransactionModel} from "src/app/models/transaction.model";
 
 @Component({
   selector: 'app-transaction-list',
@@ -42,8 +45,17 @@ export class TransactionListComponent implements OnInit {
     {
       label: 'Delete',
       icon: 'delete',
-      onClick: () => {
-        console.log(this);
+      onClick: (transaction: TransactionModel) => {
+        console.log(transaction);
+
+        this.dialog.open(TransactionDeleteModalComponent, null,
+          (res) => {
+            if (res) {
+              this.backend.request('v1/transactions/' + transaction.id, 'DELETE').subscribe(result => {
+                console.log(result);
+              });
+            }
+          });
       }
     },
   ];
@@ -51,6 +63,7 @@ export class TransactionListComponent implements OnInit {
   constructor(
     private backend: BackendService,
     private categories: CategoriesService,
+    private dialog: DialogService
   ) {
   }
 
