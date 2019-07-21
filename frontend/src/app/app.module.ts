@@ -26,6 +26,7 @@ import {CommonModule} from '@angular/common';
 import {SidenavComponent} from 'src/app/sidenav/sidenav.component';
 import {MatListModule} from '@angular/material';
 import {TransactionDeleteModalComponent} from 'src/app/transaction-delete-modal/transaction-delete-modal.component';
+import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
 
 const routes: Routes = [
   {
@@ -53,6 +54,7 @@ const routes: Routes = [
     StatsByCategoryComponent,
     SidenavComponent,
     TransactionDeleteModalComponent,
+    DeleteConfirmComponent,
   ],
   imports: [
     BrowserModule,
@@ -79,6 +81,7 @@ const routes: Routes = [
   entryComponents: [
     AddAccountComponent,
     TransactionDeleteModalComponent,
+    DeleteConfirmComponent,
   ],
   bootstrap: [AppComponent]
 })

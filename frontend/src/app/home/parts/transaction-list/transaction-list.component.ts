@@ -1,11 +1,13 @@
-import {Component, OnInit} from '@angular/core';
-import {TableAction, TableColumn, TableColumnType} from 'src/app/table/table.component';
-import {map} from 'rxjs/operators';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {TableAction, TableColumn, TableColumnType, TableComponent} from 'src/app/table/table.component';
+import {catchError, map} from 'rxjs/operators';
 import {BackendService} from 'src/app/services/backend.service';
 import {CategoriesService} from 'src/app/services/categories.service';
-import {DialogService} from "src/app/services/dialog.service";
-import {TransactionDeleteModalComponent} from "src/app/transaction-delete-modal/transaction-delete-modal.component";
-import {TransactionModel} from "src/app/models/transaction.model";
+import {DialogService} from 'src/app/services/dialog.service';
+import {TransactionModel} from 'src/app/models/transaction.model';
+import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
+import {of} from 'rxjs';
+import {MatSnackBar} from '@angular/material';
 
 @Component({
   selector: 'app-transaction-list',
@@ -13,6 +15,10 @@ import {TransactionModel} from "src/app/models/transaction.model";
   styleUrls: ['./transaction-list.component.scss']
 })
 export class TransactionListComponent implements OnInit {
+
+  public pageSize = 10;
+
+  @ViewChild(TableComponent) table: TableComponent;
 
   public displayedColumns: TableColumn[] = [
     {
@@ -46,14 +52,29 @@ export class TransactionListComponent implements OnInit {
       label: 'Delete',
       icon: 'delete',
       onClick: (transaction: TransactionModel) => {
-        console.log(transaction);
+        this.dialog.open(DeleteConfirmComponent, {
+            data: {
+              title: 'Are you sure you want to delete this transaction?',
+              onConfirm: () => {
+                return this.backend.request('v1/transactions/' + transaction.id, 'DELETE').pipe(
+                  map(res => res === null),
+                  catchError(err => {
+                    console.error(err);
 
-        this.dialog.open(TransactionDeleteModalComponent, null,
+                    return of(false);
+                  })
+                );
+              },
+            },
+          },
           (res) => {
+            console.log(res);
             if (res) {
-              this.backend.request('v1/transactions/' + transaction.id, 'DELETE').subscribe(result => {
-                console.log(result);
-              });
+              // Refresh the table
+              this.snackbar.open('Deleted');
+              this.table.goToPage(0);
+            } else {
+              this.snackbar.open('Deleting failed');
             }
           });
       }
@@ -63,7 +84,8 @@ export class TransactionListComponent implements OnInit {
   constructor(
     private backend: BackendService,
     private categories: CategoriesService,
-    private dialog: DialogService
+    private dialog: DialogService,
+    private snackbar: MatSnackBar,
   ) {
   }
 
