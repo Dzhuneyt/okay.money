@@ -11,25 +11,27 @@ use yii\db\Query;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 
+
+
 class IndexAction extends \yii\rest\IndexAction
 {
     public function validateParams()
     {
         $type = Yii::$app->request->getQueryParam('type');
-        if ( ! empty($type) && ! in_array($type, ['income', 'expense'])) {
+        if (!empty($type) && !in_array($type, ['income', 'expense'])) {
             throw new BadRequestHttpException('Invalid parameter "type". Possible values: income, expense. Provided: ' . $type);
         }
 
         $accountIds = Yii::$app->request->getQueryParam('account_ids');
-        if ( ! empty($accountIds)) {
-            if ( ! is_array($accountIds)) {
+        if (!empty($accountIds)) {
+            if (!is_array($accountIds)) {
                 throw new BadRequestHttpException('Filter "account_ids" must be an array');
             }
             // API response is an error if the client tries to filter
             // by non existing or not owned account IDs
             $ownedAccountIds = Account::find()
                                       ->where([
-                                          'id'       => $accountIds,
+                                          'id' => $accountIds,
                                           'owner_id' => Yii::$app->user->id,
                                       ])
                                       ->select('id')
@@ -37,7 +39,7 @@ class IndexAction extends \yii\rest\IndexAction
 
             $notOwnedAccountIds = array_diff($accountIds, $ownedAccountIds);
 
-            if ( ! empty($notOwnedAccountIds)) {
+            if (!empty($notOwnedAccountIds)) {
                 throw new ForbiddenHttpException(
                     'The filter "account_ids" included some invalid values: '
                     . implode(', ', $notOwnedAccountIds));
@@ -57,7 +59,7 @@ class IndexAction extends \yii\rest\IndexAction
         return (new Query())
             ->select([
                 't.*',
-                'account_name'  => 'a.name',
+                'account_name' => 'a.name',
                 'category_name' => 'c.name',
             ])
             ->from(Transaction::tableName() . ' t')
@@ -84,9 +86,11 @@ class IndexAction extends \yii\rest\IndexAction
 
     protected function prepareDataProvider()
     {
-        $requestParams = Yii::$app->getRequest()->getBodyParams();
+        $requestParams = Yii::$app->getRequest()
+                                  ->getBodyParams();
         if (empty($requestParams)) {
-            $requestParams = Yii::$app->getRequest()->getQueryParams();
+            $requestParams = Yii::$app->getRequest()
+                                      ->getQueryParams();
         }
 
         /**
@@ -97,14 +101,14 @@ class IndexAction extends \yii\rest\IndexAction
         $query = $this->applyFiltersToQuery($query);
 
         return Yii::createObject([
-            'class'        => BaseSqlDataProvider::class,
+            'class' => BaseSqlDataProvider::class,
             'rowFormatter' => function ($row) {
                 $row['category'] = [
-                    'id'   => $row['category_id'],
+                    'id' => $row['category_id'],
                     'name' => $row['category_name'],
                 ];
-                $row['account']  = [
-                    'id'   => $row['account_id'],
+                $row['account'] = [
+                    'id' => $row['account_id'],
                     'name' => $row['account_name'],
                 ];
 
@@ -117,19 +121,20 @@ class IndexAction extends \yii\rest\IndexAction
 
                 return $row;
             },
-            'sql'          => $query->createCommand()->getRawSql(),
-            'pagination'   => [
+            'sql' => $query->createCommand()
+                           ->getRawSql(),
+            'pagination' => [
                 'params' => $requestParams,
             ],
-            'sort'         => [
-                'attributes'   => [
+            'sort' => [
+                'attributes' => [
                     'created_at',
                     'id'
                 ],
                 'defaultOrder' => [
                     'created_at' => SORT_DESC
                 ],
-                'params'       => $requestParams,
+                'params' => $requestParams,
             ],
         ]);
     }
@@ -147,7 +152,7 @@ class IndexAction extends \yii\rest\IndexAction
         }
 
         $accountIds = Yii::$app->request->getQueryParam('account_ids');
-        if ( ! empty($accountIds) && is_array($accountIds)) {
+        if (!empty($accountIds) && is_array($accountIds)) {
             $query->andWhere(['account_id' => $accountIds]);
         }
 

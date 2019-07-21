@@ -1,30 +1,44 @@
-<mat-tab-group #tabs mat-align-tabs="center">
-  <mat-tab label="Expenses">
-    <canvas *ngIf="showChart.expense"
-            [chartType]="'doughnut'"
-            [datasets]="this.dataSets.expenses"
-            [labels]="legends.expsense"
-            [options]="chartOptions"
-            baseChart></canvas>
-  </mat-tab>
-  <mat-tab label="Incomes">
-    <canvas *ngIf="showChart.income"
-            [chartType]="'doughnut'"
-            [datasets]="this.dataSets.income"
-            [labels]="legends.income"
-            [options]="chartOptions"
-            baseChart></canvas>
-  </mat-tab>
-</mat-tab-group>
+<div *ngIf="hasData">
+  <mat-tab-group #tabs mat-align-tabs="center">
+    <mat-tab *ngIf="dataSets.expenses.length>0" label="Expenses">
+      <canvas *ngIf="showChart.expense"
+              [chartType]="'doughnut'"
+              [datasets]="this.dataSets.expenses"
+              [labels]="legends.expsense"
+              [options]="chartOptions"
+              baseChart></canvas>
+    </mat-tab>
+    <mat-tab *ngIf="dataSets.income.length>0" label="Incomes">
+      <canvas *ngIf="showChart.income"
+              [chartType]="'doughnut'"
+              [datasets]="this.dataSets.income"
+              [labels]="legends.income"
+              [options]="chartOptions"
+              baseChart></canvas>
+    </mat-tab>
+  </mat-tab-group>
 
-<br/>
-<mat-form-field fxLayout fxLayoutAlign="center center">
-  <mat-select
-    (selectionChange)="statsPeriodChange($event.value)"
-    [value]="'weekly'"
-  >
-    <mat-option value="weekly">Last 7 days</mat-option>
-    <mat-option value="monthly">Last 30 days</mat-option>
-    <mat-option value="half_year">Last 6 months</mat-option>
-  </mat-select>
-</mat-form-field>
+  <br/>
+  <mat-form-field fxLayout fxLayoutAlign="center center">
+    <mat-select
+      (selectionChange)="statsPeriodChange($event.value)"
+      [value]="'weekly'"
+    >
+      <mat-option value="weekly">Last 7 days</mat-option>
+      <mat-option value="monthly">Last 30 days</mat-option>
+      <mat-option value="half_year">Last 6 months</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+</div>
+
+<div *ngIf="!hasData" fxFill fxLayout="column">
+  <p fxFlex fxFlexAlign="center">
+    Nothing to see here yet. Start adding some transactions and see useful charts here later.
+  </p>
+  <p fxFlex fxFlexAlign="center">
+    <mat-icon>money_off</mat-icon>
+    <mat-icon>money_off</mat-icon>
+    <mat-icon>money_off</mat-icon>
+  </p>
+</div>

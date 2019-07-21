@@ -190,4 +190,8 @@ export class StatsByCategoryComponent implements OnInit {
       ('00' + d.getMinutes()).slice(-2) + ':' +
       ('00' + d.getSeconds()).slice(-2);
   }
+
+  get hasData() {
+    return (this.legends.income && this.legends.income.length > 0) || (this.legends.expsense && this.legends.expsense.length > 0);
+  }
 }

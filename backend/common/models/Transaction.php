@@ -3,7 +3,10 @@
 namespace common\models;
 
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+
+
 
 /**
  * This is the model class for table "transaction".
@@ -15,8 +18,10 @@ use yii\helpers\ArrayHelper;
  * @property int $category_id
  * @property int $created_at
  * @property int $updated_at
+ * @property Account $account
+ * @property Category $category
  */
-class Transaction extends \yii\db\ActiveRecord
+class Transaction extends ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -46,7 +51,7 @@ class Transaction extends \yii\db\ActiveRecord
             [
                 ['category_id'],
                 function () {
-                    if ( ! $this->category_id) {
+                    if (!$this->category_id) {
                         return; // Don't check null
                     }
                     $exists = Category::find()
@@ -55,7 +60,7 @@ class Transaction extends \yii\db\ActiveRecord
                                       ])
                                       ->exists();
 
-                    if ( ! $exists) {
+                    if (!$exists) {
                         $this->addError('category_id', 'Invalid category_id');
                     }
                 }
@@ -69,13 +74,23 @@ class Transaction extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id'          => 'ID',
+            'id' => 'ID',
             'description' => 'Description',
-            'sum'         => 'Sum',
-            'account_id'  => 'Account ID',
+            'sum' => 'Sum',
+            'account_id' => 'Account ID',
             'category_id' => 'Category ID',
-            'created_at'  => 'Created At',
-            'updated_at'  => 'Updated At',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ];
+    }
+
+    public function getCategory()
+    {
+        return $this->hasOne(Category::class, ['id' => 'category_id']);
+    }
+
+    public function getAccount()
+    {
+        return $this->hasOne(Account::class, ['id' => 'account_id']);
     }
 }

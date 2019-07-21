@@ -1,0 +1,16 @@
+:host {
+  width: 100%;
+  display: block;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+// Remove ugly Chrome arrows on sum field
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+

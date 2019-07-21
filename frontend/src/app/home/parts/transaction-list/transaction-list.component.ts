@@ -8,6 +8,7 @@ import {TransactionModel} from 'src/app/models/transaction.model';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
 import {of} from 'rxjs';
 import {MatSnackBar} from '@angular/material';
+import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 
 @Component({
   selector: 'app-transaction-list',
@@ -44,8 +45,23 @@ export class TransactionListComponent implements OnInit {
     {
       label: 'Edit',
       icon: 'edit',
-      onClick: () => {
-        console.log(this);
+      onClick: (transaction: TransactionModel) => {
+        this.dialog.open(TransactionEditComponent, {
+            data: {
+              id: transaction.id,
+            },
+            width: '700px'
+          },
+          (res) => {
+            console.log(res);
+            if (res) {
+              // Refresh the table
+              this.snackbar.open('Deleted');
+              this.table.goToPage(0);
+            } else {
+              this.snackbar.open('Deleting failed');
+            }
+          });
       }
     },
     {

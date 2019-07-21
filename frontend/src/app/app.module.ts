@@ -4,7 +4,7 @@ import {NgModule} from '@angular/core';
 import {AppComponent} from './app.component';
 import {LoginComponent} from './login/login.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {BackendService} from './services/backend.service';
 import {HttpClientModule} from '@angular/common/http';
 import {HomeComponent} from './home/home.component';
@@ -24,9 +24,10 @@ import {StatsByCategoryComponent} from 'src/app/stats-by-category/stats-by-categ
 import {UserService} from 'src/app/services/user.service';
 import {CommonModule} from '@angular/common';
 import {SidenavComponent} from 'src/app/sidenav/sidenav.component';
-import {MatListModule} from '@angular/material';
-import {TransactionDeleteModalComponent} from 'src/app/transaction-delete-modal/transaction-delete-modal.component';
+import {MatListModule, MatSlideToggleModule} from '@angular/material';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
+import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
+import {TransactionService} from 'src/app/services/transaction.service';
 
 const routes: Routes = [
   {
@@ -53,8 +54,8 @@ const routes: Routes = [
     TransactionListComponent,
     StatsByCategoryComponent,
     SidenavComponent,
-    TransactionDeleteModalComponent,
     DeleteConfirmComponent,
+    TransactionEditComponent,
   ],
   imports: [
     BrowserModule,
@@ -70,6 +71,8 @@ const routes: Routes = [
 
     HeaderModule,
     MatListModule,
+    ReactiveFormsModule,
+    MatSlideToggleModule,
   ],
   providers: [
     BackendService,
@@ -77,11 +80,12 @@ const routes: Routes = [
     AccountsService,
     CategoriesService,
     UserService,
+    TransactionService,
   ],
   entryComponents: [
     AddAccountComponent,
-    TransactionDeleteModalComponent,
     DeleteConfirmComponent,
+    TransactionEditComponent,
   ],
   bootstrap: [AppComponent]
 })

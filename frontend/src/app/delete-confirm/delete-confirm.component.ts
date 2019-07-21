@@ -27,9 +27,12 @@ export class DeleteConfirmComponent implements OnInit {
   }
 
   submit() {
-    this.onConfirm().pipe(take(1)).subscribe((res) => {
-      this.dialogRef.close(res);
-    });
+    this
+      .onConfirm()
+      .pipe(take(1))
+      .subscribe((res) => {
+        this.dialogRef.close(res);
+      });
   }
 
 }

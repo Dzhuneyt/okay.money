@@ -4,6 +4,10 @@
 }
 
 ::ng-deep {
+  .mat-column-created_at {
+    flex: 0 1 200px;
+  }
+
   .mat-column-description {
     padding-top: 10px;
     padding-bottom: 10px;
@@ -16,5 +20,6 @@
 
   .mat-column-category_name {
     flex: 0 1 120px;
+    margin-right: 1em;
   }
 }
