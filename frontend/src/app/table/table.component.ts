@@ -5,12 +5,16 @@ import {take} from 'rxjs/operators';
 export enum TableColumnType {
   standard = 'standard', // default
   dateTime = 'datetime',
+  function = 'function',
 }
 
 export interface TableColumn {
   code: string;
   label: string;
   type?: TableColumnType;
+
+  // Required if type=function
+  renderer?: (element: any) => any;
 }
 
 export interface TablePaginationResponse {

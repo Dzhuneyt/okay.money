@@ -1,5 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "theme";
 
 // Global styles
 .mat-drawer-container {
@@ -8,4 +7,20 @@
 
 .mat-table {
   background: transparent;
+}
+
+.red-bg {
+  background: #F44336;
+}
+
+.red-text {
+  color: #F44336;
+}
+
+.green-bg {
+  background: #4CAF50;
+}
+
+.green-text {
+  color: #4CAF50;
 }

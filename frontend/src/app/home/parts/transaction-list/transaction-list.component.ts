@@ -30,6 +30,13 @@ export class TransactionListComponent implements OnInit {
     {
       label: 'Amount',
       code: 'sum',
+      renderer: (element: TransactionModel) => {
+        if (element.sum > 0) {
+          return '<span class="green-text">' + Math.abs(element.sum) + '</span>';
+        } else {
+          return '<span class="red-text">' + Math.abs(element.sum) + '</span>';
+        }
+      }
     },
     {
       label: 'Category',

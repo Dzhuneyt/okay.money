@@ -8,13 +8,14 @@
 
     <mat-cell *matCellDef="let element" mat-cell>
       <span
-        *ngIf="!column.type || column.type==='standard'">
+        *ngIf="(!column.renderer && !column.type) || column.type==='standard'">
         {{element[column.code]}}
       </span>
       <span
         *ngIf="column.type==='datetime'">
         {{element[column.code] | timeAgo}}
       </span>
+      <span *ngIf="column.renderer" [innerHTML]="column.renderer(element)"></span>
     </mat-cell>
   </ng-container>
 
