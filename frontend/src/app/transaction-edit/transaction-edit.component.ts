@@ -45,8 +45,12 @@ export class TransactionEditComponent implements OnInit {
     }
   }
 
-  private isNewRecord(): boolean {
+  public isNewRecord(): boolean {
     return !this.data.id;
+  }
+
+  public submit() {
+    console.log('@TODO');
   }
 
 }
