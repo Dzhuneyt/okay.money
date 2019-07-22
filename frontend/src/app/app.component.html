@@ -1,7 +1,7 @@
 <app-header></app-header>
 
 <mat-sidenav-container class="example-container">
-  <mat-sidenav [(opened)]="menuService.isOpened" mode="side">
+  <mat-sidenav #sidenav (click)="sidenav.toggle()" [(opened)]="menuService.isOpened" mode="side">
     <div class="sidenav-wrap">
       <app-sidenav></app-sidenav>
     </div>
