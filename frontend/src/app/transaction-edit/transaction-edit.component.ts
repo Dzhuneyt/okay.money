@@ -15,6 +15,7 @@ export class TransactionEditComponent implements OnInit {
     id: new FormControl(null, [Validators.required]),
     description: new FormControl(null, [Validators.required]),
     sum: new FormControl(null, [Validators.required]),
+    type: new FormControl('expense', [Validators.required]),
     category_id: new FormControl(null, [Validators.required]),
     account_id: new FormControl(null, [Validators.required]),
   });
@@ -35,6 +36,7 @@ export class TransactionEditComponent implements OnInit {
         this.form.controls['id'].setValue(transaction.id);
         this.form.controls['description'].setValue(transaction.description);
         this.form.controls['sum'].setValue(transaction.sum);
+        this.form.controls['type'].setValue(transaction.sum < 0 ? 'expense' : 'income');
         this.form.controls['category_id'].setValue(transaction.category.id);
         this.form.controls['account_id'].setValue(transaction.account.id);
 

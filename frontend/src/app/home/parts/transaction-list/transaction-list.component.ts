@@ -10,6 +10,33 @@ import {of} from 'rxjs';
 import {MatSnackBar} from '@angular/material';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 
+const columns = [
+  {
+    label: 'Date',
+    code: 'created_at',
+    type: TableColumnType.dateTime,
+  },
+  {
+    label: 'Amount',
+    code: 'sum',
+    renderer: (element: TransactionModel) => {
+      if (element.sum > 0) {
+        return '<span class="green-text">' + Math.abs(element.sum) + '</span>';
+      } else {
+        return '<span class="red-text">' + Math.abs(element.sum) + '</span>';
+      }
+    }
+  },
+  {
+    label: 'Category',
+    code: 'category_name',
+  },
+  {
+    label: 'Description',
+    code: 'description',
+  },
+];
+
 @Component({
   selector: 'app-transaction-list',
   templateUrl: './transaction-list.component.html',
@@ -21,32 +48,7 @@ export class TransactionListComponent implements OnInit {
 
   @ViewChild(TableComponent) table: TableComponent;
 
-  public displayedColumns: TableColumn[] = [
-    {
-      label: 'Date',
-      code: 'created_at',
-      type: TableColumnType.dateTime,
-    },
-    {
-      label: 'Amount',
-      code: 'sum',
-      renderer: (element: TransactionModel) => {
-        if (element.sum > 0) {
-          return '<span class="green-text">' + Math.abs(element.sum) + '</span>';
-        } else {
-          return '<span class="red-text">' + Math.abs(element.sum) + '</span>';
-        }
-      }
-    },
-    {
-      label: 'Category',
-      code: 'category_name',
-    },
-    {
-      label: 'Description',
-      code: 'description',
-    },
-  ];
+  public displayedColumns: TableColumn[] = columns;
 
   public tableActions: TableAction[] = [
     {
@@ -63,10 +65,7 @@ export class TransactionListComponent implements OnInit {
             console.log(res);
             if (res) {
               // Refresh the table
-              this.snackbar.open('Deleted');
-              this.table.goToPage(0);
             } else {
-              this.snackbar.open('Deleting failed');
             }
           });
       }
