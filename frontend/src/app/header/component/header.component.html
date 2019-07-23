@@ -15,9 +15,19 @@
             mat-button
             routerLinkActive="true">
       <mat-icon inline="true">account_balance</mat-icon>
-      Home
+      Overview
+    </button>
+
+    <button
+      aria-label="Create Transaction"
+      class="navbar-icon"
+      mat-button>
+      <mat-icon inline="true">add</mat-icon>
+      Create transaction
     </button>
     <!--    <mat-icon [routerLink]="['/profile']" class="navbar-icon" routerLinkActive="true">person</mat-icon>-->
+
+
     <button (click)="logout()"
             *ngIf="isLoggedIn"
             aria-label="Logout"
