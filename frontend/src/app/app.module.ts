@@ -28,19 +28,28 @@ import {MatListModule, MatSlideToggleModule} from '@angular/material';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';
+import {LoggedInGuard} from "src/app/guards/logged-in.guard";
+import {AnonymousUserGuard} from "src/app/guards/anonymous-user.guard";
 
 const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
+    canActivate: [AnonymousUserGuard]
   },
   {
     path: 'home',
     component: HomeComponent,
+    canActivate: [LoggedInGuard],
   },
   {
     path: 'transactions',
     component: TransactionListComponent,
+    canActivate: [LoggedInGuard],
+  },
+  {
+    path: '**',
+    redirectTo: '/home',
   }
 ];
 

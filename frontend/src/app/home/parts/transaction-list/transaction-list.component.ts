@@ -69,10 +69,11 @@ export class TransactionListComponent implements OnInit {
             width: '700px'
           },
           (res) => {
-            console.log(res);
             if (res) {
+              this.table.goToPage(this.table.currentPage);
               // Refresh the table
             } else {
+              this.snackbar.open('Editing failed');
             }
           });
       }
@@ -89,7 +90,6 @@ export class TransactionListComponent implements OnInit {
                   map(res => res === null),
                   catchError(err => {
                     console.error(err);
-
                     return of(false);
                   })
                 );
@@ -97,11 +97,10 @@ export class TransactionListComponent implements OnInit {
             },
           },
           (res) => {
-            console.log(res);
             if (res) {
               // Refresh the table
               this.snackbar.open('Deleted');
-              this.table.goToPage(0);
+              this.table.goToPage(this.table.currentPage);
             } else {
               this.snackbar.open('Deleting failed');
             }

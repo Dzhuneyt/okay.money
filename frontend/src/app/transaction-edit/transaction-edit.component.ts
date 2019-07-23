@@ -3,6 +3,9 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {TransactionService} from 'src/app/services/transaction.service';
 import {TransactionModel} from 'src/app/models/transaction.model';
+import {CategoriesService, Category} from 'src/app/services/categories.service';
+import {Account, AccountsService} from 'src/app/services/accounts.service';
+import {map, take} from "rxjs/operators";
 
 @Component({
   selector: 'app-transaction-edit',
@@ -22,11 +25,16 @@ export class TransactionEditComponent implements OnInit {
     account_id: new FormControl(null, [Validators.required]),
   });
 
+  public categories: Category[] = [];
+  public accounts: Account[] = [];
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private transaction: TransactionService,
     public dialogRef: MatDialogRef<TransactionEditComponent>,
     private elementRef: ChangeDetectorRef,
+    private accountService: AccountsService,
+    private categoryService: CategoriesService,
   ) {
   }
 
@@ -45,6 +53,19 @@ export class TransactionEditComponent implements OnInit {
         this.elementRef.detectChanges();
       });
     }
+
+    this.accountService.getList().pipe(
+      take(1),
+      map(accounts => this.accounts = accounts),
+    ).subscribe(res => {
+      console.log(this.accounts);
+    });
+    this.categoryService.getList().pipe(
+      take(1),
+      map(cats => this.categories = cats),
+    ).subscribe(res => {
+      console.log(this.categories);
+    });
   }
 
   public isNewRecord(): boolean {
@@ -61,6 +82,8 @@ export class TransactionEditComponent implements OnInit {
     }
 
     payload['description'] = this.form.controls['description'].value;
+    payload['category_id'] = this.form.controls['category_id'].value;
+    payload['account_id'] = this.form.controls['account_id'].value;
 
     if (this.isNewRecord()) {
       // Create

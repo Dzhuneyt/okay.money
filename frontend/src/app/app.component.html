@@ -1,6 +1,6 @@
 <app-header></app-header>
 
-<mat-sidenav-container class="example-container">
+<mat-sidenav-container *ngIf="appReady" class="example-container">
   <mat-sidenav #sidenav (click)="sidenav.toggle()" [(opened)]="menuService.isOpened" mode="side">
     <div class="sidenav-wrap">
       <app-sidenav></app-sidenav>

@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {MenuService} from './menu.service';
+import {UserService} from "src/app/services/user.service";
 
 @Component({
   selector: 'app-root',
@@ -9,11 +10,15 @@ import {MenuService} from './menu.service';
 export class AppComponent {
   title = 'frontend';
 
-  public sidenavMode = 'over';
+  public appReady = false;
 
   constructor(
     public menuService: MenuService,
+    private user: UserService,
   ) {
 
+    this.user.restoreUserState().subscribe(res => {
+      this.appReady = true;
+    });
   }
 }

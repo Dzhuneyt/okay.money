@@ -54,13 +54,12 @@ export class LoginComponent implements OnInit {
 
 
           const authKey = result['auth_key'];
-          this.localStorage.setItem('auth_key', authKey).subscribe(() => {
+          this.userService.setAuthKey(authKey).subscribe(() => {
             this.userService.setIsLoggedIn(true);
+
             this.snackar.open('Login successful', null, {
               duration: 1000,
             });
-
-            // TODO redirect to homepage
 
             this.router.navigate(['/home']);
 
