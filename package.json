@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run installDeps && npm run beMigrations && concurrently 'npm run beLiteServer' 'npm run beLiteServerForTests' 'npm run feLiteServer'",
-    "tests": "npm run installDeps && npm run beMigrations && concurrently 'npm run feUnitTests' 'npm run beUnitTests && npm run beFunctionalTests'",
-    "installDeps": "concurrently 'npm run installDepsBackend' 'npm run installDepsFrontend'",
+    "dev": "npm run installDeps && npm run beMigrations && npx concurrently 'npm run beLiteServer' 'npm run beLiteServerForTests' 'npm run feLiteServer'",
+    "tests": "npm run installDeps && npm run beMigrations && npx  concurrently 'npm run feUnitTests' 'npm run beUnitTests && npm run beFunctionalTests'",
+    "installDeps": "npx concurrently 'npm run installDepsBackend' 'npm run installDepsFrontend'",
     "installDepsBackend": "cd backend && composer install -q --prefer-dist",
     "installDepsFrontend": "cd frontend && npm i -q --no-audit",
     "beMigrations": "cd backend && php yii migrate --interactive=0",

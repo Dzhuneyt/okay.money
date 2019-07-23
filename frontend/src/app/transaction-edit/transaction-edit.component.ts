@@ -1,8 +1,8 @@
 import {ChangeDetectorRef, Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {TransactionService} from "src/app/services/transaction.service";
-import {TransactionModel} from "src/app/models/transaction.model";
+import {TransactionService} from 'src/app/services/transaction.service';
+import {TransactionModel} from 'src/app/models/transaction.model';
 
 @Component({
   selector: 'app-transaction-edit',
@@ -35,7 +35,7 @@ export class TransactionEditComponent implements OnInit {
       this.transaction.getSingle(this.data.id).subscribe((transaction: TransactionModel) => {
         this.form.controls['id'].setValue(transaction.id);
         this.form.controls['description'].setValue(transaction.description);
-        this.form.controls['sum'].setValue(transaction.sum);
+        this.form.controls['sum'].setValue(Math.abs(transaction.sum));
         this.form.controls['type'].setValue(transaction.sum < 0 ? 'expense' : 'income');
         this.form.controls['category_id'].setValue(transaction.category.id);
         this.form.controls['account_id'].setValue(transaction.account.id);
@@ -50,7 +50,27 @@ export class TransactionEditComponent implements OnInit {
   }
 
   public submit() {
-    console.log('@TODO');
+    const payload = {};
+
+    if (this.form.controls['type'].value === 'expense') {
+      payload['sum'] = -Math.abs(this.form.controls['sum'].value);
+    } else {
+      payload['sum'] = Math.abs(this.form.controls['sum'].value);
+    }
+
+    payload['description'] = this.form.controls['description'].value;
+
+    if (this.isNewRecord()) {
+      // Create
+      // @TODO create transaction
+    } else {
+      // Edit
+      this.transaction.updateSingle(this.data.id, payload).subscribe(res => {
+        console.log(res);
+
+        this.dialogRef.close(true);
+      });
+    }
   }
 
 }

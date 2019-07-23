@@ -32,6 +32,13 @@ const columns = [
     code: 'category_name',
   },
   {
+    label: 'Account',
+    code: 'account_name',
+    renderer: (element: TransactionModel) => {
+      return element.account.name;
+    }
+  },
+  {
     label: 'Description',
     code: 'description',
   },

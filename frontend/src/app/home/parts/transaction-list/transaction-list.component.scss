@@ -18,8 +18,9 @@
     flex: 0 1 120px;
   }
 
-  .mat-column-category_name {
-    flex: 0 1 120px;
+  .mat-column-category_name,
+  .mat-column-account_name {
+    flex: 0 1 150px;
     margin-right: 1em;
   }
 }

@@ -1,8 +1,14 @@
 @import "theme";
 
+body, html {
+  height: 100%;
+  display: block;
+  background: #f0f0f0;
+}
+
 // Global styles
 .mat-drawer-container {
-  background: #f0f0f0;
+  background: transparent;
 }
 
 .mat-table {
