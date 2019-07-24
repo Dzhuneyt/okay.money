@@ -1,99 +1,269 @@
-module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
-  version = "~> 1.26.0"
+// https://solidsoftware.io/blog/hybrid-spot-ondemand-ecs-cluster-setup/
 
-  name = "app-dev"
-  cidr = "10.10.10.0/24"
-  azs = [
-    "us-east-1a",
-    "us-east-1b",
-    "us-east-1c"]
-  private_subnets = [
-    "10.10.10.0/27",
-    "10.10.10.32/27",
-    "10.10.10.64/27"]
-  public_subnets = [
-    "10.10.10.96/27",
-    "10.10.10.128/27",
-    "10.10.10.160/27"]
-  enable_nat_gateway = true
-  single_nat_gateway = true
+provider "aws" {
+  region = "us-east-1"
+}
+
+# Create a VPC
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
   tags = {
-    Environment = "dev"
-    Owner = "me"
+    Name = local.ecs_cluster_name
+  }
+}
+resource "aws_subnet" "subnet1" {
+  vpc_id = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+
+  tags = {
+    Name = "AZ1"
+  }
+}
+resource "aws_subnet" "subnet2" {
+  vpc_id = aws_vpc.main.id
+  cidr_block = "10.0.2.0/24"
+
+  tags = {
+    Name = "AZ2"
   }
 }
 
-module "ecs_cluster" {
-  source = "anrim/ecs/aws//modules/cluster"
+# Set the default vpc
+data "aws_vpc" "default" {
+  id = aws_vpc.main.id
+}
 
-  name = "app-dev"
-  vpc_id = module.vpc.vpc_id
-  vpc_subnets = [
-    module.vpc.private_subnets]
-  tags = {
-    Environment = "dev"
-    Owner = "me"
+# Read all subnet ids for this vpc/region.
+data "aws_subnet_ids" "all_subnets" {
+  vpc_id = data.aws_vpc.default.id
+}
+
+# Define some variables we'll use later.
+locals {
+  instance_type = "t3a.micro"
+  spot_price = "0.10"
+  key_name = "Scava_Ubuntu_PC"
+  ecs_cluster_name = "Personal_Finance"
+  max_spot_instances = 3
+  min_spot_instances = 1
+
+  max_ondemand_instances = 3
+  min_ondemand_instances = 1
+}
+
+# Lookup the current ECS AMI.
+# In a production environment you probably want to 
+# hardcode the AMI ID, to prevent upgrading to a 
+# new and potentially broken release.
+data "aws_ami" "ecs" {
+  most_recent = true
+
+  filter {
+    name = "name"
+    values = [
+      "amzn-ami-*-amazon-ecs-optimized"]
+  }
+
+  filter {
+    name = "virtualization-type"
+    values = [
+      "hvm"]
+  }
+
+  owners = [
+    "591542846629"]
+  # Amazon
+}
+
+# Create a Security Group with SSH access from the world
+resource "aws_security_group" "ecs_cluster" {
+  name = "${local.ecs_cluster_name}_ecs_cluster"
+  description = "An ecs cluster"
+  vpc_id = data.aws_vpc.default.id
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+      "0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = [
+      "0.0.0.0/0"]
+    prefix_list_ids = []
   }
 }
 
-module "alb" {
-  source = "anrim/ecs/aws//modules/alb"
+# Create an IAM role for the ECS instances.
+resource "aws_iam_role" "ecs_instance" {
+  name = "ecs_instance"
 
-  name = "app-dev"
-  host_name = "app"
-  domain_name = "finance.hasmobi.com"
-  certificate_arn = "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
-  backend_sg_id = module.ecs_cluster.instance_sg_id
-  tags = {
-    Environment = "dev"
-    Owner = "me"
-  }
-  vpc_id = module.vpc.vpc_id
-  vpc_subnets = [
-    module.vpc.public_subnets]
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
 }
-
-resource "aws_ecs_task_definition" "app" {
-  family = "app-dev"
-  container_definitions = <<EOF
-[
-  {
-    "name": "nginx",
-    "image": "nginx:1.13-alpine",
-    "essential": true,
-    "portMappings": [
-      {
-        "containerPort": 80
-      }
-    ],
-    "logConfiguration": {
-      "logDriver": "awslogs",
-      "options": {
-        "awslogs-group": "app-dev-nginx",
-        "awslogs-region": "us-east-1"
-      }
-    },
-    "memory": 128,
-    "cpu": 100
-  }
-]
 EOF
 }
 
-module "ecs_service_app" {
-  source = "anrim/ecs/aws//modules/service"
-
-  name = "app-dev"
-  alb_target_group_arn = module.alb.target_group_arn
-  cluster = module.ecs_cluster.cluster_id
-  container_name = "nginx"
-  container_port = "80"
-  log_groups = [
-    "app-dev-nginx"]
-  task_definition_arn = aws_ecs_task_definition.app.arn
-  tags = {
-    Environment = "dev"
-    Owner = "me"
+# Create and attach an IAM role policy which alllows the necessary
+# permissions for the ECS agent to function. 
+data "aws_iam_policy_document" "ecs_instance_role_policy_doc" {
+  statement {
+    actions = [
+      "ecs:CreateCluster",
+      "ecs:DeregisterContainerInstance",
+      "ecs:DiscoverPollEndpoint",
+      "ecs:Poll",
+      "ecs:RegisterContainerInstance",
+      "ecs:StartTelemetrySession",
+      "ecs:Submit*",
+      "ecr:GetAuthorizationToken",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      "*",
+    ]
   }
+}
+
+resource "aws_iam_policy" "ecs_role_permissions" {
+  name = "ecs_role_permissions"
+  description = "ECS instance permissions"
+  path = "/"
+  policy = data.aws_iam_policy_document.ecs_instance_role_policy_doc.json
+}
+
+
+resource "aws_iam_policy_attachment" "ecs_instance_role_policy_attachment" {
+  name = "ecs_instance_role_policy_attachment"
+  roles = [
+    aws_iam_role.ecs_instance.name]
+  policy_arn = aws_iam_policy.ecs_role_permissions.arn
+}
+
+resource "aws_iam_instance_profile" "ecs_iam_profile" {
+  name = "ecs_role_instance_profile"
+  role = aws_iam_role.ecs_instance.name
+}
+
+# Create two launch configs one for ondemand instances and the other for spot.
+resource "aws_launch_configuration" "ecs_config_launch_config_spot" {
+  name_prefix = "${local.ecs_cluster_name}_ecs_cluster_spot"
+  image_id = data.aws_ami.ecs.id
+  instance_type = local.instance_type
+  spot_price = local.spot_price
+  enable_monitoring = true
+  lifecycle {
+    create_before_destroy = true
+  }
+  user_data = <<EOF
+#!/bin/bash
+echo ECS_CLUSTER=${local.ecs_cluster_name} >> /etc/ecs/ecs.config
+echo ECS_INSTANCE_ATTRIBUTES={\"purchase-option\":\"spot\"} >> /etc/ecs/ecs.config
+EOF
+  security_groups = [
+    aws_security_group.ecs_cluster.id]
+  key_name = local.key_name
+  iam_instance_profile = aws_iam_instance_profile.ecs_iam_profile.arn
+}
+
+resource "aws_launch_configuration" "ecs_config_launch_config_ondemand" {
+  name_prefix = "${local.ecs_cluster_name}_ecs_cluster_ondemand"
+  image_id = data.aws_ami.ecs.id
+  instance_type = local.instance_type
+  enable_monitoring = true
+  lifecycle {
+    create_before_destroy = true
+  }
+  user_data = <<EOF
+#!/bin/bash
+echo ECS_CLUSTER=${local.ecs_cluster_name} >> /etc/ecs/ecs.config
+echo ECS_INSTANCE_ATTRIBUTES={\"purchase-option\":\"ondemand\"} >> /etc/ecs/ecs.config
+EOF
+  security_groups = [
+    aws_security_group.ecs_cluster.id]
+  key_name = local.key_name
+  iam_instance_profile = aws_iam_instance_profile.ecs_iam_profile.arn
+}
+
+# Create two autoscaling groups one for spot and the other for spot.
+resource "aws_autoscaling_group" "ecs_cluster_ondemand" {
+  name_prefix = "${aws_launch_configuration.ecs_config_launch_config_ondemand.name}_ecs_cluster_ondemand"
+  termination_policies = [
+    "OldestInstance"]
+  max_size = local.max_ondemand_instances
+  min_size = local.min_ondemand_instances
+  launch_configuration = aws_launch_configuration.ecs_config_launch_config_ondemand.name
+  lifecycle {
+    create_before_destroy = true
+  }
+  vpc_zone_identifier = data.aws_subnet_ids.all_subnets.ids
+
+  # Wait for these resources to be created
+  depends_on = [
+    aws_subnet.subnet1,
+    aws_subnet.subnet2]
+}
+
+resource "aws_autoscaling_group" "ecs_cluster_spot" {
+  name_prefix = "${aws_launch_configuration.ecs_config_launch_config_spot.name}_ecs_cluster_spot"
+  termination_policies = [
+    "OldestInstance"]
+  max_size = local.max_spot_instances
+  min_size = local.min_spot_instances
+  launch_configuration = aws_launch_configuration.ecs_config_launch_config_spot.name
+  lifecycle {
+    create_before_destroy = true
+  }
+  vpc_zone_identifier = data.aws_subnet_ids.all_subnets.ids
+
+  # Wait for these resources to be created
+  depends_on = [
+    aws_subnet.subnet1,
+    aws_subnet.subnet2]
+}
+
+# Attach an autoscaling policy to the spot cluster to target 70% MemoryReservation on the ECS cluster.
+resource "aws_autoscaling_policy" "ecs_cluster_scale_policy" {
+  name = "${local.ecs_cluster_name}_ecs_cluster_spot_scale_policy"
+  policy_type = "TargetTrackingScaling"
+  adjustment_type = "ChangeInCapacity"
+  autoscaling_group_name = aws_autoscaling_group.ecs_cluster_spot.name
+
+  target_tracking_configuration {
+    customized_metric_specification {
+      metric_dimension {
+        name = "ClusterName"
+        value = local.ecs_cluster_name
+      }
+      metric_name = "MemoryReservation"
+      namespace = "AWS/ECS"
+      statistic = "Average"
+    }
+    target_value = 70.0
+  }
+}
+
+
+resource "aws_ecs_cluster" "ecs_cluster" {
+  name = local.ecs_cluster_name
 }
