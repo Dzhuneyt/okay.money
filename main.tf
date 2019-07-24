@@ -7,9 +7,14 @@ provider "aws" {
 # Create a VPC
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
+  enable_dns_hostnames = true
   tags = {
     Name = local.ecs_cluster_name
   }
+}
+output "vpc_id" {
+  # Output the newly created VPC ID
+  value = aws_vpc.main.id
 }
 resource "aws_subnet" "subnet1" {
   vpc_id = aws_vpc.main.id
@@ -42,7 +47,7 @@ data "aws_subnet_ids" "all_subnets" {
 locals {
   instance_type = "t3a.micro"
   spot_price = "0.10"
-  key_name = "Scava_Ubuntu_PC"
+  key_name = "Scava Ubuntu PC id_rsa"
   ecs_cluster_name = "Personal_Finance"
   max_spot_instances = 3
   min_spot_instances = 1
@@ -61,7 +66,7 @@ data "aws_ami" "ecs" {
   filter {
     name = "name"
     values = [
-      "amzn-ami-*-amazon-ecs-optimized"]
+      "amzn2-ami-ecs-*"]
   }
 
   filter {
@@ -73,6 +78,42 @@ data "aws_ami" "ecs" {
   owners = [
     "591542846629"]
   # Amazon
+
+  //  most_recent = true
+  //  owners = ["099720109477"] # Canonical
+  //
+  //  filter {
+  //    name   = "name"
+  //    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
+  //  }
+  //
+  //  filter {
+  //    name = "virtualization-type"
+  //    values = [
+  //      "hvm"]
+  //  }
+}
+
+resource "aws_route_table" "route_table" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "10.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+
+  tags = {
+    Name = "personal_finance_route_table"
+  }
+}
+resource "aws_route_table_association" "vpc-route-table-association1" {
+  subnet_id = aws_subnet.subnet1.id
+  route_table_id = aws_route_table.route_table.id
+}
+
+resource "aws_route_table_association" "vpc-route-table-association2" {
+  subnet_id = aws_subnet.subnet2.id
+  route_table_id = aws_route_table.route_table.id
 }
 
 # Create a Security Group with SSH access from the world
@@ -172,6 +213,7 @@ resource "aws_launch_configuration" "ecs_config_launch_config_spot" {
   instance_type = local.instance_type
   spot_price = local.spot_price
   enable_monitoring = true
+  associate_public_ip_address = true
   lifecycle {
     create_before_destroy = true
   }
@@ -191,6 +233,7 @@ resource "aws_launch_configuration" "ecs_config_launch_config_ondemand" {
   image_id = data.aws_ami.ecs.id
   instance_type = local.instance_type
   enable_monitoring = true
+  associate_public_ip_address = true
   lifecycle {
     create_before_destroy = true
   }
