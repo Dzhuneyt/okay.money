@@ -53,4 +53,19 @@ return [
 //            'backend/config/main-local.php',
 //        ],
     ],
+    'Docker' => [
+        'path' => 'docker',
+        'setWritable' => [
+            'backend/runtime',
+            'backend/web/assets',
+            'rest/runtime',
+        ],
+        'setExecutable' => [
+            'yii',
+            'vendor/bin/phpunit',
+        ],
+//        'setCookieValidationKey' => [
+//            'backend/config/main-local.php',
+//        ],
+    ],
 ];
