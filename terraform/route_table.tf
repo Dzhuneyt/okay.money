@@ -16,5 +16,5 @@ resource "aws_route_table_association" "vpc-route-table-association" {
   route_table_id = aws_route_table.route_table.id
   count = length(local.public_subnets)
 
-  subnet_id = element(aws_subnet.public_subnets.*.id, count.index)
+  subnet_id = aws_subnet.public_subnets.*.id[count.index]
 }
