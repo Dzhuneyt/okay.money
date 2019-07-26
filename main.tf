@@ -4,45 +4,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# Create a VPC
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-  enable_dns_hostnames = true
-  tags = {
-    Name = local.ecs_cluster_name
-  }
-}
-output "vpc_id" {
-  # Output the newly created VPC ID
-  value = aws_vpc.main.id
-}
-resource "aws_subnet" "subnet1" {
-  vpc_id = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
-
-  tags = {
-    Name = "AZ1"
-  }
-}
-resource "aws_subnet" "subnet2" {
-  vpc_id = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24"
-
-  tags = {
-    Name = "AZ2"
-  }
-}
-
-# Set the default vpc
-data "aws_vpc" "default" {
-  id = aws_vpc.main.id
-}
-
-# Read all subnet ids for this vpc/region.
-data "aws_subnet_ids" "all_subnets" {
-  vpc_id = data.aws_vpc.default.id
-}
-
 # Define some variables we'll use later.
 locals {
   instance_type = "t3a.micro"
@@ -50,70 +11,15 @@ locals {
   key_name = "Scava Ubuntu PC id_rsa"
   ecs_cluster_name = "Personal_Finance"
   max_spot_instances = 3
-  min_spot_instances = 1
+  min_spot_instances = 0
 
   max_ondemand_instances = 3
   min_ondemand_instances = 1
-}
 
-# Lookup the current ECS AMI.
-# In a production environment you probably want to 
-# hardcode the AMI ID, to prevent upgrading to a 
-# new and potentially broken release.
-data "aws_ami" "ecs" {
-  most_recent = true
-
-  filter {
-    name = "name"
-    values = [
-      "amzn2-ami-ecs-*"]
-  }
-
-  filter {
-    name = "virtualization-type"
-    values = [
-      "hvm"]
-  }
-
-  owners = [
-    "591542846629"]
-  # Amazon
-
-  //  most_recent = true
-  //  owners = ["099720109477"] # Canonical
-  //
-  //  filter {
-  //    name   = "name"
-  //    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
-  //  }
-  //
-  //  filter {
-  //    name = "virtualization-type"
-  //    values = [
-  //      "hvm"]
-  //  }
-}
-
-resource "aws_route_table" "route_table" {
-  vpc_id = aws_vpc.main.id
-
-  route {
-    cidr_block = "10.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
-  }
-
-  tags = {
-    Name = "personal_finance_route_table"
-  }
-}
-resource "aws_route_table_association" "vpc-route-table-association1" {
-  subnet_id = aws_subnet.subnet1.id
-  route_table_id = aws_route_table.route_table.id
-}
-
-resource "aws_route_table_association" "vpc-route-table-association2" {
-  subnet_id = aws_subnet.subnet2.id
-  route_table_id = aws_route_table.route_table.id
+  public_subnets = [
+    "10.0.1.0/24",
+    "10.0.2.0/24",
+    "10.0.3.0/24"]
 }
 
 # Create a Security Group with SSH access from the world
@@ -122,12 +28,24 @@ resource "aws_security_group" "ecs_cluster" {
   description = "An ecs cluster"
   vpc_id = data.aws_vpc.default.id
 
+  # Allow SSH
   ingress {
     from_port = 22
     to_port = 22
     protocol = "tcp"
     cidr_blocks = [
-      "0.0.0.0/0"]
+      "0.0.0.0/0"
+    ]
+  }
+
+  # Allow HTTP
+  ingress {
+    protocol = "tcp"
+    from_port = 80
+    to_port = 80
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
   }
 
   egress {
@@ -204,106 +122,6 @@ resource "aws_iam_policy_attachment" "ecs_instance_role_policy_attachment" {
 resource "aws_iam_instance_profile" "ecs_iam_profile" {
   name = "ecs_role_instance_profile"
   role = aws_iam_role.ecs_instance.name
-}
-
-# Create two launch configs one for ondemand instances and the other for spot.
-resource "aws_launch_configuration" "ecs_config_launch_config_spot" {
-  name_prefix = "${local.ecs_cluster_name}_ecs_cluster_spot"
-  image_id = data.aws_ami.ecs.id
-  instance_type = local.instance_type
-  spot_price = local.spot_price
-  enable_monitoring = true
-  associate_public_ip_address = true
-  lifecycle {
-    create_before_destroy = true
-  }
-  user_data = <<EOF
-#!/bin/bash
-echo ECS_CLUSTER=${local.ecs_cluster_name} >> /etc/ecs/ecs.config
-echo ECS_INSTANCE_ATTRIBUTES={\"purchase-option\":\"spot\"} >> /etc/ecs/ecs.config
-EOF
-  security_groups = [
-    aws_security_group.ecs_cluster.id]
-  key_name = local.key_name
-  iam_instance_profile = aws_iam_instance_profile.ecs_iam_profile.arn
-}
-
-resource "aws_launch_configuration" "ecs_config_launch_config_ondemand" {
-  name_prefix = "${local.ecs_cluster_name}_ecs_cluster_ondemand"
-  image_id = data.aws_ami.ecs.id
-  instance_type = local.instance_type
-  enable_monitoring = true
-  associate_public_ip_address = true
-  lifecycle {
-    create_before_destroy = true
-  }
-  user_data = <<EOF
-#!/bin/bash
-echo ECS_CLUSTER=${local.ecs_cluster_name} >> /etc/ecs/ecs.config
-echo ECS_INSTANCE_ATTRIBUTES={\"purchase-option\":\"ondemand\"} >> /etc/ecs/ecs.config
-EOF
-  security_groups = [
-    aws_security_group.ecs_cluster.id]
-  key_name = local.key_name
-  iam_instance_profile = aws_iam_instance_profile.ecs_iam_profile.arn
-}
-
-# Create two autoscaling groups one for spot and the other for spot.
-resource "aws_autoscaling_group" "ecs_cluster_ondemand" {
-  name_prefix = "${aws_launch_configuration.ecs_config_launch_config_ondemand.name}_ecs_cluster_ondemand"
-  termination_policies = [
-    "OldestInstance"]
-  max_size = local.max_ondemand_instances
-  min_size = local.min_ondemand_instances
-  launch_configuration = aws_launch_configuration.ecs_config_launch_config_ondemand.name
-  lifecycle {
-    create_before_destroy = true
-  }
-  vpc_zone_identifier = data.aws_subnet_ids.all_subnets.ids
-
-  # Wait for these resources to be created
-  depends_on = [
-    aws_subnet.subnet1,
-    aws_subnet.subnet2]
-}
-
-resource "aws_autoscaling_group" "ecs_cluster_spot" {
-  name_prefix = "${aws_launch_configuration.ecs_config_launch_config_spot.name}_ecs_cluster_spot"
-  termination_policies = [
-    "OldestInstance"]
-  max_size = local.max_spot_instances
-  min_size = local.min_spot_instances
-  launch_configuration = aws_launch_configuration.ecs_config_launch_config_spot.name
-  lifecycle {
-    create_before_destroy = true
-  }
-  vpc_zone_identifier = data.aws_subnet_ids.all_subnets.ids
-
-  # Wait for these resources to be created
-  depends_on = [
-    aws_subnet.subnet1,
-    aws_subnet.subnet2]
-}
-
-# Attach an autoscaling policy to the spot cluster to target 70% MemoryReservation on the ECS cluster.
-resource "aws_autoscaling_policy" "ecs_cluster_scale_policy" {
-  name = "${local.ecs_cluster_name}_ecs_cluster_spot_scale_policy"
-  policy_type = "TargetTrackingScaling"
-  adjustment_type = "ChangeInCapacity"
-  autoscaling_group_name = aws_autoscaling_group.ecs_cluster_spot.name
-
-  target_tracking_configuration {
-    customized_metric_specification {
-      metric_dimension {
-        name = "ClusterName"
-        value = local.ecs_cluster_name
-      }
-      metric_name = "MemoryReservation"
-      namespace = "AWS/ECS"
-      statistic = "Average"
-    }
-    target_value = 70.0
-  }
 }
 
 
