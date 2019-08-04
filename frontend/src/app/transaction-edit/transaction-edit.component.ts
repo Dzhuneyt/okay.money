@@ -5,7 +5,7 @@ import {TransactionService} from 'src/app/services/transaction.service';
 import {TransactionModel} from 'src/app/models/transaction.model';
 import {CategoriesService, Category} from 'src/app/services/categories.service';
 import {Account, AccountsService} from 'src/app/services/accounts.service';
-import {map, take} from "rxjs/operators";
+import {map, take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-transaction-edit',
@@ -17,7 +17,7 @@ export class TransactionEditComponent implements OnInit {
   // @TODO display category dropdown
   // @TODO display account dropdown
   public form = new FormGroup({
-    id: new FormControl(null, [Validators.required]),
+    id: new FormControl(null, []),
     description: new FormControl(null, []),
     sum: new FormControl(null, [Validators.required]),
     type: new FormControl('expense', [Validators.required]),
@@ -88,6 +88,9 @@ export class TransactionEditComponent implements OnInit {
     if (this.isNewRecord()) {
       // Create
       // @TODO create transaction
+      this.transaction.createSingle(payload).subscribe(() => {
+        this.dialogRef.close(true);
+      });
     } else {
       // Edit
       this.transaction.updateSingle(this.data.id, payload).subscribe(res => {

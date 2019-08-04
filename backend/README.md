@@ -78,6 +78,9 @@ The above command will generate the fixture "data" files (/fixtures/data). Those
     php yii fixture/load "Category"
     php yii fixture/load "Account"
     php yii fixture/load "Transaction"
+    
+### Loading fixtures into a local Docker Compose stack's MYSQL container
+    docker-compose exec backend php yii fixture/load "*"
 
 
 ## Commands

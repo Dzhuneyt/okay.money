@@ -9,6 +9,7 @@ import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.comp
 import {of} from 'rxjs';
 import {MatSnackBar} from '@angular/material';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
+import {TransactionService} from 'src/app/services/transaction.service';
 
 const columns = [
   {
@@ -114,10 +115,15 @@ export class TransactionListComponent implements OnInit {
     private categories: CategoriesService,
     private dialog: DialogService,
     private snackbar: MatSnackBar,
+    private transaction: TransactionService,
   ) {
   }
 
   ngOnInit() {
+    // On serious changes to the transactions, reinitialize the table
+    this.transaction.changes.subscribe(() => {
+      this.table.goToPage(0);
+    });
   }
 
   public getPage = (page, pageSize) => {

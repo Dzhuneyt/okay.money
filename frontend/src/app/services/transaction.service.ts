@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {BackendService} from 'src/app/services/backend.service';
 import {Observable} from 'rxjs';
 import {TransactionModel} from 'src/app/models/transaction.model';
@@ -7,6 +7,8 @@ import {TransactionModel} from 'src/app/models/transaction.model';
   providedIn: 'root'
 })
 export class TransactionService {
+
+  public changes = new EventEmitter();
 
   constructor(
     private backend: BackendService,
@@ -19,5 +21,9 @@ export class TransactionService {
 
   updateSingle(id: number, payload: {}) {
     return this.backend.request('v1/transactions/' + id, 'PUT', {}, payload);
+  }
+
+  createSingle(payload: {}) {
+    return this.backend.request('v1/transactions', 'POST', {}, payload);
   }
 }

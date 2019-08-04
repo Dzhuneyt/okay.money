@@ -5,12 +5,15 @@ namespace rest\versions\v1\actions\transaction;
 
 use common\models\Account;
 use common\models\Category;
+use common\models\Transaction;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\ServerErrorHttpException;
+
+
 
 class CreateAction extends \yii\rest\CreateAction
 {
@@ -55,7 +58,7 @@ class CreateAction extends \yii\rest\CreateAction
         }
 
         if (floatval($params['sum']) <= 0) {
-            throw new BadRequestHttpException('Invalid parameter "sum"');
+//            throw new BadRequestHttpException('Invalid parameter "sum"');
         }
         if (!empty($params['category_id'])) {
             if (!$this->getCategoryModel($params['category_id'])) {
@@ -70,10 +73,10 @@ class CreateAction extends \yii\rest\CreateAction
             call_user_func($this->checkAccess, $this->id);
         }
 
-        $params = \Yii::$app->request->getBodyParams();
+        $params = Yii::$app->request->getBodyParams();
         $this->validateParams($params);
 
-        /* @var $model Account */
+        /* @var $model Transaction */
         $model = $this->createModel();
 
         $params = Yii::$app->getRequest()->getBodyParams();

@@ -8,10 +8,15 @@ use common\models\Category;
 use common\models\Transaction;
 use common\models\User;
 use tests\functional\FunctionalTestCase;
+use yii\base\Exception;
 use yii\db\Query;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 use yii\web\UnauthorizedHttpException;
+
+
 
 class CreateActionTest extends FunctionalTestCase
 {
@@ -84,9 +89,9 @@ class CreateActionTest extends FunctionalTestCase
     /**
      * @depends testCreateTransactionSuccess
      * @throws ForbiddenHttpException
-     * @throws \yii\base\Exception
-     * @throws \yii\web\NotFoundHttpException
-     * @throws \yii\web\ServerErrorHttpException
+     * @throws Exception
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
      */
     public function testCanCreateTransactionWithFloatValue()
     {
@@ -117,9 +122,9 @@ class CreateActionTest extends FunctionalTestCase
     /**
      * @depends testCreateTransactionSuccess
      * @throws ForbiddenHttpException
-     * @throws \yii\base\Exception
-     * @throws \yii\web\NotFoundHttpException
-     * @throws \yii\web\ServerErrorHttpException
+     * @throws Exception
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
      */
     public function testTransactionGoesInCorrectAccount()
     {
@@ -151,9 +156,9 @@ class CreateActionTest extends FunctionalTestCase
     /**
      * @depends testCreateTransactionSuccess
      * @throws ForbiddenHttpException
-     * @throws \yii\base\Exception
-     * @throws \yii\web\NotFoundHttpException
-     * @throws \yii\web\ServerErrorHttpException
+     * @throws Exception
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
      */
     public function testTransactionTextIsSaved()
     {
@@ -188,16 +193,6 @@ class CreateActionTest extends FunctionalTestCase
         $this->apiCall('v1/transactions', 'POST', [
             'description' => $this->faker->text(),
             'account_id' => $this->account->id
-        ]);
-    }
-
-    public function testCanNotCreateTransactionWithNegativeSum()
-    {
-        $this->expectException(BadRequestHttpException::class);
-        $this->apiCall('v1/transactions', 'POST', [
-            'description' => $this->faker->text(),
-            'account_id' => $this->account->id,
-            'sum' => -1,
         ]);
     }
 

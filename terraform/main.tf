@@ -3,24 +3,8 @@
 provider "aws" {
   region = "us-east-1"
 }
+data "aws_region" "current" {
 
-# Define some variables we'll use later.
-locals {
-  instance_type = "t3a.micro"
-  spot_price = "0.10"
-  key_name = "Scava Ubuntu PC id_rsa"
-  ecs_cluster_name = "Personal_Finance"
-  max_spot_instances = 3
-  min_spot_instances = 0
-
-  max_ondemand_instances = 3
-  min_ondemand_instances = 1
-
-  # TODO Define also the AZs here (hardcoded) because sometimes Terraform creates 2 subnets in the same AZ and a Load balancer can not be attached to such thing
-  public_subnets = [
-    "10.0.1.0/24",
-    "10.0.2.0/24",
-    "10.0.3.0/24"]
 }
 
 # Create a Security Group with SSH access from the world
@@ -92,6 +76,7 @@ data "aws_iam_policy_document" "ecs_instance_role_policy_doc" {
       "ecs:RegisterContainerInstance",
       "ecs:StartTelemetrySession",
       "ecs:Submit*",
+      "ecs:StartTask",
       "ecr:GetAuthorizationToken",
       "ecr:BatchCheckLayerAvailability",
       "ecr:GetDownloadUrlForLayer",
@@ -128,4 +113,32 @@ resource "aws_iam_instance_profile" "ecs_iam_profile" {
 
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = local.ecs_cluster_name
+}
+
+
+# NEEDED FOR ALB
+# ecs service role
+resource "aws_iam_role" "ecs-service-role" {
+  name = "ecs-service-role-test"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ecs.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ecs-service-attach" {
+  role = aws_iam_role.ecs-service-role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
 }

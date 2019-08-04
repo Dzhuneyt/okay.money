@@ -6,8 +6,11 @@ use common\models\Account;
 use common\models\Category;
 use common\models\Transaction;
 use common\models\User;
+use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
+use tests\helpers\Curl;
+use Yii;
 use yii\base\Exception;
 use yii\db\Query;
 use yii\helpers\Json;
@@ -18,12 +21,11 @@ use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\web\UnauthorizedHttpException;
 
+
+
 class FunctionalTestCase extends TestCase
 {
     use FixtureTrait;
-
-    // The result of `php yii server`
-    private $baseUrl = 'http://127.0.0.1:9009/';
 
     /**
      * @var User
@@ -46,7 +48,7 @@ class FunctionalTestCase extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->faker = \Faker\Factory::create();
+        $this->faker = Factory::create();
         // Prerequisites for almost all tests
         $this->baseUser = $this->createUser();
     }
@@ -57,6 +59,14 @@ class FunctionalTestCase extends TestCase
             throw new ServerErrorHttpException('Can not delete temp user for tests: ' . $this->baseUser->id);
         }
         parent::tearDown();
+    }
+
+    private function getBaseUrl()
+    {
+        if (getenv('TESTS_BACKEND_HOST')) {
+            return getenv('TESTS_BACKEND_HOST');
+        }
+        return 'http://127.0.0.1:9009/';
     }
 
     /**
@@ -72,14 +82,14 @@ class FunctionalTestCase extends TestCase
      */
     protected function apiCall($path, $method = 'GET', $params = [])
     {
-        $curl = new \tests\helpers\Curl();
+        $curl = new Curl();
         $curl->setHeader('Accept', 'application/json');
 
         if ($this->accessToken) {
             $curl->setGetParams(['access-token' => $this->accessToken]);
         }
 
-        $url = $this->baseUrl . $path;
+        $url = $this->getBaseUrl() . $path;
         switch ($method) {
             case 'GET':
                 $curl->setGetParams($params);
@@ -109,7 +119,7 @@ class FunctionalTestCase extends TestCase
             try {
                 $response = Json::decode($response, true);
             } catch (\Exception $e) {
-                \Yii::error("Can not parse JSON response from API");
+                Yii::error("Can not parse JSON response from API");
                 throw $e;
             }
         }
@@ -182,12 +192,12 @@ class FunctionalTestCase extends TestCase
      */
     protected function createUser($username = null, $password = null)
     {
-        $faker = \Faker\Factory::create('en_US');
+        $faker = Factory::create('en_US');
         $password = ($password === null ? $faker->password : $password);
         $user = new User();
         $user->username = ($username === null ? $faker->userName : $username);
         $user->generateAuthKey();
-        $user->password_hash = \Yii::$app->security->generatePasswordHash($password, 4);
+        $user->password_hash = Yii::$app->security->generatePasswordHash($password, 4);
         $user->generatePasswordResetToken();
         $user->email = $faker->email;
         $user->status = 10;
@@ -207,10 +217,11 @@ class FunctionalTestCase extends TestCase
     protected function loginAsUser($idUser = null)
     {
         if ($idUser != null) {
-            $token = \Yii::$app->db->createCommand(
+            $token = Yii::$app->db->createCommand(
                 'SELECT auth_key FROM user WHERE id=:id',
                 [':id' => $idUser]
-            )->queryScalar();
+            )
+                                  ->queryScalar();
             if (!$token) {
                 throw new Exception('Can not login as user with ID ' . $idUser . '. Not found in DB');
             }
@@ -295,13 +306,13 @@ class FunctionalTestCase extends TestCase
     {
         // Get user's accounts and categories
         $userAccountIds = Account::find()
-            ->where(['owner_id' => $id])
-            ->select('id')
-            ->column();
+                                 ->where(['owner_id' => $id])
+                                 ->select('id')
+                                 ->column();
         $userCategoryIds = Category::find()
-            ->where(['owner_id' => $id])
-            ->select('id')
-            ->column();
+                                   ->where(['owner_id' => $id])
+                                   ->select('id')
+                                   ->column();
 
         // Delete transactions from these accounts
         Transaction::deleteAll(['category_id' => $userCategoryIds]);

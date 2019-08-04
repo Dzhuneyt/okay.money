@@ -11,11 +11,16 @@ output "vpc_id" {
   value = aws_vpc.main.id
 }
 
+# Declare the data source
+data "aws_availability_zones" "available" {
+  state = "available"
+}
 # For high availability we need to create multiple subnets
 resource "aws_subnet" "public_subnets" {
   vpc_id = aws_vpc.main.id
   count = length(local.public_subnets)
   cidr_block = local.public_subnets[count.index]
+  availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
     Name = "${local.ecs_cluster_name}-zone-${count.index}"

@@ -28,6 +28,8 @@ try {
     echo '--------------';
     echo 'Can not run functional tests due to a failure with migrations' . PHP_EOL;
     echo '--------------';
+    echo 'Config at the time of failure was:';
+    var_dump(json_encode($config));
     throw $e;
 }
 

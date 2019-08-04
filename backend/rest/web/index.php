@@ -1,4 +1,9 @@
 <?php
+
+use yii\base\InvalidConfigException;
+
+
+
 header("Access-Control-Allow-Origin: *");
 header('Access-Control-Allow-Methods: POST, GET, PUT, DELETE, OPTIONS ');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
@@ -13,7 +18,6 @@ require(__DIR__ . '/../config/bootstrap.php');
 
 $config = yii\helpers\ArrayHelper::merge(
     require(__DIR__ . '/../../common/config/main.php'),
-    require(__DIR__ . '/../../common/config/main-local.php'),
     require(__DIR__ . '/../config/main.php'),
     require(__DIR__ . '/../config/main-local.php')
 );
@@ -21,7 +25,7 @@ $config = yii\helpers\ArrayHelper::merge(
 try {
     $application = new yii\web\Application($config);
     $application->run();
-} catch (\yii\base\InvalidConfigException $e) {
+} catch (InvalidConfigException $e) {
     if (YII_DEBUG) {
         throw $e;
     } else {
