@@ -5,7 +5,7 @@
   "containerDefinitions": [
     {
       "name": "nginx",
-      "image": "216987438199.dkr.ecr.us-east-1.amazonaws.com/finance/nginx",
+      "image": "216987438199.dkr.ecr.us-east-1.amazonaws.com/finance/nginx@sha256:cfda28158480c7ab7daacadddff46e61ece1c4745d10071e1790aea80529f020",
       "essential": true,
       "memory": 128,
       "portMappings": [
