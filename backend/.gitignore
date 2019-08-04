@@ -27,5 +27,5 @@ phpunit.phar
 /phpunit.xml
 
 
-console/config/*-local.php
-common/config/*-local.php
+/console/config/*-local.php
+/common/config/*-local.php

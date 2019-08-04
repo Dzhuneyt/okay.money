@@ -19,7 +19,4 @@ Thumbs.db
 node_modules
 package-lock.json
 
-# Ignore AWS credentials and any other sensitive Terraform related files
-variables.tf
-.terraform
-*.tfstate.backup
+

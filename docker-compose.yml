@@ -5,11 +5,14 @@ services:
     build: nginx
     ports:
       - 8080:80
+    depends_on:
+      - backend
+      - frontend
   backend:
     build:
       context: backend
-    volumes:
-      - "./backend:/app"
+    #    volumes:
+    #      - "./backend:/app"
     ports:
       - "8081:80"
     depends_on:
@@ -17,8 +20,21 @@ services:
   frontend:
     build:
       context: frontend
+    depends_on:
+      - frontend_builder
+    volumes:
+      - frontend_app:/app
     ports:
       - 8082:80
+
+  frontend_builder:
+    build:
+      context: frontend
+      dockerfile: Dockerfile-builder
+    volumes:
+      - frontend_app:/app
+  #      - ./frontend:/app
+
   mysql:
     image: mysql:5.7
     restart: always
@@ -32,6 +48,7 @@ services:
       MYSQL_ROOT_PASSWORD: 'password'
     volumes:
       - mysql_data:/var/lib/mysql
-# Names our volume
+
 volumes:
   mysql_data:
+  frontend_app:

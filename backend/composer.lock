@@ -50,7 +50,7 @@
             "version": "v1.3.2",
             "source": {
                 "type": "git",
-                "url": "git@github.com:bestiejs/punycode.js.git",
+              "url": "https://github.com/bestiejs/punycode.js.git",
                 "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3"
             },
             "dist": {
@@ -547,12 +547,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "fe5e94c604826c35a32fa832f35bd036b6799609"
+              "reference": "626bb16c799983996863d1243eadf5bcb2cbb5bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/fe5e94c604826c35a32fa832f35bd036b6799609",
-                "reference": "fe5e94c604826c35a32fa832f35bd036b6799609",
+              "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/626bb16c799983996863d1243eadf5bcb2cbb5bd",
+              "reference": "626bb16c799983996863d1243eadf5bcb2cbb5bd",
                 "shasum": ""
             },
             "require": {
@@ -598,7 +598,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2019-02-06T07:57:58+00:00"
+          "time": "2019-08-01T10:49:16+00:00"
         },
         {
             "name": "symfony/polyfill-php72",
@@ -661,12 +661,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "7bc2d5afcacb8f01e199842fcbeefaabd554d18c"
+              "reference": "194eda4b55de6d5b4cfd7108f224617bd60a19e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/7bc2d5afcacb8f01e199842fcbeefaabd554d18c",
-                "reference": "7bc2d5afcacb8f01e199842fcbeefaabd554d18c",
+              "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/194eda4b55de6d5b4cfd7108f224617bd60a19e5",
+              "reference": "194eda4b55de6d5b4cfd7108f224617bd60a19e5",
                 "shasum": ""
             },
             "require": {
@@ -753,7 +753,7 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2019-07-24T08:49:32+00:00"
+          "time": "2019-08-01T10:20:37+00:00"
         },
         {
             "name": "yiisoft/yii2-composer",
@@ -2626,12 +2626,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-debug.git",
-                "reference": "f30a01a27b485dbd847793f435f4247897afe899"
+              "reference": "ad186e7ebaa12e6a01da69f5bdbdabbd1cb290dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-debug/zipball/f30a01a27b485dbd847793f435f4247897afe899",
-                "reference": "f30a01a27b485dbd847793f435f4247897afe899",
+              "url": "https://api.github.com/repos/yiisoft/yii2-debug/zipball/ad186e7ebaa12e6a01da69f5bdbdabbd1cb290dc",
+              "reference": "ad186e7ebaa12e6a01da69f5bdbdabbd1cb290dc",
                 "shasum": ""
             },
             "require": {
@@ -2676,7 +2676,7 @@
                 "debugger",
                 "yii2"
             ],
-            "time": "2019-07-23T20:21:11+00:00"
+          "time": "2019-07-30T12:41:00+00:00"
         },
         {
             "name": "yiisoft/yii2-faker",
