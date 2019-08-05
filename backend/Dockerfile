@@ -36,9 +36,11 @@ COPY . /app
 COPY --from=vendor /app/vendor/ /app/vendor/
 
 # Prepare important config files
-RUN php init --env=Docker --overwrite=y && ls common/config
+RUN php init --env=Docker --overwrite=y
 
 # Set apache http folder
 ENV APACHE_DOCUMENT_ROOT /app/rest/web
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf && \
     sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+CMD /app/scripts/container_start.sh
