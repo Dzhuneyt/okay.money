@@ -29,7 +29,7 @@ services:
     build:
       context: frontend
     volumes:
-      - ./frontend/dist/frontend:/app
+      - ./frontend:/app
     ports:
       - 8082:80
 
