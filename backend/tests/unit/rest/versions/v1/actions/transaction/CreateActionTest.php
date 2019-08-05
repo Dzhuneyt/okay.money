@@ -8,6 +8,8 @@ use rest\versions\v1\actions\transaction\CreateAction;
 use tests\unit\helpers\BaseCreateActionUnitTest;
 use yii\web\BadRequestHttpException;
 
+
+
 class CreateActionTest extends BaseCreateActionUnitTest
 {
     protected $actionClass = CreateAction::class;
@@ -47,29 +49,6 @@ class CreateActionTest extends BaseCreateActionUnitTest
         $mock->validateParams([
             'account_id' => 1,
             'sum' => 5
-        ]);
-    }
-
-    /**
-     * @depends testValidatesParamCategory
-     * @throws BadRequestHttpException
-     */
-    public function testValidatesParamSumNegative()
-    {
-        /**
-         * @var $mock CreateAction
-         */
-        $mock = $this->getMockBuilder($this->actionClass)
-            ->disableOriginalConstructor()
-            ->setMethods(['run'])
-            ->getMock();
-
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessageRegExp('(sum)');
-        $mock->validateParams([
-            'account_id' => 1,
-            'category_id' => 1,
-            'sum' => -5
         ]);
     }
 
