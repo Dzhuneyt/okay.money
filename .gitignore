@@ -28,3 +28,4 @@ package-lock.json
 
 .terraform
 .terraform.tfstate.lock.info
+terraform.tfstate.backup

@@ -2,7 +2,7 @@ version: "3"
 
 services:
   nginx:
-    image: ${ECR_PREFIX}/nginx
+    image: ${ECR_PREFIX}/nginx:${TAG}
     build: nginx
     ports:
       - 8080:80
@@ -10,7 +10,7 @@ services:
       - backend
       - frontend
   backend:
-    image: ${ECR_PREFIX}/backend
+    image: ${ECR_PREFIX}/backend:${TAG}
     build:
       context: backend
     volumes:
@@ -25,11 +25,11 @@ services:
     depends_on:
       - mysql
   frontend:
-    image: ${ECR_PREFIX}/frontend
+    image: ${ECR_PREFIX}/frontend:${TAG}
     build:
       context: frontend
-    volumes:
-      - ./frontend:/app
+    #    volumes:
+    #      - ./frontend:/app
     ports:
       - 8082:80
 

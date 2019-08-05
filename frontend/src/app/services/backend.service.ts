@@ -4,13 +4,14 @@ import {Observable} from 'rxjs';
 import {LocalStorage} from '@ngx-pwa/local-storage';
 import {catchError, flatMap} from 'rxjs/operators';
 import {Router} from '@angular/router';
+import {environment} from "src/environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class BackendService {
 
-  baseUrl = 'http://localhost:8080/';
+  baseUrl = environment.baseUrl;
 
   constructor(
     private http: HttpClient,
