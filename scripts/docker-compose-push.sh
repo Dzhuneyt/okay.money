@@ -1,6 +1,6 @@
 ##!/usr/bin/env sh
 
-timestamp=$(date -u +"%F-%H-%M-UTC")
+timestamp=$1
 
 TAG=$timestamp docker-compose build
 $(aws ecr get-login --no-include-email)

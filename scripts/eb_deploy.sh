@@ -1,6 +1,10 @@
 ##!/usr/bin/env sh
 
-timestamp=$(date +%s)
+BASEDIR=$(dirname "$0")
+
+timestamp=$(date -u +"%F-%H-%M-UTC")
+
+$BASEDIR/docker-compose-push.sh $timestamp
 
 # Generate Dockerrun.aws.json from the template file
 # Fix the version tags of images
@@ -12,9 +16,6 @@ declare -a StringArray=(
   "216987438199.dkr.ecr.us-east-1.amazonaws.com/finance/nginx"
   "216987438199.dkr.ecr.us-east-1.amazonaws.com/finance/backend"
   "216987438199.dkr.ecr.us-east-1.amazonaws.com/finance/frontend")
-
-TAG=$timestamp docker-compose build
-TAG=$timestamp docker-compose push
 
 # Iterate the string array using for loop
 for val in ${StringArray[@]}; do

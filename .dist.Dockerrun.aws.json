@@ -34,6 +34,21 @@
       ]
     },
     {
+      "name": "migrations",
+      "image": "216987438199.dkr.ecr.us-east-1.amazonaws.com/finance/backend",
+      "essential": true,
+      "memory": 128,
+      "command": [
+        "sleep 60"
+      ],
+      "Volumes": [
+        {
+          "HostDirectory": "/tmp/",
+          "ContainerDirectory": "/host_tmp/"
+        }
+      ]
+    },
+    {
       "name": "frontend",
       "image": "216987438199.dkr.ecr.us-east-1.amazonaws.com/finance/frontend",
       "essential": true,
