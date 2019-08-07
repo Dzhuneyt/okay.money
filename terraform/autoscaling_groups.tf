@@ -10,6 +10,14 @@ resource "aws_autoscaling_group" "ecs_cluster_ondemand" {
     create_before_destroy = true
   }
   vpc_zone_identifier = data.aws_subnet_ids.all_subnets.ids
+
+  tags = [
+    {
+      key = "Name"
+      value = local.ecs_cluster_name,
+      propagate_at_launch = true
+    }
+  ]
 }
 
 resource "aws_autoscaling_group" "ecs_cluster_spot" {

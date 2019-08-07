@@ -3,7 +3,8 @@
     "cpu": 256,
     "essential": true,
     "image": "${image_url}",
-    "memory": 512,
+    "memory": 128,
+    "memoryReservation": 10,
     "name": "${container_name}",
     "portMappings": [
       {

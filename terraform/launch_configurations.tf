@@ -15,7 +15,7 @@ echo ECS_CLUSTER=${local.ecs_cluster_name} >> /etc/ecs/ecs.config
 echo ECS_INSTANCE_ATTRIBUTES={\"purchase-option\":\"spot\"} >> /etc/ecs/ecs.config
 EOF
   security_groups = [
-    aws_security_group.ecs_cluster.id]
+    aws_security_group.sg_for_ec2_instances.id]
   key_name = local.key_name
   iam_instance_profile = aws_iam_instance_profile.ecs_iam_profile.arn
 }
@@ -35,7 +35,7 @@ echo ECS_CLUSTER=${local.ecs_cluster_name} >> /etc/ecs/ecs.config
 echo ECS_INSTANCE_ATTRIBUTES={\"purchase-option\":\"ondemand\"} >> /etc/ecs/ecs.config
 EOF
   security_groups = [
-    aws_security_group.ecs_cluster.id]
+    aws_security_group.sg_for_ec2_instances.id]
   key_name = local.key_name
   iam_instance_profile = aws_iam_instance_profile.ecs_iam_profile.arn
 }

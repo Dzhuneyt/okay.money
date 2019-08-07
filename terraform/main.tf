@@ -8,9 +8,9 @@ data "aws_region" "current" {
 }
 
 # Create a Security Group with SSH access from the world
-resource "aws_security_group" "ecs_cluster" {
-  name = "${local.ecs_cluster_name}_ecs_cluster"
-  description = "An ecs cluster"
+resource "aws_security_group" "sg_for_ec2_instances" {
+  name_prefix = "${local.ecs_cluster_name}_sg_for_ec2_instances_"
+  description = "Security group that allows incoming HTTP and SSH traffic to EC2 instances within the cluster called ${local.ecs_cluster_name}"
   vpc_id = data.aws_vpc.default.id
 
   # Allow SSH
@@ -33,6 +33,18 @@ resource "aws_security_group" "ecs_cluster" {
     ]
   }
 
+  # Allow all HTTP traffic from the Load Balancer in the ephemeral (Docker) port range
+  # This allows the ALB to call Docker Containers that run within the EC2 instances and have
+  # exposed some ports in the ephemeral range of that EC2 instance
+  ingress {
+    from_port = 32768
+    to_port = 61000
+    protocol = "tcp"
+    security_groups = [
+      aws_security_group.sg_for_alb.id
+    ]
+  }
+
   egress {
     from_port = 0
     to_port = 0
@@ -40,6 +52,14 @@ resource "aws_security_group" "ecs_cluster" {
     cidr_blocks = [
       "0.0.0.0/0"]
     prefix_list_ids = []
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = local.ecs_cluster_name
   }
 }
 
