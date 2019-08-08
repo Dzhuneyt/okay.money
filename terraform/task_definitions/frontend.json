@@ -12,6 +12,7 @@
         "hostPort": 0
       }
     ],
+    "networkMode": "awsvpc",
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
