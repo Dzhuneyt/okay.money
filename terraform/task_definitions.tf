@@ -39,14 +39,21 @@ data "template_file" "task_definition__frontend" {
 resource "aws_ecs_task_definition" "nginx" {
   family = local.ecs_cluster_name
   container_definitions = data.template_file.task_definition__nginx.rendered
+  network_mode = "awsvpc"
+  depends_on = [
+    aws_ecs_task_definition.frontend,
+    aws_ecs_task_definition.backend
+  ]
 }
 resource "aws_ecs_task_definition" "backend" {
   family = local.ecs_cluster_name
   container_definitions = data.template_file.task_definition__backend.rendered
+  network_mode = "awsvpc"
 }
 resource "aws_ecs_task_definition" "frontend" {
   family = local.ecs_cluster_name
   container_definitions = data.template_file.task_definition__frontend.rendered
+  network_mode = "awsvpc"
 }
 
 resource "aws_ecs_service" "nginx" {
@@ -54,7 +61,10 @@ resource "aws_ecs_service" "nginx" {
   cluster = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.nginx.arn
   desired_count = "1"
-//  iam_role = aws_iam_role.ecs-service-role.arn
+  network_configuration {
+    subnets = aws_subnet.public_subnets.*.id
+  }
+  //  iam_role = aws_iam_role.ecs-service-role.arn
 
   load_balancer {
     # Register the ECS service within the ALB target group
@@ -67,7 +77,8 @@ resource "aws_ecs_service" "nginx" {
 
   service_registries {
     registry_arn = aws_service_discovery_service.service_discovery.arn
-    port = "80"
+    container_name = "nginx"
+    container_port = "80"
   }
 
   depends_on = [
@@ -79,20 +90,24 @@ resource "aws_ecs_service" "backend" {
   cluster = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.backend.arn
   desired_count = "1"
+  network_configuration {
+    subnets = aws_subnet.public_subnets.*.id
+  }
   //  iam_role = aws_iam_role.ecs-service-role.arn
 
-//  load_balancer {
-//    # Register the ECS service within the ALB target group
-//    # This makes the service participate in health checks
-//    # and receive traffic when healthy
-//    target_group_arn = aws_alb_target_group.test.id
-//    container_name = "backend"
-//    container_port = "80"
-//  }
+  //  load_balancer {
+  //    # Register the ECS service within the ALB target group
+  //    # This makes the service participate in health checks
+  //    # and receive traffic when healthy
+  //    target_group_arn = aws_alb_target_group.test.id
+  //    container_name = "backend"
+  //    container_port = "80"
+  //  }
 
   service_registries {
     registry_arn = aws_service_discovery_service.service_discovery.arn
-    port = "80"
+    container_name = "backend"
+    container_port = 80
   }
 
   depends_on = [
@@ -100,24 +115,28 @@ resource "aws_ecs_service" "backend" {
   ]
 }
 resource "aws_ecs_service" "frontend" {
-  name = "${local.ecs_cluster_name}_nginx"
+  name = "${local.ecs_cluster_name}_frontend"
   cluster = aws_ecs_cluster.ecs_cluster.id
-  task_definition = aws_ecs_task_definition.nginx.arn
+  task_definition = aws_ecs_task_definition.frontend.arn
   desired_count = "1"
+  network_configuration {
+    subnets = aws_subnet.public_subnets.*.id
+  }
   //  iam_role = aws_iam_role.ecs-service-role.arn
 
-//  load_balancer {
-//    # Register the ECS service within the ALB target group
-//    # This makes the service participate in health checks
-//    # and receive traffic when healthy
-//    target_group_arn = aws_alb_target_group.test.id
-//    container_name = "nginx"
-//    container_port = "80"
-//  }
+  //  load_balancer {
+  //    # Register the ECS service within the ALB target group
+  //    # This makes the service participate in health checks
+  //    # and receive traffic when healthy
+  //    target_group_arn = aws_alb_target_group.test.id
+  //    container_name = "nginx"
+  //    container_port = "80"
+  //  }
 
   service_registries {
     registry_arn = aws_service_discovery_service.service_discovery.arn
-    port = "80"
+    container_name = "frontend"
+    container_port = 80
   }
 
   depends_on = [

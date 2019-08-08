@@ -8,17 +8,16 @@
     "name": "${container_name}",
     "portMappings": [
       {
-        "containerPort": 80,
-        "hostPort": 0
+        "containerPort": 80
       }
     ],
-    "networkMode": "awsvpc",
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
         "awslogs-group": "${log_group_name}",
         "awslogs-region": "${log_group_region}"
       }
-    }
+    },
+    "networkMode": "awsvpc"
   }
 ]

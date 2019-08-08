@@ -3,6 +3,8 @@ resource "aws_autoscaling_group" "ecs_cluster_ondemand" {
   name_prefix = "${aws_launch_configuration.ecs_config_launch_config_ondemand.name}_ecs_cluster_ondemand"
   termination_policies = [
     "OldestInstance"]
+  default_cooldown = 30
+  health_check_grace_period = 30
   max_size = local.max_ondemand_instances
   min_size = local.min_ondemand_instances
   launch_configuration = aws_launch_configuration.ecs_config_launch_config_ondemand.name
@@ -24,6 +26,8 @@ resource "aws_autoscaling_group" "ecs_cluster_spot" {
   name_prefix = "${aws_launch_configuration.ecs_config_launch_config_spot.name}_ecs_cluster_spot"
   termination_policies = [
     "OldestInstance"]
+  default_cooldown = 30
+  health_check_grace_period = 30
   max_size = local.max_spot_instances
   min_size = local.min_spot_instances
   launch_configuration = aws_launch_configuration.ecs_config_launch_config_spot.name
