@@ -39,7 +39,7 @@
       "essential": true,
       "memory": 128,
       "command": [
-        "sleep 60"
+        "pwd"
       ],
       "Volumes": [
         {
