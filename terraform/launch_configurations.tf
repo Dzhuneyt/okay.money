@@ -17,7 +17,7 @@ EOF
   security_groups = [
     aws_security_group.sg_for_ec2_instances.id]
   key_name = local.key_name
-  iam_instance_profile = aws_iam_instance_profile.ecs_iam_profile.arn
+  iam_instance_profile = aws_iam_instance_profile.ec2_iam_instance_profile.arn
 }
 
 resource "aws_launch_configuration" "ecs_config_launch_config_ondemand" {
@@ -37,5 +37,5 @@ EOF
   security_groups = [
     aws_security_group.sg_for_ec2_instances.id]
   key_name = local.key_name
-  iam_instance_profile = aws_iam_instance_profile.ecs_iam_profile.arn
+  iam_instance_profile = aws_iam_instance_profile.ec2_iam_instance_profile.arn
 }

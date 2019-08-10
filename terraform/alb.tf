@@ -68,5 +68,5 @@ resource "aws_alb_listener" "front_end" {
 }
 
 output "alb_public_url" {
-  value = aws_alb.main.dns_name
+  value = "http://${aws_alb.main.dns_name}/"
 }

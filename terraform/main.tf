@@ -65,7 +65,7 @@ resource "aws_security_group" "sg_for_ec2_instances" {
 
 # Create an IAM role for the ECS instances.
 resource "aws_iam_role" "ecs_instance" {
-  name = "ecs_instance"
+  name = "${local.ecs_cluster_name}-instance-role"
 
   assume_role_policy = <<EOF
 {
@@ -74,7 +74,10 @@ resource "aws_iam_role" "ecs_instance" {
     {
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": "ec2.amazonaws.com"
+        "Service": [
+          "ec2.amazonaws.com",
+          "ecs-tasks.amazonaws.com"
+        ]
       },
       "Effect": "Allow",
       "Sid": ""
@@ -125,7 +128,7 @@ resource "aws_iam_policy_attachment" "ecs_instance_role_policy_attachment" {
   policy_arn = aws_iam_policy.ecs_role_permissions.arn
 }
 
-resource "aws_iam_instance_profile" "ecs_iam_profile" {
+resource "aws_iam_instance_profile" "ec2_iam_instance_profile" {
   name = "ecs_role_instance_profile"
   role = aws_iam_role.ecs_instance.name
 }

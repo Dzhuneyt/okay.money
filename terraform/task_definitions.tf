@@ -40,6 +40,7 @@ resource "aws_ecs_task_definition" "nginx" {
   family = local.ecs_cluster_name
   container_definitions = data.template_file.task_definition__nginx.rendered
   network_mode = "awsvpc"
+  execution_role_arn = aws_iam_role.ecs_instance.arn
   depends_on = [
     aws_ecs_task_definition.frontend,
     aws_ecs_task_definition.backend
@@ -49,11 +50,13 @@ resource "aws_ecs_task_definition" "backend" {
   family = local.ecs_cluster_name
   container_definitions = data.template_file.task_definition__backend.rendered
   network_mode = "awsvpc"
+  execution_role_arn = aws_iam_role.ecs_instance.arn
 }
 resource "aws_ecs_task_definition" "frontend" {
   family = local.ecs_cluster_name
   container_definitions = data.template_file.task_definition__frontend.rendered
   network_mode = "awsvpc"
+  execution_role_arn = aws_iam_role.ecs_instance.arn
 }
 
 resource "aws_ecs_service" "nginx" {
@@ -61,6 +64,8 @@ resource "aws_ecs_service" "nginx" {
   cluster = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.nginx.arn
   desired_count = "1"
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent = 200
   network_configuration {
     subnets = aws_subnet.public_subnets.*.id
   }
@@ -90,6 +95,8 @@ resource "aws_ecs_service" "backend" {
   cluster = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.backend.arn
   desired_count = "1"
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent = 200
   network_configuration {
     subnets = aws_subnet.public_subnets.*.id
   }
@@ -119,6 +126,8 @@ resource "aws_ecs_service" "frontend" {
   cluster = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.frontend.arn
   desired_count = "1"
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent = 200
   network_configuration {
     subnets = aws_subnet.public_subnets.*.id
   }
