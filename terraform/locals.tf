@@ -1,8 +1,8 @@
 # Define some variables we'll use later.
 locals {
   instance_type = "t3a.micro"
-  spot_price = "0.003"
-  key_name = "Scava Ubuntu PC id_rsa"
+  spot_price    = "0.003"
+  key_name      = "Scava Ubuntu PC id_rsa"
 
   # Alphanumeric and dash allowed
   ecs_cluster_name = "Personal-Finance"
@@ -18,5 +18,5 @@ locals {
     "10.0.1.0/24",
     "10.0.2.0/24",
     "10.0.3.0/24",
-    "10.0.4.0/24"]
+  "10.0.4.0/24"]
 }

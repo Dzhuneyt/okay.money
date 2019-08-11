@@ -1,6 +1,6 @@
 # Create a VPC
 resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
   tags = {
     Name = local.ecs_cluster_name
@@ -17,9 +17,9 @@ data "aws_availability_zones" "available" {
 }
 # For high availability we need to create multiple subnets
 resource "aws_subnet" "public_subnets" {
-  vpc_id = aws_vpc.main.id
-  count = length(local.public_subnets)
-  cidr_block = local.public_subnets[count.index]
+  vpc_id            = aws_vpc.main.id
+  count             = length(local.public_subnets)
+  cidr_block        = local.public_subnets[count.index]
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {

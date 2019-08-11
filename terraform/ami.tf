@@ -8,17 +8,17 @@ data "aws_ami" "ecs" {
   filter {
     name = "name"
     values = [
-      "amzn2-ami-ecs-*"]
+    "amzn2-ami-ecs-*"]
   }
 
   filter {
     name = "virtualization-type"
     values = [
-      "hvm"]
+    "hvm"]
   }
 
   owners = [
-    "591542846629"]
+  "591542846629"]
   # Amazon
 
   //  most_recent = true

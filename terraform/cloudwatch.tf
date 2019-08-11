@@ -1,9 +1,9 @@
 ## CloudWatch Logs
 
 resource "aws_cloudwatch_log_group" "ecs" {
-  name = "tf-ecs-group/ecs-agent"
+  name = "${local.ecs_cluster_name}-ecs"
 }
 
 resource "aws_cloudwatch_log_group" "app" {
-  name = "tf-ecs-group/app-ghost"
+  name = "${local.ecs_cluster_name}-app"
 }

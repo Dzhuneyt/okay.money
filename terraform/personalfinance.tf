@@ -8,7 +8,7 @@ data "template_file" "instance_profile" {
 }
 
 resource "aws_iam_role_policy" "instance" {
-  name = "TfEcsExampleInstanceRole"
-  role = aws_iam_role.ecs_instance.name
+  name   = "TfEcsExampleInstanceRole"
+  role   = aws_iam_role.ecs_instance.name
   policy = data.template_file.instance_profile.rendered
 }
