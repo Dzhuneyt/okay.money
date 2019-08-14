@@ -2,12 +2,13 @@
 resource "aws_autoscaling_group" "ecs_cluster_ondemand" {
   name_prefix = "${aws_launch_configuration.ecs_config_launch_config_ondemand.name}_ecs_cluster_ondemand"
   termination_policies = [
-  "OldestInstance"]
-  default_cooldown          = 30
+    "OldestInstance"]
+  default_cooldown = 30
   health_check_grace_period = 30
-  max_size                  = local.max_ondemand_instances
-  min_size                  = local.min_ondemand_instances
-  launch_configuration      = aws_launch_configuration.ecs_config_launch_config_ondemand.name
+  max_size = local.max_ondemand_instances
+  min_size = local.min_ondemand_instances
+  desired_capacity = local.min_ondemand_instances
+  launch_configuration = aws_launch_configuration.ecs_config_launch_config_ondemand.name
   lifecycle {
     create_before_destroy = true
   }
@@ -15,8 +16,8 @@ resource "aws_autoscaling_group" "ecs_cluster_ondemand" {
 
   tags = [
     {
-      key                 = "Name"
-      value               = local.ecs_cluster_name,
+      key = "Name"
+      value = local.ecs_cluster_name,
       propagate_at_launch = true
     }
   ]
@@ -25,12 +26,13 @@ resource "aws_autoscaling_group" "ecs_cluster_ondemand" {
 resource "aws_autoscaling_group" "ecs_cluster_spot" {
   name_prefix = "${aws_launch_configuration.ecs_config_launch_config_spot.name}_ecs_cluster_spot"
   termination_policies = [
-  "OldestInstance"]
-  default_cooldown          = 30
+    "OldestInstance"]
+  default_cooldown = 30
   health_check_grace_period = 30
-  max_size                  = local.max_spot_instances
-  min_size                  = local.min_spot_instances
-  launch_configuration      = aws_launch_configuration.ecs_config_launch_config_spot.name
+  max_size = local.max_spot_instances
+  min_size = local.min_spot_instances
+  desired_capacity = local.min_spot_instances
+  launch_configuration = aws_launch_configuration.ecs_config_launch_config_spot.name
   lifecycle {
     create_before_destroy = true
   }
@@ -38,8 +40,8 @@ resource "aws_autoscaling_group" "ecs_cluster_spot" {
 
   tags = [
     {
-      key                 = "Name"
-      value               = local.ecs_cluster_name,
+      key = "Name"
+      value = local.ecs_cluster_name,
       propagate_at_launch = true
     }
   ]
@@ -47,24 +49,24 @@ resource "aws_autoscaling_group" "ecs_cluster_spot" {
 
 # Attach an autoscaling policy to the spot cluster to target 70% MemoryReservation on the ECS cluster.
 resource "aws_autoscaling_policy" "ecs_cluster_scale_policy" {
-  name            = "${local.ecs_cluster_name}_ecs_cluster_spot_scale_policy"
-  policy_type     = "TargetTrackingScaling"
+  name = "${local.ecs_cluster_name}_ecs_cluster_spot_scale_policy"
+  policy_type = "TargetTrackingScaling"
   adjustment_type = "ChangeInCapacity"
   lifecycle {
     ignore_changes = [
-    adjustment_type]
+      adjustment_type]
   }
   autoscaling_group_name = aws_autoscaling_group.ecs_cluster_spot.name
 
   target_tracking_configuration {
     customized_metric_specification {
       metric_dimension {
-        name  = "ClusterName"
+        name = "ClusterName"
         value = local.ecs_cluster_name
       }
       metric_name = "MemoryReservation"
-      namespace   = "AWS/ECS"
-      statistic   = "Average"
+      namespace = "AWS/ECS"
+      statistic = "Average"
     }
     target_value = 70.0
   }

@@ -8,7 +8,8 @@
     "name": "${container_name}",
     "portMappings": [
       {
-        "containerPort": 80
+        "containerPort": 80,
+        "protocol": "tcp"
       }
     ],
     "networkMode": "awsvpc",

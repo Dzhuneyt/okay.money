@@ -23,26 +23,35 @@ resource "aws_security_group" "sg_for_ec2_instances" {
       "0.0.0.0/0"
     ]
   }
+  # Allow HTTPS
+  ingress {
+    protocol = "tcp"
+    from_port = 443
+    to_port = 443
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+  }
 
   # Allow all HTTP traffic from the Load Balancer in the ephemeral (Docker) port range
   # This allows the ALB to call Docker Containers that run within the EC2 instances and have
   # exposed some ports in the ephemeral range of that EC2 instance
   ingress {
-    from_port = 32768
-    to_port   = 61000
-    protocol  = "tcp"
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
     security_groups = [
       aws_security_group.sg_for_alb.id
     ]
   }
 
+  # Allow egresss network
   egress {
     from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    to_port = 0
+    protocol = "-1"
     cidr_blocks = [
-    "0.0.0.0/0"]
-    prefix_list_ids = []
+      "0.0.0.0/0"]
   }
 
   lifecycle {
@@ -65,18 +74,17 @@ resource "aws_security_group" "sg_for_alb" {
     from_port = 80
     to_port   = 80
     cidr_blocks = [
-      "0.0.0.0/0"
+      "0.0.0.0/0",
     ]
   }
 
   # Allow the ALB to communicate with any other resource within AWS (and the internet)
   egress {
     from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    to_port = 0
+    protocol = "-1"
     cidr_blocks = [
-    "0.0.0.0/0"]
-    prefix_list_ids = []
+      "0.0.0.0/0"]
   }
 
   tags = {

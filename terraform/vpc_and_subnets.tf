@@ -23,7 +23,17 @@ resource "aws_subnet" "public_subnets" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
-    Name = "${local.ecs_cluster_name}-zone-${count.index}"
+    Name = "${local.ecs_cluster_name}-publicsubnet-${count.index}"
+  }
+}
+resource "aws_subnet" "private_subnet" {
+  vpc_id = aws_vpc.main.id
+  count = length(local.private_subnets)
+  cidr_block = local.private_subnets[count.index]
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+
+  tags = {
+    Name = "${local.ecs_cluster_name}-privatesubnet-${count.index}"
   }
 }
 
