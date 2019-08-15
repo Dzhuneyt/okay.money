@@ -2,4 +2,5 @@
 
 timestamp=$(date -u +"%F-%H-UTC")
 
-TAG=$timestamp docker-compose up --build
+TAG=$timestamp docker-compose build --parallel
+TAG=$timestamp docker-compose up

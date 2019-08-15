@@ -1,14 +1,15 @@
 # Define some variables we'll use later.
 locals {
-  instance_type = "t3a.micro"
-  spot_price = "0.003"
-  key_name = "Scava Ubuntu PC id_rsa"
+  instance_type_ondemand = "t3a.micro"
+  instance_type_spot     = "t3a.medium"
+  spot_price             = "0.0113"
+  key_name               = "Dell G5 Ubuntu"
 
   # Alphanumeric and dash allowed
   ecs_cluster_name = "Personal-Finance"
 
-  max_spot_instances = 4
-  min_spot_instances = 3
+  max_spot_instances = 10
+  min_spot_instances = 7
 
   max_ondemand_instances = 3
   min_ondemand_instances = 1
@@ -23,4 +24,6 @@ locals {
     "10.0.10.0/24",
     "10.0.11.0/24",
   ]
+
+  network_mode = "awsvpc"
 }

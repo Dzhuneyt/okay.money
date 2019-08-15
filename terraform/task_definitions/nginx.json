@@ -12,6 +12,20 @@
       }
     ],
     "networkMode": "awsvpc",
+    "environment": [
+      {
+        "name": "IS_AWS",
+        "value": "1"
+      },
+      {
+        "name": "BACKEND_HOST",
+        "value": "backend.personal-finance.local"
+      },
+      {
+        "name": "FRONTEND_HOST",
+        "value": "frontend.personal-finance.local"
+      }
+    ],
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {

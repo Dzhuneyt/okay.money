@@ -1,5 +1,4 @@
 # Ignore AWS credentials and any other sensitive Terraform related files
-variables.tf
 .terraform
 *.tfstate.backup
 .terraform.tfstate.lock.info

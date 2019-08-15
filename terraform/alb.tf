@@ -3,19 +3,30 @@
 # see https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html
 resource "aws_alb" "main" {
   name = local.ecs_cluster_name
+
+  # The ALB will potentially target all possible public subnets and AZs
   subnets = aws_subnet.public_subnets.*.id
+
   security_groups = [
-    aws_security_group.sg_for_alb.id]
+    # SG that allows incoming traffic to the ALB
+    # and the ALB to communicate internally
+    # with other resources within the VPC
+    aws_security_group.sg_for_alb.id
+  ]
   tags = {
     Name = local.ecs_cluster_name
   }
 }
 
 resource "aws_alb_target_group" "target_group_frontend" {
-  name = "${local.ecs_cluster_name}-frontend"
-  port = 80
+  name     = "${local.ecs_cluster_name}-frontend"
+  port     = 80
   protocol = "HTTP"
-  vpc_id = aws_vpc.main.id
+  vpc_id   = aws_vpc.main.id
+
+  health_check {
+    path = "/health"
+  }
 
   # This target_type allows distributing traffic to
   # ECS services within EC2 instances (ECS cluster)
@@ -25,10 +36,14 @@ resource "aws_alb_target_group" "target_group_frontend" {
   target_type = "ip"
 
   deregistration_delay = 15
+
+  tags = {
+    Name = local.ecs_cluster_name
+  }
 }
 resource "aws_alb_target_group" "target_group_backend" {
-  name = "${local.ecs_cluster_name}-backend"
-  port = 80
+  name     = "${local.ecs_cluster_name}-backend"
+  port     = 80
   protocol = "HTTP"
   health_check {
     path = "/robots.txt"
@@ -43,6 +58,10 @@ resource "aws_alb_target_group" "target_group_backend" {
   target_type = "ip"
 
   deregistration_delay = 15
+
+  tags = {
+    Name = local.ecs_cluster_name
+  }
 }
 
 # Listener for traffic
@@ -52,32 +71,60 @@ resource "aws_alb_listener" "http_traffic" {
 
   # Listens on port 80 ingress
   # Make sure the Security Group associated with the ALB allows this
-  port = "80"
+  port     = "80"
   protocol = "HTTP"
 
-  # And forwards everything to a "catch all" ALB group
+  # And forwards everything to a "catch all" ALB group (frontend)
   default_action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_alb_target_group.target_group_frontend.id
   }
 }
 
+# Redirect requests that start with "/v1" to the REST API service
 resource "aws_lb_listener_rule" "backend" {
   listener_arn = aws_alb_listener.http_traffic.arn
-  priority = 100
+  priority     = 100
 
   action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_alb_target_group.target_group_backend.arn
   }
 
   condition {
     field = "path-pattern"
     values = [
-      "/v1/*"]
+    "/v1/*"]
   }
 }
-
-output "alb_public_url" {
-  value = "http://${aws_alb.main.dns_name}/"
-}
+//
+//resource "aws_lb_listener_rule" "static_js_to_frontend" {
+//  listener_arn = aws_alb_listener.http_traffic.arn
+//  priority = 100
+//
+//  action {
+//    type = "forward"
+//    target_group_arn = aws_alb_target_group.target_group_frontend.arn
+//  }
+//
+//  condition {
+//    field = "path-pattern"
+//    values = [
+//      "/**.js"]
+//  }
+//}
+//resource "aws_lb_listener_rule" "static_css_to_frontend" {
+//  listener_arn = aws_alb_listener.http_traffic.arn
+//  priority = 100
+//
+//  action {
+//    type = "forward"
+//    target_group_arn = aws_alb_target_group.target_group_frontend.arn
+//  }
+//
+//  condition {
+//    field = "path-pattern"
+//    values = [
+//      "/**.css"]
+//  }
+//}

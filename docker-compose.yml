@@ -4,6 +4,10 @@ services:
   nginx:
     image: ${ECR_PREFIX}/nginx:${TAG}
     build: nginx
+    environment:
+      - IS_AWS=${IS_AWS}
+      - BACKEND_HOST=backend
+      - FRONTEND_HOST=frontend
     ports:
       - 8080:80
     depends_on:
