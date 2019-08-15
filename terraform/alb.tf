@@ -37,6 +37,9 @@ resource "aws_alb_target_group" "target_group_frontend" {
 
   deregistration_delay = 15
 
+  depends_on = [
+    aws_alb.main
+  ]
   tags = {
     Name = local.ecs_cluster_name
   }
@@ -58,6 +61,10 @@ resource "aws_alb_target_group" "target_group_backend" {
   target_type = "ip"
 
   deregistration_delay = 15
+
+  depends_on = [
+    aws_alb.main
+  ]
 
   tags = {
     Name = local.ecs_cluster_name
