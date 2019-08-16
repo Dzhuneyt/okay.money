@@ -31,6 +31,8 @@ resource "aws_alb" "main" {
 resource "aws_s3_bucket" "alb_logs" {
   bucket = local.alb_logs_bucket_name
   acl = "private"
+  # On destroy of stack, delete the bucket even if it has some content
+  force_destroy = true
 
   tags = {
     Name = local.ecs_cluster_name
