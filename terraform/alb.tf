@@ -19,10 +19,10 @@ resource "aws_alb" "main" {
 }
 
 resource "aws_alb_target_group" "target_group_frontend" {
-  name     = "${local.ecs_cluster_name}-frontend"
-  port     = 80
+  name = "${local.ecs_cluster_name}-frontend"
+  port = 80
   protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
+  vpc_id = aws_vpc.main.id
 
   health_check {
     path = "/health"
@@ -45,8 +45,8 @@ resource "aws_alb_target_group" "target_group_frontend" {
   }
 }
 resource "aws_alb_target_group" "target_group_backend" {
-  name     = "${local.ecs_cluster_name}-backend"
-  port     = 80
+  name = "${local.ecs_cluster_name}-backend"
+  port = 80
   protocol = "HTTP"
   health_check {
     path = "/robots.txt"
@@ -72,36 +72,55 @@ resource "aws_alb_target_group" "target_group_backend" {
 }
 
 # Listener for traffic
+resource "aws_alb_listener" "https_traffic" {
+  # Attach the listener to an actual ALB
+  load_balancer_arn = aws_alb.main.id
+  certificate_arn = aws_acm_certificate_validation.cert.certificate_arn
+
+  port = "443"
+  protocol = "HTTPS"
+  ssl_policy = "ELBSecurityPolicy-2016-08"
+
+  # And forwards everything to a "catch all" ALB group (frontend)
+  default_action {
+    type = "forward"
+    target_group_arn = aws_alb_target_group.target_group_frontend.id
+  }
+}
 resource "aws_alb_listener" "http_traffic" {
   # Attach the listener to an actual ALB
   load_balancer_arn = aws_alb.main.id
 
   # Listens on port 80 ingress
   # Make sure the Security Group associated with the ALB allows this
-  port     = "80"
+  port = "80"
   protocol = "HTTP"
 
-  # And forwards everything to a "catch all" ALB group (frontend)
   default_action {
-    type             = "forward"
-    target_group_arn = aws_alb_target_group.target_group_frontend.id
+    type = "redirect"
+
+    redirect {
+      port = "443"
+      protocol = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 }
 
 # Redirect requests that start with "/v1" to the REST API service
 resource "aws_lb_listener_rule" "backend" {
   listener_arn = aws_alb_listener.http_traffic.arn
-  priority     = 100
+  priority = 100
 
   action {
-    type             = "forward"
+    type = "forward"
     target_group_arn = aws_alb_target_group.target_group_backend.arn
   }
 
   condition {
     field = "path-pattern"
     values = [
-    "/v1/*"]
+      "/v1/*"]
   }
 }
 //

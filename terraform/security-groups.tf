@@ -68,11 +68,19 @@ resource "aws_security_group" "sg_for_alb" {
   description = "A security group for the Application Load Balancer. Allows HTTP traffic in"
   vpc_id      = data.aws_vpc.default.id
 
-  # Allow HTTP traffic from any IP
+  # Allow HTTP/HTTPS traffic from any IP
   ingress {
     protocol  = "tcp"
     from_port = 80
     to_port   = 80
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
+  }
+  ingress {
+    protocol = "tcp"
+    from_port = 443
+    to_port = 443
     cidr_blocks = [
       "0.0.0.0/0",
     ]
