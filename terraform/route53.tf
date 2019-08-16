@@ -1,12 +1,15 @@
 resource "aws_route53_zone" "domain" {
   name = var.domain_name
+  tags = {
+    Name = local.ecs_cluster_name
+  }
 }
 
 # Create HTTPS certificate
 resource "aws_acm_certificate" "cert" {
   domain_name = var.domain_name
   validation_method = "DNS"
-  tags {
+  tags = {
     Name = local.ecs_cluster_name
   }
 }

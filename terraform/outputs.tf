@@ -1,6 +1,10 @@
 output "alb_public_url" {
   value = "http://${aws_alb.main.dns_name}/"
 }
+output "vpc_id" {
+  # Output the newly created VPC ID
+  value = "${aws_vpc.main.id} with CIDR block ${aws_vpc.main.cidr_block}"
+}
 output "public_subnet_ids" {
   value = aws_subnet.public_subnets.*.id
 }
@@ -12,4 +16,14 @@ output "domain_name" {
 }
 output "dns_zone_nameservers" {
   value = aws_route53_zone.domain.name_servers
+}
+
+output "security_group_alb" {
+  value = "ID of security group of the ALB: ${aws_security_group.sg_for_alb.id}"
+}
+output "security_group_ec2" {
+  value = "ID of security group of the EC2 instances: ${aws_security_group.sg_for_ec2_instances.id}"
+}
+output "security_group_apps" {
+  value = "ID of security group of the apps within the cluster: ${aws_security_group.sg_for_ecs_apps.id}"
 }

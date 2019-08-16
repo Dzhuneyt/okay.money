@@ -24,7 +24,7 @@ resource "aws_ecs_task_definition" "nginx" {
 //  network_configuration {
 //    subnets = aws_subnet.private_subnet.*.id
 //    security_groups = [
-//    aws_security_group.sg_for_ec2_instances.id]
+//    aws_security_group.sg_for_ecs_apps.id]
 //  }
 //
 //  load_balancer {

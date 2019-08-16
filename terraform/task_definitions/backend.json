@@ -12,6 +12,24 @@
         "protocol": "tcp"
       }
     ],
+    "environment": [
+      {
+        "name": "MYSQL_HOST",
+        "value": "${MYSQL_HOST}"
+      },
+      {
+        "name": "MYSQL_DB",
+        "value": "${MYSQL_DB}"
+      },
+      {
+        "name": "MYSQL_USER",
+        "value": "${MYSQL_USER}"
+      },
+      {
+        "name": "MYSQL_PASS",
+        "value": "${MYSQL_PASSWORD}"
+      }
+    ],
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {

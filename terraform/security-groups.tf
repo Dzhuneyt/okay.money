@@ -1,14 +1,14 @@
 # Create a Security Group with SSH access from the world
 resource "aws_security_group" "sg_for_ec2_instances" {
   name_prefix = "${local.ecs_cluster_name}_sg_for_ec2_instances_"
-  description = "Security group that allows incoming HTTP and SSH traffic to EC2 instances within the cluster called ${local.ecs_cluster_name}"
-  vpc_id      = data.aws_vpc.default.id
+  description = "Security group that allows SSH traffic to the EC2 instances within the cluster"
+  vpc_id = data.aws_vpc.default.id
 
   # Allow SSH
   ingress {
     from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
+    to_port = 22
+    protocol = "tcp"
     cidr_blocks = [
       "0.0.0.0/0"
     ]
@@ -16,9 +16,63 @@ resource "aws_security_group" "sg_for_ec2_instances" {
 
   # Allow HTTP
   ingress {
-    protocol  = "tcp"
+    protocol = "tcp"
     from_port = 80
-    to_port   = 80
+    to_port = 80
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+  }
+  # Allow HTTPS
+  ingress {
+    protocol = "tcp"
+    from_port = 443
+    to_port = 443
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+  }
+
+  # Allow all HTTP traffic from the Load Balancer in the ephemeral (Docker) port range
+  # This allows the ALB to call Docker Containers that run within the EC2 instances and have
+  # exposed some ports in the ephemeral range of that EC2 instance
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    security_groups = [
+      aws_security_group.sg_for_alb.id
+    ]
+  }
+
+  # Allow egresss network
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = [
+      "0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = local.ecs_cluster_name
+  }
+}
+
+resource "aws_security_group" "sg_for_ecs_apps" {
+  name_prefix = "${local.ecs_cluster_name}_sg_for_ecs_apps_"
+  description = "Security group that allows incoming HTTP/HTTPS traffic and ALB traffic to the ECS tasks within the cluster"
+  vpc_id = data.aws_vpc.default.id
+
+  # Allow HTTP
+  ingress {
+    protocol = "tcp"
+    from_port = 80
+    to_port = 80
     cidr_blocks = [
       "0.0.0.0/0"
     ]
@@ -66,13 +120,13 @@ resource "aws_security_group" "sg_for_ec2_instances" {
 resource "aws_security_group" "sg_for_alb" {
   name_prefix = "${local.ecs_cluster_name}_sg_for_alb"
   description = "A security group for the Application Load Balancer. Allows HTTP traffic in"
-  vpc_id      = data.aws_vpc.default.id
+  vpc_id = data.aws_vpc.default.id
 
   # Allow HTTP/HTTPS traffic from any IP
   ingress {
-    protocol  = "tcp"
+    protocol = "tcp"
     from_port = 80
-    to_port   = 80
+    to_port = 80
     cidr_blocks = [
       "0.0.0.0/0",
     ]

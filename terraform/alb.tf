@@ -4,6 +4,12 @@
 resource "aws_alb" "main" {
   name = local.ecs_cluster_name
 
+  access_logs {
+    bucket = aws_s3_bucket.alb_logs.bucket
+    prefix = local.ecs_cluster_name
+    enabled = true
+  }
+
   # The ALB will potentially target all possible public subnets and AZs
   subnets = aws_subnet.public_subnets.*.id
 
@@ -16,6 +22,31 @@ resource "aws_alb" "main" {
   tags = {
     Name = local.ecs_cluster_name
   }
+
+  depends_on = [
+    aws_s3_bucket.alb_logs,
+    aws_s3_bucket_policy.aws_s3_bucket_policy
+  ]
+}
+resource "aws_s3_bucket" "alb_logs" {
+  bucket = local.alb_logs_bucket_name
+  acl = "private"
+
+  tags = {
+    Name = local.ecs_cluster_name
+    Environment = "Dev"
+  }
+}
+data "template_file" "aws_s3_bucket_policy" {
+  template = file("${path.module}/alb_s3_bucket_policy.json")
+
+  vars = {
+    BUCKET_NAME = aws_s3_bucket.alb_logs.bucket
+  }
+}
+resource "aws_s3_bucket_policy" "aws_s3_bucket_policy" {
+  bucket = aws_s3_bucket.alb_logs.bucket
+  policy = data.template_file.aws_s3_bucket_policy.rendered
 }
 
 resource "aws_alb_target_group" "target_group_frontend" {
@@ -109,7 +140,7 @@ resource "aws_alb_listener" "http_traffic" {
 
 # Redirect requests that start with "/v1" to the REST API service
 resource "aws_lb_listener_rule" "backend" {
-  listener_arn = aws_alb_listener.http_traffic.arn
+  listener_arn = aws_alb_listener.https_traffic.arn
   priority = 100
 
   action {

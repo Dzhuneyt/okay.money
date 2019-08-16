@@ -6,10 +6,6 @@ resource "aws_vpc" "main" {
     Name = local.ecs_cluster_name
   }
 }
-output "vpc_id" {
-  # Output the newly created VPC ID
-  value = aws_vpc.main.id
-}
 
 # Declare the data source
 data "aws_availability_zones" "available" {

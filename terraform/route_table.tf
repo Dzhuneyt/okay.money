@@ -14,6 +14,11 @@ resource "aws_route_table" "route_table_private" {
   vpc_id = aws_vpc.main.id
 
   route {
+    cidr_block = "172.31.0.0/16"
+    # RDS VPC CIDR
+    vpc_peering_connection_id = aws_vpc_peering_connection.foo.id
+  }
+  route {
     cidr_block = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.gw.id
   }

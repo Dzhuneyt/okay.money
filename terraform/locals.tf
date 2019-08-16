@@ -1,12 +1,13 @@
 # Define some variables we'll use later.
 locals {
   instance_type_ondemand = "t3a.micro"
-  instance_type_spot     = "t3a.medium"
-  spot_price             = "0.0113"
-  key_name               = "Dell G5 Ubuntu"
+  instance_type_spot = "t3a.medium"
+  spot_price = "0.0113"
+  key_name = "Dell G5 Ubuntu"
 
   # Alphanumeric and dash allowed
   ecs_cluster_name = "Personal-Finance"
+  alb_logs_bucket_name = "personal-finance-alb-logs"
 
   max_spot_instances = 10
   min_spot_instances = 7
