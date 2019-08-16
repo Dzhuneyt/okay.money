@@ -14,35 +14,35 @@ resource "aws_ecs_task_definition" "nginx" {
   container_definitions = data.template_file.task_definition__nginx.rendered
   network_mode          = local.network_mode
 }
-resource "aws_ecs_service" "nginx" {
-  name                               = "${local.ecs_cluster_name}_nginx"
-  cluster                            = aws_ecs_cluster.ecs_cluster.id
-  task_definition                    = aws_ecs_task_definition.nginx.arn
-  desired_count                      = "2"
-  deployment_minimum_healthy_percent = 50
-  deployment_maximum_percent         = 200
-  network_configuration {
-    subnets = aws_subnet.private_subnet.*.id
-    security_groups = [
-    aws_security_group.sg_for_ec2_instances.id]
-  }
-
-  load_balancer {
-    # Register the ECS service within the ALB target group
-    # This makes the service participate in health checks
-    # and receive traffic when healthy
-    target_group_arn = aws_alb_target_group.target_group_frontend.id
-    container_name   = "nginx"
-    container_port   = "80"
-  }
-
-  service_registries {
-    registry_arn   = aws_service_discovery_service.nginx.arn
-    container_name = "nginx"
-    container_port = "80"
-  }
-
-  depends_on = [
-    aws_alb_listener.http_traffic,
-  ]
-}
+//resource "aws_ecs_service" "nginx" {
+//  name                               = "${local.ecs_cluster_name}_nginx"
+//  cluster                            = aws_ecs_cluster.ecs_cluster.id
+//  task_definition                    = aws_ecs_task_definition.nginx.arn
+//  desired_count                      = "2"
+//  deployment_minimum_healthy_percent = 50
+//  deployment_maximum_percent         = 200
+//  network_configuration {
+//    subnets = aws_subnet.private_subnet.*.id
+//    security_groups = [
+//    aws_security_group.sg_for_ec2_instances.id]
+//  }
+//
+//  load_balancer {
+//    # Register the ECS service within the ALB target group
+//    # This makes the service participate in health checks
+//    # and receive traffic when healthy
+//    target_group_arn = aws_alb_target_group.target_group_frontend.id
+//    container_name   = "nginx"
+//    container_port   = "80"
+//  }
+//
+//  service_registries {
+//    registry_arn   = aws_service_discovery_service.nginx.arn
+//    container_name = "nginx"
+//    container_port = "80"
+//  }
+//
+//  depends_on = [
+//    aws_alb_listener.http_traffic,
+//  ]
+//}
