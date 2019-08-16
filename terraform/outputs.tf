@@ -17,6 +17,9 @@ output "domain_name" {
 output "dns_zone_nameservers" {
   value = aws_route53_zone.domain.name_servers
 }
+output "nat_gateway_public_ip" {
+  value = "IP with which ECS services communicate to the outside world: ${aws_nat_gateway.gw.public_ip}"
+}
 
 output "security_group_alb" {
   value = "ID of security group of the ALB: ${aws_security_group.sg_for_alb.id}"
