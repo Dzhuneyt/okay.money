@@ -11,7 +11,7 @@
       "Resource": "arn:aws:s3:::${BUCKET_NAME}/*",
       "Principal": {
         "AWS": [
-          "127311923021"
+          "${AWS_SERVICE_ACCOUNT_ID}"
         ]
       }
     }

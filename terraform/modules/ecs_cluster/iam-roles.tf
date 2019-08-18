@@ -1,6 +1,6 @@
-# Create an IAM role for the ECS instances.
+# Create an IAM role for the ECS EC2 instances.
 resource "aws_iam_role" "ecs_instance" {
-  name = "${local.ecs_cluster_name}-instance-role"
+  name = "${var.cluster_name}-ec2-instance-role"
 
   assume_role_policy = <<EOF
 {
@@ -50,10 +50,10 @@ data "aws_iam_policy_document" "ecs_instance_role_policy_doc" {
 
 # Create the custom policy
 resource "aws_iam_policy" "ecs_role_permissions" {
-  name = "${local.ecs_cluster_name}-ecs_role_permissions"
+  name        = "${var.cluster_name}-ecs_role_permissions"
   description = "These policies allow the ECS instances to do certain actions like pull images from ECR"
-  path = "/"
-  policy = data.aws_iam_policy_document.ecs_instance_role_policy_doc.json
+  path        = "/"
+  policy      = data.aws_iam_policy_document.ecs_instance_role_policy_doc.json
 }
 
 # Attach the custom Policy to the Role
@@ -64,7 +64,8 @@ resource "aws_iam_policy_attachment" "ecs_instance_role_policy_attachment" {
   policy_arn = aws_iam_policy.ecs_role_permissions.arn
 }
 
+# Allow EC2 instances to be launched using this role
 resource "aws_iam_instance_profile" "ec2_iam_instance_profile" {
-  name = "ecs_role_instance_profile"
-  role = aws_iam_role.ecs_instance.name
+  name_prefix = var.cluster_name
+  role        = aws_iam_role.ecs_instance.name
 }
