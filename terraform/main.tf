@@ -1,20 +1,17 @@
 // https://solidsoftware.io/blog/hybrid-spot-ondemand-ecs-cluster-setup/
 
 provider "aws" {
-  region = "us-east-1"
+  region = "eu-west-3"
 }
 data "aws_region" "current" {
 
-}
-
-module "route53_delegation_set" {
-  source = "./modules/delegation_set"
 }
 module "ecs_cluster" {
   source = "./modules/ecs_cluster"
   cluster_name = var.cluster_name
   subnet_ids = data.aws_subnet_ids.public_subnet_ids.ids
-  ssh_key_name = "Dell G5 Ubuntu"
+  ssh_key_name = ""
+  # Not needed to access EC2 instances for now
   vpc_id = aws_vpc.main.id
   min_spot_instances = "3"
   max_spot_instances = "5"

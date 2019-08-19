@@ -13,6 +13,10 @@ variable "cluster_name" {
   default = "cluster-name"
   description = "The name of the cluster"
 }
+variable "route53_delegation_set_id" {
+  default = "N1LYDT12VZI42X"
+  description = "A delegation set, previously created using the 'aws_route53_delegation_set' resource. Make sure all domains are pointed to the nameservers of this delegation set"
+}
 
 # VPC perring between the app's VPC and the RDS
 variable "vpc_perring_owner_id" {

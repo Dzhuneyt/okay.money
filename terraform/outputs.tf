@@ -17,9 +17,6 @@ output "private_subnet_ids" {
 output "domain_name" {
   value = var.domain_name
 }
-output "nameservers" {
-  value = module.route53_delegation_set.nameservers
-}
 output "nat_gateway_public_ip" {
   # IP with which ECS services communicate to the outside world
   value = aws_nat_gateway.gw.public_ip

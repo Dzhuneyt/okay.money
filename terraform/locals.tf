@@ -3,7 +3,6 @@ locals {
   instance_type_ondemand = "t3a.micro"
   instance_type_spot     = "t3a.medium"
   spot_price             = "0.0113"
-  key_name               = "Dell G5 Ubuntu"
 
   # Alphanumeric and dash allowed
   ecs_cluster_name     = var.cluster_name

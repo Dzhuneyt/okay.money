@@ -27,5 +27,5 @@ variable "max_ondmand_instances" {
 }
 variable "subnet_ids" {
   description = "A list of subnet IDs to launch EC2 instances in"
-  type        = list(string)
+  type = list(string)
 }
