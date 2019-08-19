@@ -6,7 +6,7 @@ locals {
   key_name = "Dell G5 Ubuntu"
 
   # Alphanumeric and dash allowed
-  ecs_cluster_name = "Personal-Finance"
+  ecs_cluster_name = var.cluster_name
   alb_logs_bucket_name = "personal-finance-alb-logs"
 
   max_spot_instances = 10

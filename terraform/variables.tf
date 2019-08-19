@@ -9,6 +9,10 @@ variable "create_iam_service_linked_role" {
 variable "domain_name" {
   description = "The domain name to use for the whole stack. This will be used to create a Route 53 record and many other resources depend on it"
 }
+variable "cluster_name" {
+  default = "cluster-name"
+  description = "The name of the cluster"
+}
 
 # VPC perring between the app's VPC and the RDS
 variable "vpc_perring_owner_id" {

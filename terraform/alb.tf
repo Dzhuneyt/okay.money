@@ -4,6 +4,8 @@
 resource "aws_alb" "main" {
   name = local.ecs_cluster_name
 
+  idle_timeout = 600
+
   access_logs {
     bucket  = aws_s3_bucket.alb_logs.bucket
     prefix  = local.ecs_cluster_name
