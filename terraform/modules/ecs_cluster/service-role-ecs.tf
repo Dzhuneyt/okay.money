@@ -1,7 +1,7 @@
 # Allow AWS ECS to manage the cluster on my behalf
 # This includes creating services and tasks, monitoring ECS instance health, etc
 resource "aws_iam_service_linked_role" "ecs" {
-  custom_suffix    = local.ecs_cluster_name
+  custom_suffix = var.cluster_name
   aws_service_name = "ecs.amazonaws.com"
 
   # The service role is automatically created by AWS the first time you create

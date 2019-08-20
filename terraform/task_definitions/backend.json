@@ -15,6 +15,7 @@
     "entrypoint": [
       "/entrypoint.sh"
     ],
+    "command": ["apache2-foreground"],
     "environment": [
       {
         "name": "MYSQL_HOST",

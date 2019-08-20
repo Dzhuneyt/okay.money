@@ -6,11 +6,11 @@ resource "aws_alb" "main" {
 
   idle_timeout = 600
 
-  access_logs {
-    bucket = aws_s3_bucket.alb_logs.bucket
-    prefix = local.ecs_cluster_name
-    enabled = true
-  }
+//  access_logs {
+//    bucket = aws_s3_bucket.alb_logs.bucket
+//    prefix = local.ecs_cluster_name
+//    enabled = true
+//  }
 
   # The ALB will potentially target all possible public subnets and AZs
   subnets = aws_subnet.public_subnets.*.id
@@ -26,33 +26,33 @@ resource "aws_alb" "main" {
   }
 
   depends_on = [
-    aws_s3_bucket.alb_logs,
-    aws_s3_bucket_policy.aws_s3_bucket_policy
+//    aws_s3_bucket.alb_logs,
+//    aws_s3_bucket_policy.aws_s3_bucket_policy
   ]
 }
-resource "aws_s3_bucket" "alb_logs" {
-  bucket = "${var.cluster_name}-alb-logs"
-  acl = "private"
-  # On destroy of stack, delete the bucket even if it has some content
-  force_destroy = true
-
-  tags = {
-    Name = local.ecs_cluster_name
-  }
-}
-data "aws_elb_service_account" "main" {}
-data "template_file" "aws_s3_bucket_policy" {
-  template = file("${path.module}/alb_s3_bucket_policy.json")
-
-  vars = {
-    BUCKET_NAME = aws_s3_bucket.alb_logs.bucket
-    AWS_SERVICE_ACCOUNT_ID = data.aws_elb_service_account.main.arn
-  }
-}
-resource "aws_s3_bucket_policy" "aws_s3_bucket_policy" {
-  bucket = aws_s3_bucket.alb_logs.bucket
-  policy = data.template_file.aws_s3_bucket_policy.rendered
-}
+//resource "aws_s3_bucket" "alb_logs" {
+//  bucket = "${var.cluster_name}-alb-logs"
+//  acl = "private"
+//  # On destroy of stack, delete the bucket even if it has some content
+//  force_destroy = true
+//
+//  tags = {
+//    Name = local.ecs_cluster_name
+//  }
+//}
+//data "aws_elb_service_account" "main" {}
+//data "template_file" "aws_s3_bucket_policy" {
+//  template = file("${path.module}/alb_s3_bucket_policy.json")
+//
+//  vars = {
+//    BUCKET_NAME = aws_s3_bucket.alb_logs.bucket
+//    AWS_SERVICE_ACCOUNT_ID = data.aws_elb_service_account.main.arn
+//  }
+//}
+//resource "aws_s3_bucket_policy" "aws_s3_bucket_policy" {
+//  bucket = aws_s3_bucket.alb_logs.bucket
+//  policy = data.template_file.aws_s3_bucket_policy.rendered
+//}
 
 resource "aws_alb_target_group" "target_group_frontend" {
   name = "${local.ecs_cluster_name}-frontend"
