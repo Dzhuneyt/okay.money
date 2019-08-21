@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Exit on error
+set -e
+
 timestamp=$(date -u +"%F-%H-%M-UTC")
 
 TAG=$timestamp docker-compose build --parallel
@@ -9,3 +12,5 @@ TAG=$timestamp docker-compose push
 cd ./terraform
 
 terraform apply -var "version_tag=$timestamp" -auto-approve
+
+echo Remember to whitelist the NAT gateway IP into RDS: $(terraform output nat_gateway_public_ips)

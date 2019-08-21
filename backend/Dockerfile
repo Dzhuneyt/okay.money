@@ -27,7 +27,10 @@ RUN a2enmod rewrite && \
     # Install Yii2 requirements
     docker-php-source extract  && \
     docker-php-ext-install pdo pdo_mysql && \
-    docker-php-source delete
+    docker-php-source delete && \
+    apt-get update && \
+    apt-get install -y wget && \
+    rm -rf /var/lib/apt/lists/*
 
 # Bundle app inside container
 COPY . /app
@@ -43,9 +46,18 @@ ENV APACHE_DOCUMENT_ROOT /app/rest/web
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf && \
     sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+ENV DOCKERIZE_VERSION v0.6.1
+RUN wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+
 EXPOSE 80
 
 COPY ./scripts/entrypoint.sh /entrypoint.sh
+COPY ./scripts/migrations.sh /migrations.sh
+COPY ./scripts/waitForMySQL.sh /waitForMySQL.sh
 RUN chmod +x /entrypoint.sh
+RUN chmod +x /migrations.sh
+RUN chmod +x /waitForMySQL.sh
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]

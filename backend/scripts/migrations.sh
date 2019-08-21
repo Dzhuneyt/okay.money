@@ -1,25 +1,11 @@
-##!/usr/bin/env sh
+#!/usr/bin/env sh
 
-fail() {
-  echo $1 >&2
-  exit 1
-}
+set -e
 
-retry() {
-  local n=1
-  local max=15
-  local delay=3
-  while true; do
-    "$@" && break || {
-      if [[ $n -lt $max ]]; then
-        ((n++))
-        echo "Command failed. Attempt $n/$max:"
-        sleep $delay
-      else
-        fail "The command has failed after $n attempts."
-      fi
-    }
-  done
-}
+echo Executing migrations
+echo MySQL host is ${MYSQL_HOST}
+echo MySQL db is ${MYSQL_DB}
+echo MySQL user is ${MYSQL_USER}
+echo MySQL password is ${MYSQL_PASS}
 
-retry php yii migrate --interactive=0
+/waitForMySQL.sh &&  (sleep 5 && echo Connected to MySQL &&  php yii migrate --interactive=0)
