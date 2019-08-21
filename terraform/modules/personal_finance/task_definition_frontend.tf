@@ -26,12 +26,13 @@ resource "aws_ecs_service" "frontend" {
   cluster                            = var.cluster_id
   task_definition                    = aws_ecs_task_definition.frontend.arn
   desired_count                      = "2"
-  deployment_minimum_healthy_percent = 100
+  deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 300
   network_configuration {
     subnets = var.private_subnets
     security_groups = [
-    aws_security_group.sg_for_ecs_apps.id]
+      aws_security_group.sg_for_ecs_apps.id
+    ]
   }
 
   load_balancer {
