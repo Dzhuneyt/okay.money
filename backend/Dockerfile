@@ -1,5 +1,5 @@
 # Step 1: Install app dependencies in /vendor
-FROM composer:1.7 as vendor
+FROM composer:1.9.0 as vendor
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN composer install \
     --no-interaction \
     --no-plugins \
     --no-scripts \
-    --prefer-dist
+    --prefer-dist --quiet
 
 # Step 2: Serve the PHP app
 FROM php:7.3-apache
@@ -38,6 +38,7 @@ ENV APACHE_DOCUMENT_ROOT /app/rest/web
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf && \
     sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+# Install Dockerize
 ENV DOCKERIZE_VERSION v0.6.1
 RUN wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
