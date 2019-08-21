@@ -1,7 +1,7 @@
 resource "aws_security_group" "sg_for_ecs_apps" {
   name_prefix = "${local.ecs_cluster_name}_sg_for_ecs_apps_"
   description = "Security group that allows incoming HTTP/HTTPS traffic and ALB traffic to the ECS tasks within the cluster"
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = module.vpc.vpc_id
 
   # Allow HTTP
   ingress {
@@ -55,7 +55,7 @@ resource "aws_security_group" "sg_for_ecs_apps" {
 resource "aws_security_group" "sg_for_alb" {
   name_prefix = "${local.ecs_cluster_name}_sg_for_alb"
   description = "A security group for the Application Load Balancer. Allows HTTP traffic in"
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = module.vpc.vpc_id
 
   # Allow HTTP/HTTPS traffic from any IP
   ingress {
@@ -85,7 +85,7 @@ resource "aws_security_group" "sg_for_alb" {
   }
 
   tags = {
-    Name = local.ecs_cluster_name
+    Name = var.cluster_name
   }
 
   lifecycle {

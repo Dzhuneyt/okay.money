@@ -13,7 +13,7 @@ data "template_file" "task_definition__frontend" {
 resource "aws_ecs_task_definition" "frontend" {
   family                = local.ecs_cluster_name
   container_definitions = data.template_file.task_definition__frontend.rendered
-  network_mode          = local.network_mode
+  network_mode          = "awsvpc"
   depends_on = [
     # Avoid parallel calls that sometimes cause:
     # https://github.com/terraform-providers/terraform-provider-aws/issues/9777
@@ -29,7 +29,7 @@ resource "aws_ecs_service" "frontend" {
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 300
   network_configuration {
-    subnets = aws_subnet.private_subnet.*.id
+    subnets = module.vpc.private_subnets
     security_groups = [
     aws_security_group.sg_for_ecs_apps.id]
   }

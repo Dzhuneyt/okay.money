@@ -13,7 +13,7 @@ resource "aws_alb" "main" {
 //  }
 
   # The ALB will potentially target all possible public subnets and AZs
-  subnets = aws_subnet.public_subnets.*.id
+  subnets = module.vpc.public_subnets
 
   security_groups = [
     # SG that allows incoming traffic to the ALB
@@ -58,7 +58,7 @@ resource "aws_alb_target_group" "target_group_frontend" {
   name = "${local.ecs_cluster_name}-frontend"
   port = 80
   protocol = "HTTP"
-  vpc_id = aws_vpc.main.id
+  vpc_id = module.vpc.vpc_id
 
   health_check {
     path = "/health"
@@ -87,7 +87,7 @@ resource "aws_alb_target_group" "target_group_backend" {
   health_check {
     path = "/robots.txt"
   }
-  vpc_id = aws_vpc.main.id
+  vpc_id = module.vpc.vpc_id
 
   # This target_type allows distributing traffic to
   # ECS services within EC2 instances (ECS cluster)

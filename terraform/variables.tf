@@ -15,6 +15,7 @@ variable "cluster_name" {
   description = "The name of the cluster"
 }
 variable "route53_delegation_set_id" {
+  # us-east-1 nameservers set ID: N35YEF3QZNEHLQ
   default = "N35YEF3QZNEHLQ"
   description = "A delegation set, previously created using the 'aws_route53_delegation_set' resource. Make sure all domains are pointed to the nameservers of this delegation set"
 }

@@ -17,7 +17,7 @@ data "template_file" "task_definition__backend" {
 resource "aws_ecs_task_definition" "backend" {
   family = local.ecs_cluster_name
   container_definitions = data.template_file.task_definition__backend.rendered
-  network_mode = local.network_mode
+  network_mode = "awsvpc"
 }
 resource "aws_ecs_service" "backend" {
   name = "${local.ecs_cluster_name}_backend"
@@ -27,7 +27,7 @@ resource "aws_ecs_service" "backend" {
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent = 300
   network_configuration {
-    subnets = aws_subnet.private_subnet.*.id
+    subnets = module.vpc.private_subnets
     security_groups = [
       aws_security_group.sg_for_ecs_apps.id]
   }
