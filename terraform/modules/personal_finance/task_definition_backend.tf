@@ -2,34 +2,34 @@ data "template_file" "task_definition__backend" {
   template = file("${path.module}/task_definitions/backend.json")
 
   vars = {
-    image_url = "216987438199.dkr.ecr.us-east-1.amazonaws.com/finance/backend:${var.version_tag}"
+    image_url      = "216987438199.dkr.ecr.us-east-1.amazonaws.com/finance/backend:${var.version_tag}"
     container_name = "backend"
 
     log_group_region = data.aws_region.current.name
-    log_group_name = aws_cloudwatch_log_group.backend.name
+    log_group_name   = aws_cloudwatch_log_group.backend.name
 
-    MYSQL_HOST = var.MYSQL_HOST
-    MYSQL_DB = var.MYSQL_DB
-    MYSQL_USER = var.MYSQL_USER
+    MYSQL_HOST     = var.MYSQL_HOST
+    MYSQL_DB       = var.MYSQL_DB
+    MYSQL_USER     = var.MYSQL_USER
     MYSQL_PASSWORD = var.MYSQL_PASSWORD
   }
 }
 resource "aws_ecs_task_definition" "backend" {
-  family = local.ecs_cluster_name
+  family                = var.app_name
   container_definitions = data.template_file.task_definition__backend.rendered
-  network_mode = "awsvpc"
+  network_mode          = "awsvpc"
 }
 resource "aws_ecs_service" "backend" {
-  name = "${local.ecs_cluster_name}_backend"
-  cluster = module.ecs_cluster.cluster_id
-  task_definition = aws_ecs_task_definition.backend.arn
-  desired_count = "2"
+  name                               = "${var.app_name}_backend"
+  cluster                            = var.cluster_id
+  task_definition                    = aws_ecs_task_definition.backend.arn
+  desired_count                      = "2"
   deployment_minimum_healthy_percent = 100
-  deployment_maximum_percent = 300
+  deployment_maximum_percent         = 300
   network_configuration {
-    subnets = module.vpc.private_subnets
+    subnets = var.private_subnets
     security_groups = [
-      aws_security_group.sg_for_ecs_apps.id]
+    aws_security_group.sg_for_ecs_apps.id]
   }
 
   load_balancer {
@@ -37,12 +37,12 @@ resource "aws_ecs_service" "backend" {
     # This makes the service participate in health checks
     # and receive traffic when healthy
     target_group_arn = aws_alb_target_group.target_group_backend.arn
-    container_name = "backend"
-    container_port = "80"
+    container_name   = "backend"
+    container_port   = "80"
   }
 
   service_registries {
-    registry_arn = aws_service_discovery_service.backend.arn
+    registry_arn   = aws_service_discovery_service.backend.arn
     container_name = "backend"
     container_port = 80
   }
@@ -54,15 +54,15 @@ resource "aws_ecs_service" "backend" {
 resource "aws_service_discovery_service" "backend" {
   name = "backend"
   dns_config {
-    namespace_id = module.ecs_cluster.service_discovery_id
+    namespace_id   = aws_service_discovery_private_dns_namespace.dns_namespace.id
     routing_policy = "MULTIVALUE"
     dns_records {
-      ttl = 10
+      ttl  = 10
       type = "A"
     }
 
     dns_records {
-      ttl = 10
+      ttl  = 10
       type = "SRV"
     }
   }

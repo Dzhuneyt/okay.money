@@ -15,7 +15,9 @@
     "entrypoint": [
       "/entrypoint.sh"
     ],
-    "command": ["apache2-foreground"],
+    "command": [
+      "apache2-foreground"
+    ],
     "environment": [
       {
         "name": "MYSQL_HOST",
@@ -54,7 +56,8 @@
       "/migrations.sh"
     ],
     "command": [
-      "apache2-foreground"
+      "sleep",
+      "infinity"
     ],
     "environment": [
       {

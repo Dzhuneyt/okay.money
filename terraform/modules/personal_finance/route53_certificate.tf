@@ -3,7 +3,7 @@ resource "aws_acm_certificate" "cert" {
   domain_name       = var.domain_name
   validation_method = "DNS"
   tags = {
-    Name = local.ecs_cluster_name
+    Name = var.app_name
   }
 }
 resource "aws_route53_record" "cert_validation_dns_record_1" {

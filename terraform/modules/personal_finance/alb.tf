@@ -2,18 +2,19 @@
 
 # see https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html
 resource "aws_alb" "main" {
-  name = local.ecs_cluster_name
+  name = var.app_name
 
   idle_timeout = 600
 
-//  access_logs {
-//    bucket = aws_s3_bucket.alb_logs.bucket
-//    prefix = local.ecs_cluster_name
-//    enabled = true
-//  }
+  //  access_logs {
+  //    bucket = aws_s3_bucket.alb_logs.bucket
+  //    prefix = local.ecs_cluster_name
+  //    enabled = true
+  //  }
 
   # The ALB will potentially target all possible public subnets and AZs
-  subnets = module.vpc.public_subnets
+  subnets = var.public_subnets
+  //  subnets = module.vpc.public_subnets
 
   security_groups = [
     # SG that allows incoming traffic to the ALB
@@ -22,12 +23,12 @@ resource "aws_alb" "main" {
     aws_security_group.sg_for_alb.id
   ]
   tags = {
-    Name = local.ecs_cluster_name
+    Name = var.app_name
   }
 
   depends_on = [
-//    aws_s3_bucket.alb_logs,
-//    aws_s3_bucket_policy.aws_s3_bucket_policy
+    //    aws_s3_bucket.alb_logs,
+    //    aws_s3_bucket_policy.aws_s3_bucket_policy
   ]
 }
 //resource "aws_s3_bucket" "alb_logs" {
@@ -55,10 +56,10 @@ resource "aws_alb" "main" {
 //}
 
 resource "aws_alb_target_group" "target_group_frontend" {
-  name = "${local.ecs_cluster_name}-frontend"
-  port = 80
+  name     = "${var.app_name}-frontend"
+  port     = 80
   protocol = "HTTP"
-  vpc_id = module.vpc.vpc_id
+  vpc_id   = var.vpc_id
 
   health_check {
     path = "/health"
@@ -77,17 +78,17 @@ resource "aws_alb_target_group" "target_group_frontend" {
     aws_alb.main
   ]
   tags = {
-    Name = local.ecs_cluster_name
+    Name = var.app_name
   }
 }
 resource "aws_alb_target_group" "target_group_backend" {
-  name = "${local.ecs_cluster_name}-backend"
-  port = 80
+  name     = "${var.app_name}-backend"
+  port     = 80
   protocol = "HTTP"
   health_check {
     path = "/robots.txt"
   }
-  vpc_id = module.vpc.vpc_id
+  vpc_id = var.vpc_id
 
   # This target_type allows distributing traffic to
   # ECS services within EC2 instances (ECS cluster)
@@ -103,7 +104,7 @@ resource "aws_alb_target_group" "target_group_backend" {
   ]
 
   tags = {
-    Name = local.ecs_cluster_name
+    Name = var.app_name
   }
 }
 
@@ -113,15 +114,15 @@ resource "aws_alb_listener" "http_traffic" {
 
   # Listens on port 80 ingress
   # Make sure the Security Group associated with the ALB allows this
-  port = "80"
+  port     = "80"
   protocol = "HTTP"
 
   default_action {
     type = "redirect"
 
     redirect {
-      port = "443"
-      protocol = "HTTPS"
+      port        = "443"
+      protocol    = "HTTPS"
       status_code = "HTTP_301"
     }
   }
@@ -130,16 +131,16 @@ resource "aws_alb_listener" "http_traffic" {
 # Redirect requests that start with "/v1" to the REST API service
 resource "aws_lb_listener_rule" "backend" {
   listener_arn = aws_alb_listener.https_traffic.arn
-  priority = 100
+  priority     = 100
 
   action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_alb_target_group.target_group_backend.arn
   }
 
   condition {
     field = "path-pattern"
     values = [
-      "/v1/*"]
+    "/v1/*"]
   }
 }

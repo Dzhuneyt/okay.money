@@ -28,18 +28,10 @@ RUN a2enmod rewrite && \
     docker-php-source extract  && \
     docker-php-ext-install pdo pdo_mysql && \
     docker-php-source delete && \
+    export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get install -y wget && \
     rm -rf /var/lib/apt/lists/*
-
-# Bundle app inside container
-COPY . /app
-
-# Copy dependencies from Step 1 of multi-stage build
-COPY --from=vendor /app/vendor/ /app/vendor/
-
-# Prepare important config files
-RUN php init --env=Docker --overwrite=y
 
 # Set apache http folder
 ENV APACHE_DOCUMENT_ROOT /app/rest/web
@@ -55,9 +47,17 @@ EXPOSE 80
 
 COPY ./scripts/entrypoint.sh /entrypoint.sh
 COPY ./scripts/migrations.sh /migrations.sh
-COPY ./scripts/waitForMySQL.sh /waitForMySQL.sh
 RUN chmod +x /entrypoint.sh
 RUN chmod +x /migrations.sh
-RUN chmod +x /waitForMySQL.sh
+
+# Bundle app inside container
+COPY . /app
+
+# Copy dependencies from Step 1 of multi-stage build
+COPY --from=vendor /app/vendor/ /app/vendor/
+
+# Prepare important config files
+RUN php init --env=Docker --overwrite=y
+
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]

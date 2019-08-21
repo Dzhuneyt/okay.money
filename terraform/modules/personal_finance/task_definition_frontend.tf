@@ -11,7 +11,7 @@ data "template_file" "task_definition__frontend" {
 }
 
 resource "aws_ecs_task_definition" "frontend" {
-  family                = local.ecs_cluster_name
+  family                = var.app_name
   container_definitions = data.template_file.task_definition__frontend.rendered
   network_mode          = "awsvpc"
   depends_on = [
@@ -22,14 +22,14 @@ resource "aws_ecs_task_definition" "frontend" {
 }
 
 resource "aws_ecs_service" "frontend" {
-  name                               = "${local.ecs_cluster_name}_frontend"
-  cluster                            = module.ecs_cluster.cluster_id
+  name                               = "${var.app_name}_frontend"
+  cluster                            = var.cluster_id
   task_definition                    = aws_ecs_task_definition.frontend.arn
   desired_count                      = "2"
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 300
   network_configuration {
-    subnets = module.vpc.private_subnets
+    subnets = var.private_subnets
     security_groups = [
     aws_security_group.sg_for_ecs_apps.id]
   }
@@ -60,7 +60,7 @@ resource "aws_ecs_service" "frontend" {
 resource "aws_service_discovery_service" "frontend" {
   name = "frontend"
   dns_config {
-    namespace_id   = module.ecs_cluster.service_discovery_id
+    namespace_id   = aws_service_discovery_private_dns_namespace.dns_namespace.id
     routing_policy = "MULTIVALUE"
     dns_records {
       ttl  = 10
