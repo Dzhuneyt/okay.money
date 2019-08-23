@@ -4,8 +4,9 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {TransactionService} from 'src/app/services/transaction.service';
 import {TransactionModel} from 'src/app/models/transaction.model';
 import {CategoriesService, Category} from 'src/app/services/categories.service';
-import {Account, AccountsService} from 'src/app/services/accounts.service';
+import {AccountsService} from 'src/app/services/accounts.service';
 import {map, take} from 'rxjs/operators';
+import {Account} from 'src/app/models/account.model';
 
 @Component({
   selector: 'app-transaction-edit',

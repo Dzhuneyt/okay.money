@@ -1,5 +1,5 @@
 import {Category} from 'src/app/services/categories.service';
-import {Account} from 'src/app/services/accounts.service';
+import {Account} from './account.model';
 
 export interface TransactionModel {
   id?: number;
