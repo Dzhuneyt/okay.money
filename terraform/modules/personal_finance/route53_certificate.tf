@@ -7,18 +7,19 @@ resource "aws_acm_certificate" "cert" {
   }
 }
 resource "aws_route53_record" "cert_validation_dns_record_1" {
-  name    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_name
-  type    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_type
+  count = length(aws_acm_certificate.cert.domain_validation_options)
+
+  name    = aws_acm_certificate.cert.domain_validation_options[count.index].resource_record_name
+  type    = aws_acm_certificate.cert.domain_validation_options[count.index].resource_record_type
   zone_id = aws_route53_zone.domain.id
   records = [
-  aws_acm_certificate.cert.domain_validation_options[0].resource_record_value]
+  aws_acm_certificate.cert.domain_validation_options[count.index].resource_record_value]
   ttl = 60
 }
 resource "aws_acm_certificate_validation" "cert" {
-  certificate_arn = aws_acm_certificate.cert.arn
-  validation_record_fqdns = [
-    aws_route53_record.cert_validation_dns_record_1.fqdn
-  ]
+  certificate_arn         = aws_acm_certificate.cert.arn
+  validation_record_fqdns = aws_route53_record.cert_validation_dns_record_1.*.fqdn
+
 }
 # Listener for traffic
 resource "aws_alb_listener" "https_traffic" {

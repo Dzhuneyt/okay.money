@@ -12,5 +12,3 @@ TAG=$timestamp docker-compose push
 cd ./terraform
 
 terraform apply -var "version_tag=$timestamp" -auto-approve
-
-echo Remember to whitelist the NAT gateway IP into RDS security groups

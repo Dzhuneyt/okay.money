@@ -14,6 +14,7 @@ module "ecs_cluster" {
   # Not needed to access EC2 instances for now
   ssh_key_name           = ""
   vpc_id                 = module.vpc.vpc_id
+  instance_type_spot     = "t3a.medium"
   min_spot_instances     = "3"
   max_spot_instances     = "5"
   min_ondemand_instances = "0"
@@ -36,19 +37,17 @@ module "vpc" {
   name = var.cluster_name
   cidr = "10.0.0.0/16"
 
-  azs = [
-    data.aws_availability_zones.available.names[0],
-    data.aws_availability_zones.available.names[1],
-    data.aws_availability_zones.available.names[2],
-  ]
+  azs = data.aws_availability_zones.available.names
   private_subnets = [
     "10.0.1.0/24",
     "10.0.2.0/24",
-  "10.0.3.0/24"]
+    "10.0.3.0/24"
+  ]
   public_subnets = [
     "10.0.101.0/24",
     "10.0.102.0/24",
-  "10.0.103.0/24"]
+    "10.0.103.0/24"
+  ]
 
   enable_nat_gateway     = true
   single_nat_gateway     = true
@@ -73,4 +72,12 @@ module "personal_finance" {
   public_subnets  = module.vpc.public_subnets
   version_tag     = var.version_tag
   vpc_id          = module.vpc.vpc_id
+}
+
+module "rds" {
+  source = "./modules/rds"
+  allowed_ingress_ips = [
+    "${module.vpc.nat_public_ips[0]}/32"
+  ]
+  cluster_name = var.cluster_name
 }

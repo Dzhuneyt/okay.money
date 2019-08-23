@@ -11,8 +11,8 @@ variable "private_subnets" {
 }
 variable "domain_name" {}
 variable "route53_delegation_set_id" {
-  # us-east-1 nameservers set ID: N35YEF3QZNEHLQ
-  default     = "N35YEF3QZNEHLQ"
+  # eu-west-1 nameservers set ID: N1EOXW00F403S3
+  default     = "N1EOXW00F403S3"
   description = "A delegation set, previously created using the 'aws_route53_delegation_set' resource. Make sure all domains are pointed to the nameservers of this delegation set"
 }
 variable "version_tag" {
