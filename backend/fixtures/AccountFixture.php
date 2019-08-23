@@ -39,7 +39,7 @@ class AccountFixture extends ActiveFixture
         }
 
         foreach ($allUserIds as $idUser) {
-            for ($index = 0; $index < 10; $index++) {
+            for ($index = 0; $index < 15; $index++) {
                 $start = '-3 months';
                 $end = 'now';
                 $timestamp = $faker->dateTimeBetween($start, $end)
