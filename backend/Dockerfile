@@ -53,6 +53,7 @@ RUN chmod +x /migrations.sh
 
 # Bundle app inside container
 COPY . /app
+RUN chmod +x /app/scripts/*
 
 # Copy dependencies from Step 1 of multi-stage build
 COPY --from=vendor /app/vendor/ /app/vendor/
