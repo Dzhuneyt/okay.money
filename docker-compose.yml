@@ -32,8 +32,8 @@ services:
     image: ${ECR_PREFIX}/frontend:${TAG}
     build:
       context: frontend
-    #    volumes:
-    #      - ./frontend:/app
+    volumes:
+      - ./frontend:/app
     ports:
       - 8082:80
 

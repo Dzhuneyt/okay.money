@@ -10,7 +10,7 @@ RUN npm ci --no-audit && \
 FROM nginx:1.17.2-alpine
 
 WORKDIR /app
-COPY --from=builder /app/dist/* /app/dist/
+COPY --from=builder /app/dist/* /app/dist/frontend/
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 

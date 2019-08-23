@@ -1,24 +1,29 @@
 <mat-toolbar color="primary">
   <mat-toolbar-row>
-    <button aria-label="Home page"
-            (click)="toggleMenu()"
-            class="hamburger"
-            mat-icon-button>
+    <button
+      (click)="toggleMenu()"
+      *ngIf="isLoggedIn"
+      aria-label="Home page"
+      class="hamburger"
+      mat-icon-button>
       <mat-icon>menu</mat-icon>
     </button>
-    <span>Finance</span>
+    <span routerLink="['/home']" routerLinkActive="true">Finance</span>
     <span class="example-spacer"></span>
 
-    <button [routerLink]="['/home']"
-            aria-label="Transactions and accounts list"
-            class="navbar-icon"
-            mat-button
-            routerLinkActive="true">
+    <button
+      *ngIf="isLoggedIn"
+      [routerLink]="['/home']"
+      aria-label="Transactions and accounts list"
+      class="navbar-icon"
+      mat-button
+      routerLinkActive="true">
       <mat-icon inline="true">account_balance</mat-icon>
       Overview
     </button>
 
     <button
+      *ngIf="isLoggedIn"
       (click)="createTransaction()"
       aria-label="Create Transaction"
       class="navbar-icon"
