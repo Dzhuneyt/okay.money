@@ -3,12 +3,6 @@ import {Observable} from "rxjs";
 import {BackendService} from "./backend.service";
 import {map} from "rxjs/operators";
 
-export interface Account {
-  id: number;
-  name: string;
-  starting_balance: number;
-  current_balance: number;
-}
 
 @Injectable({
   providedIn: 'root'

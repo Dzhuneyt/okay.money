@@ -5,10 +5,10 @@ import {TableColumn, TableComponent} from "../../../table/table.component";
 
 @Component({
   selector: 'app-accounts-list',
-  templateUrl: './accounts-list.component.html',
-  styleUrls: ['./accounts-list.component.scss']
+  templateUrl: './account-summary-list.component.html',
+  styleUrls: ['./account-summary-list.component.scss']
 })
-export class AccountsListComponent implements OnInit {
+export class AccountSummaryListComponent implements OnInit {
 
   @ViewChild(TableComponent) table: TableComponent;
 

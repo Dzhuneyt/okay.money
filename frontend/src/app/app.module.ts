@@ -11,7 +11,7 @@ import {HomeComponent} from './home/home.component';
 import {HeaderModule} from './header/header.module';
 import {MaterialComponentsModule} from './material-components.module';
 import {FlexLayoutModule} from '@angular/flex-layout';
-import {AccountsListComponent} from './home/parts/accounts-list/accounts-list.component';
+import {AccountSummaryListComponent} from 'src/app/home/parts/accounts-list/account-summary-list.component';
 import {RouterModule, Routes} from '@angular/router';
 import {UiKitModule} from './ui-kit/ui-kit.module';
 import {TransactionListComponent} from './home/parts/transaction-list/transaction-list.component';
@@ -30,6 +30,7 @@ import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edi
 import {TransactionService} from 'src/app/services/transaction.service';
 import {LoggedInGuard} from "src/app/guards/logged-in.guard";
 import {AnonymousUserGuard} from "src/app/guards/anonymous-user.guard";
+import {AccountListComponent} from "src/app/account-list/account-list.component";
 
 const routes: Routes = [
   {
@@ -48,6 +49,11 @@ const routes: Routes = [
     canActivate: [LoggedInGuard],
   },
   {
+    path: 'accounts',
+    component: AccountListComponent,
+    canActivate: [LoggedInGuard],
+  },
+  {
     path: '**',
     redirectTo: '/home',
   }
@@ -58,13 +64,14 @@ const routes: Routes = [
     AppComponent,
     HomeComponent,
     LoginComponent,
-    AccountsListComponent,
+    AccountSummaryListComponent,
     AddAccountComponent,
     TransactionListComponent,
     StatsByCategoryComponent,
     SidenavComponent,
     DeleteConfirmComponent,
     TransactionEditComponent,
+    AccountListComponent,
   ],
   imports: [
     BrowserModule,

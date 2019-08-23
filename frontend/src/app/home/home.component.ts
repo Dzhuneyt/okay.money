@@ -3,7 +3,7 @@ import {BackendService} from '../services/backend.service';
 import {MatDialog, MatSnackBar, MatTabGroup} from '@angular/material';
 import {AddAccountComponent} from './parts/add-account/add-account.component';
 import {DialogService} from '../services/dialog.service';
-import {AccountsListComponent} from './parts/accounts-list/accounts-list.component';
+import {AccountSummaryListComponent} from 'src/app/home/parts/accounts-list/account-summary-list.component';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +12,7 @@ import {AccountsListComponent} from './parts/accounts-list/accounts-list.compone
 })
 export class HomeComponent implements OnInit {
 
-  @ViewChild(AccountsListComponent) accountListComponent;
+  @ViewChild(AccountSummaryListComponent) accountListComponent;
 
   @ViewChild(MatTabGroup) public tabs: MatTabGroup;
 

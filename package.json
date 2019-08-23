@@ -10,6 +10,7 @@
     "beMigrations": "cd backend && php yii migrate --interactive=0",
     "feLiteServer": "cd frontend && npm run serve",
     "feUnitTests": "echo 'TO BE IMPLEMENTED' && exit 0; cd frontend && npm run test:cli",
+    "feBuildAndWatch": "./scripts/frontend-build.sh",
     "beLiteServer": "cd backend && php yii server",
     "beUnitTests": "./scripts/backend-tests-unit.sh",
     "beFunctionalTests": "./scripts/backend-tests-functional.sh",

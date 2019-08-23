@@ -5,5 +5,5 @@ WORKDIR /app
 RUN rm -rf /app/*
 COPY . .
 
-CMD npm ci --silent --no-audit && \
-    npm run build:prod
+CMD npm ci --no-audit && \
+    npm run build:watch
