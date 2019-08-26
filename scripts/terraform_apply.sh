@@ -10,5 +10,5 @@ $(aws ecr get-login --no-include-email)
 TAG=$timestamp docker-compose push
 
 cd ./terraform
-
+terraform init
 terraform apply -var "version_tag=$timestamp" -auto-approve
