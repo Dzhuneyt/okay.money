@@ -5,6 +5,9 @@ data "aws_region" "current" {
 
 }
 module "ecs_cluster" {
+  providers = {
+    aws = aws
+  }
   source       = "github.com/Dzhuneyt/Terraform-Module-AWS-ECS-Cluster?ref=v1.0.3"
   create_vpc   = false
   aws_region   = var.aws_region
@@ -32,6 +35,9 @@ resource "aws_security_group_rule" "allow_alb_traffic_to_apps" {
 }
 
 module "personal_finance" {
+  providers = {
+    aws = aws
+  }
   source          = "./modules/personal_finance"
   cluster_id      = module.ecs_cluster.cluster_id
   private_subnets = module.vpc.private_subnets
@@ -48,6 +54,9 @@ module "personal_finance" {
 }
 
 module "vpc" {
+  providers = {
+    aws = aws
+  }
   source = "terraform-aws-modules/vpc/aws"
 
   name = var.cluster_name
