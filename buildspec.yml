@@ -11,7 +11,7 @@ phases:
       - echo Installing Terraform
       - wget https://releases.hashicorp.com/terraform/0.6.8/terraform_0.6.8_linux_amd64.zip
       - unzip terraform_0.6.8_linux_amd64.zip -d /usr/local/bin
-      - chmod +x /ur/local/bin/terraform
+      - chmod +x /usr/local/bin/terraform
   #      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
 #      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
   build:
