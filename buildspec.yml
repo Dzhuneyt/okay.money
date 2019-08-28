@@ -10,7 +10,7 @@ phases:
       - eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
       - echo Installing Terraform
       - wget -q https://releases.hashicorp.com/terraform/0.12.7/terraform_0.12.7_linux_amd64.zip
-      - unzip terraform_0.6.8_linux_amd64.zip -d -q /usr/local/bin
+      - unzip terraform_0.12.7_linux_amd64.zip -d -q /usr/local/bin
       - chmod +x /usr/local/bin/terraform
   #      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
 #      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
