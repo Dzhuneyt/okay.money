@@ -301,8 +301,8 @@ resource "aws_codebuild_project" "build" {
     # Example on how to pass "regular" (non secret)
     # environment variables to the builder
     environment_variable {
-      name  = "SOME_KEY1"
-      value = "SOME_VALUE1"
+      name  = "TF_IN_AUTOMATION"
+      value = "1"
     }
 
     # Pass these env vars to the builder job
