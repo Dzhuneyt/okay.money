@@ -277,7 +277,7 @@ resource "aws_security_group" "crypto" {
 
 resource "aws_codebuild_project" "build" {
   name          = "${var.app_name}-build"
-  description   = "test_codebuild_project"
+  description   = "Build and deploy of ${var.app_name}"
   build_timeout = "5"
   service_role  = aws_iam_role.codebuild_role.arn
 
@@ -285,8 +285,10 @@ resource "aws_codebuild_project" "build" {
     type = "CODEPIPELINE"
   }
   cache {
-    type     = "S3"
-    location = aws_s3_bucket.ci_bucket.bucket
+    type = "LOCAL"
+    modes = [
+      "LOCAL_DOCKER_LAYER_CACHE",
+    "LOCAL_SOURCE_CACHE"]
   }
 
   environment {
