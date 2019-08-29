@@ -271,14 +271,38 @@ resource "aws_codebuild_project" "build" {
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
 
+    # Example on how to pass "regular" (non secret)
+    # environment variables to the builder
     environment_variable {
       name  = "SOME_KEY1"
       value = "SOME_VALUE1"
     }
 
+    # Pass these env vars to the builder job
+    # They will be retrieved from AWS Parameter Store
     environment_variable {
       name  = "TF_VAR_domain_name"
-      value = "personalfinance_domain_name"
+      value = "/personalfinance/domain_name"
+      type  = "PARAMETER_STORE"
+    }
+    environment_variable {
+      name  = "TF_VAR_MYSQL_HOST"
+      value = "/personalfinance/MYSQL_HOST"
+      type  = "PARAMETER_STORE"
+    }
+    environment_variable {
+      name  = "TF_VAR_MYSQL_DB"
+      value = "/personalfinance/MYSQL_DB"
+      type  = "PARAMETER_STORE"
+    }
+    environment_variable {
+      name  = "TF_VAR_MYSQL_USER"
+      value = "/personalfinance/MYSQL_USER"
+      type  = "PARAMETER_STORE"
+    }
+    environment_variable {
+      name  = "TF_VAR_MYSQL_PASSWORD"
+      value = "/personalfinance/MYSQL_PASSWORD"
       type  = "PARAMETER_STORE"
     }
   }
