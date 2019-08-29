@@ -11,8 +11,9 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws --version
+      # Hardcoded region, because the ECR images are currently hosted there
+      # TODO: Parameterize region of ECR repos
       - eval $(aws ecr get-login --region us-east-1 --no-include-email)
-      - cat /root/.docker/config.json
       - echo Installing Terraform && wget -q https://releases.hashicorp.com/terraform/0.12.7/terraform_0.12.7_linux_amd64.zip && unzip terraform_0.12.7_linux_amd64.zip -d /usr/local/bin && chmod +x /usr/local/bin/terraform
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - echo Version name will be ${IMAGE_TAG}
@@ -20,8 +21,9 @@ phases:
     commands:
       - echo Build started on `date`
       - ./scripts/docker-compose-push.sh ${IMAGE_TAG}
-  #      - echo Initializing Terraform
-  #      - cd ./terraform && terraform init
+      - echo Docker images pushed to ECR with tag ${IMAGE_TAG}
+      - echo Initializing Terraform
+      - cd ./terraform && terraform init
   #      - terraform plan -var="version_tag=${IMAGE_TAG}"
   #      - REPO_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
   #      - docker pull $REPO_URI:latest || true
@@ -29,10 +31,6 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - echo Pushing the Docker images...
-#      - REPO_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
-#      - docker push $REPO_URI:latest
-#      - docker push $REPO_URI:$IMAGE_TAG
 #      - echo Writing image definitions file...
 #      - printf '[{"name":"%s","imageUri":"%s"}]' "$CONTAINER_NAME" "$REPO_URI:$IMAGE_TAG" | tee imagedefinitions.json
 #artifacts:

@@ -278,7 +278,7 @@ resource "aws_security_group" "crypto" {
 resource "aws_codebuild_project" "build" {
   name          = "${var.app_name}-build"
   description   = "Build and deploy of ${var.app_name}"
-  build_timeout = "5"
+  build_timeout = "20"
   service_role  = aws_iam_role.codebuild_role.arn
 
   artifacts {
