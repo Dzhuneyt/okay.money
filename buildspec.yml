@@ -11,7 +11,7 @@ phases:
       - eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
       - echo Installing Terraform && - wget -q https://releases.hashicorp.com/terraform/0.12.7/terraform_0.12.7_linux_amd64.zip && unzip terraform_0.12.7_linux_amd64.zip -d /usr/local/bin &&  chmod +x /usr/local/bin/terraform
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - echo "Version name will be: ${IMAGE_TAG}"
+      - echo Version name will be ${IMAGE_TAG}
   build:
     commands:
       - echo Build started on `date`
