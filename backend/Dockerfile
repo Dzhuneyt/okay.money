@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Reuse an existing /vendor folder for faster builds
 # on dev environments
-COPY /vendor /app/vendor
+#COPY /vendor /app/vendor
 
 COPY composer.json composer.json
 COPY composer.lock composer.lock
