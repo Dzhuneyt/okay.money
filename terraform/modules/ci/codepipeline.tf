@@ -95,8 +95,9 @@ resource "aws_codepipeline" "codepipeline" {
       configuration = {
         # Must match the name from
         # https://eu-west-1.console.aws.amazon.com/codesuite/codecommit/repositories?region=eu-west-1
-        RepositoryName       = "Personal-Finance"
-        BranchName           = "develop"
+        RepositoryName = "Personal-Finance"
+        BranchName     = "develop"
+        # There is now a CloudWatch event for CodeCommit changes
         PollForSourceChanges = false
       }
     }

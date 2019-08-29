@@ -22,10 +22,7 @@ resource "aws_iam_role" "codebuild_role" {
 EOF
 }
 
-data "aws_region" "current" {}
-data "aws_billing_service_account" "main" {}
-
-data "aws_iam_policy_document" "codebuild_policy" {
+data "aws_iam_policy_document" "codebuild_base_policy" {
   version = "2012-10-17"
   statement {
     # Allow CloudBuild to write its logs to CloudWatch
@@ -116,7 +113,7 @@ data "aws_iam_policy_document" "codebuild_policy" {
   }
 
   statement {
-    # Allow Terraform to aqcuire remote state lock
+    # Allow CodeBuild to aqcuire remote state lock
     resources = [
       data.aws_dynamodb_table.terraform_remote_state_lock.arn
     ]
@@ -128,7 +125,7 @@ data "aws_iam_policy_document" "codebuild_policy" {
   }
 
   statement {
-    # Allow Terraform to read keys from Parameter Store
+    # Allow CloudBuild to read keys from Parameter Store
     actions = [
       "ssm:GetParameters"
     ]
@@ -136,13 +133,40 @@ data "aws_iam_policy_document" "codebuild_policy" {
       "arn:aws:ssm:*:*:parameter/personalfinance*"
     ]
   }
+
+  statement {
+    # Allow CodeBuild to push ECR images
+    actions = [
+      "ecr:GetAuthorizationToken",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:GetRepositoryPolicy",
+      "ecr:DescribeRepositories",
+      "ecr:ListImages",
+      "ecr:DescribeImages",
+      "ecr:BatchGetImage",
+      "ecr:InitiateLayerUpload",
+      "ecr:UploadLayerPart",
+      "ecr:CompleteLayerUpload",
+      "ecr:PutImage"
+    ]
+    resources = [
+      "arn:aws:ecr:*:*:repository/finance/*"
+    ]
+  }
 }
-resource "aws_iam_policy" "codebuild_policy" {
+resource "aws_iam_policy" "codebuild_base_policy" {
   name_prefix = "${var.app_name}-codebuild-policy"
-  policy      = data.aws_iam_policy_document.codebuild_policy.json
+  policy      = data.aws_iam_policy_document.codebuild_base_policy.json
 }
-resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment" {
-  policy_arn = aws_iam_policy.codebuild_policy.arn
+resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment_1" {
+  policy_arn = aws_iam_policy.codebuild_base_policy.arn
+  role       = aws_iam_role.codebuild_role.name
+}
+
+# Allow CodeBuild to do Terraform operations
+resource "aws_iam_role_policy_attachment" "codebuild_terraform_policy_attachment" {
+  policy_arn = aws_iam_policy.terraform_policy.arn
   role       = aws_iam_role.codebuild_role.name
 }
 resource "aws_iam_role_policy" "example" {

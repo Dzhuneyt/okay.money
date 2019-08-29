@@ -19,7 +19,7 @@ resource "aws_cloudwatch_event_rule" "codecommit_activity" {
 PATTERN
 }
 
-resource "aws_cloudwatch_event_target" "yada" {
+resource "aws_cloudwatch_event_target" "cloudwatch_triggers_pipeline" {
   target_id = "${var.app_name}-commits-trigger-pipeline"
   rule      = aws_cloudwatch_event_rule.codecommit_activity.name
   arn       = aws_codepipeline.codepipeline.arn
