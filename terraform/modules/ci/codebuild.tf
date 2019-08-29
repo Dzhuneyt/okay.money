@@ -126,6 +126,16 @@ data "aws_iam_policy_document" "codebuild_policy" {
       "dynamodb:DeleteItem"
     ]
   }
+
+  statement {
+    # Allow Terraform to read keys from Parameter Store
+    actions = [
+      "ssm:GetParameters"
+    ]
+    resources = [
+      "arn:aws:ssm:*:*:parameter/personalfinance*"
+    ]
+  }
 }
 resource "aws_iam_policy" "codebuild_policy" {
   name_prefix = "${var.app_name}-codebuild-policy"
@@ -266,11 +276,11 @@ resource "aws_codebuild_project" "build" {
       value = "SOME_VALUE1"
     }
 
-    //    environment_variable {
-    //      name  = "SOME_KEY2"
-    //      value = "SOME_VALUE2"
-    //      type  = "PARAMETER_STORE"
-    //    }
+    environment_variable {
+      name  = "TF_VAR_domain_name"
+      value = "personalfinance_domain_name"
+      type  = "PARAMETER_STORE"
+    }
   }
 
   logs_config {
