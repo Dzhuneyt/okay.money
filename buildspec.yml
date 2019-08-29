@@ -15,10 +15,11 @@ phases:
   build:
     commands:
       - echo Build started on `date`
+      - docker run hello-world
       - ./scripts/docker-compose-push.sh ${IMAGE_TAG}
-#      - echo Initializing Terraform
-#      - cd ./terraform && terraform init
-#      - terraform plan -var="version_tag=${IMAGE_TAG}"
+  #      - echo Initializing Terraform
+  #      - cd ./terraform && terraform init
+  #      - terraform plan -var="version_tag=${IMAGE_TAG}"
   #      - REPO_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
   #      - docker pull $REPO_URI:latest || true
   #      - docker build --cache-from $REPO_URI:latest --tag $REPO_URI:latest --tag $REPO_URI:$IMAGE_TAG .
