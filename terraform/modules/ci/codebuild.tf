@@ -25,6 +25,116 @@ EOF
 data "aws_region" "current" {}
 data "aws_billing_service_account" "main" {}
 
+data "aws_iam_policy_document" "codebuild_policy" {
+  version = "2012-10-17"
+  statement {
+    # Allow CloudBuild to write its logs to CloudWatch
+    resources = [
+      "*"
+    ]
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+  }
+
+  statement {
+    actions = [
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeDhcpOptions",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DetachNetworkInterface",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeVpcs",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    # Allow only codebuild runners that are placed on these Subnets
+    # to be able to create network interfaces
+    actions = [
+      "ec2:CreateNetworkInterfacePermission"
+    ]
+    resources = [
+      "arn:aws:ec2:${data.aws_region.current.name}:216987438199:network-interface/*"
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:Subnet"
+      values = [
+        "arn:aws:ec2:${data.aws_region.current.name}:216987438199:subnet/${var.private_subnet_ids[0]}",
+        "arn:aws:ec2:${data.aws_region.current.name}:216987438199:subnet/${var.private_subnet_ids[1]}",
+      ]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:AuthorizedService"
+      values = [
+        "codebuild.amazonaws.com"
+      ]
+    }
+  }
+
+  statement {
+    # General requirement for other statements to work
+    actions = [
+      "s3:ListAllMyBuckets"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    # Allow CodeBuild to write to the CI S3 bucket
+    actions = [
+      "s3:*"
+    ]
+    resources = [
+      aws_s3_bucket.ci_bucket.arn,
+      "${aws_s3_bucket.ci_bucket.arn}/*",
+    ]
+  }
+  statement {
+    # Allow CodeBuild to deploy apps using a remote S3 state
+    # See https://www.terraform.io/docs/backends/types/s3.html#using-the-s3-remote-state
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      data.aws_s3_bucket.terraform_backend.arn,
+      "${data.aws_s3_bucket.terraform_backend.arn}/personal-finance.tfstate"
+    ]
+  }
+
+  statement {
+    # Allow Terraform to aqcuire remote state lock
+    resources = [
+      data.aws_dynamodb_table.terraform_remote_state_lock.arn
+    ]
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem"
+    ]
+  }
+}
+resource "aws_iam_policy" "codebuild_policy" {
+  name_prefix = "${var.app_name}-codebuild-policy"
+  policy      = data.aws_iam_policy_document.codebuild_policy.json
+}
+resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment" {
+  policy_arn = aws_iam_policy.codebuild_policy.arn
+  role       = aws_iam_role.codebuild_role.name
+}
 resource "aws_iam_role_policy" "example" {
   role = aws_iam_role.codebuild_role.name
 

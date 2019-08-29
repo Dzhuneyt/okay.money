@@ -12,14 +12,13 @@ phases:
       - wget -q https://releases.hashicorp.com/terraform/0.12.7/terraform_0.12.7_linux_amd64.zip
       - unzip terraform_0.12.7_linux_amd64.zip -d /usr/local/bin
       - chmod +x /usr/local/bin/terraform
-  #      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
-  #      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
       - cd ./terraform && terraform init
-      - terraform plan
+      - terraform plan -var="version_tag=${IMAGE_TAG}"
   #      - REPO_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
   #      - docker pull $REPO_URI:latest || true
   #      - docker build --cache-from $REPO_URI:latest --tag $REPO_URI:latest --tag $REPO_URI:$IMAGE_TAG .
