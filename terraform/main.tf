@@ -21,7 +21,8 @@ module "ecs_cluster" {
   max_spot_instances     = "10"
   min_ondemand_instances = "0"
   max_ondmand_instances  = "0"
-  spot_bid_price         = "0.0031" # 0.0122 for t3a.medium
+  spot_bid_price         = "0.0031"
+  # 0.0122 for t3a.medium
 }
 
 # Allow traffic from the ALB to apps within the cluster
@@ -88,4 +89,14 @@ module "rds" {
   allowed_ingress_ips = [
     "${module.vpc.nat_public_ips[0]}/32"
   ]
+}
+module "ci" {
+  source             = "./modules/ci"
+  private_subnet_ids = module.vpc.private_subnets
+  public_subnet_ids  = module.vpc.public_subnets
+  vpc_id             = module.vpc.vpc_id
+
+  providers = {
+    aws = aws
+  }
 }
