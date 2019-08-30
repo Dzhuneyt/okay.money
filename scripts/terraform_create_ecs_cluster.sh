@@ -5,7 +5,7 @@ set -e
 
 # Create or upgrade the VPC infrastructure
 echo Creating or upgrading VPC infrastructure... &&
-  (cd ./terraform/vpc && terraform init && terraform apply -auto-approve) >/dev/null &&
+  cd ./terraform/vpc && terraform init > /dev/null && terraform apply -auto-approve >/dev/null &&
   echo VPC provisioning finished
 
 VPC_ID=$(cd ./terraform/vpc && terraform output vpc_id)
