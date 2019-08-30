@@ -1,5 +1,5 @@
 resource "aws_iam_role" "codepipeline_role" {
-  name = "${var.app_name}-codepipeline-role"
+  name = "${var.tag}-codepipeline-role"
 
   assume_role_policy = <<EOF
 {
@@ -18,7 +18,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "codepipeline_policy" {
-  name = "${var.app_name}_ci_policy"
+  name = "${var.tag}_ci_policy"
   role = aws_iam_role.codepipeline_role.id
 
   policy = <<EOF
@@ -62,7 +62,7 @@ EOF
 }
 
 resource "aws_codepipeline" "codepipeline" {
-  name     = "${var.app_name}-pipeline"
+  name     = "${var.tag}-pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {

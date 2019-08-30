@@ -60,7 +60,7 @@ module "vpc" {
   }
   source = "terraform-aws-modules/vpc/aws"
 
-  name = var.cluster_name
+  name = "DO-NOT-USE"
   cidr = "10.0.0.0/16"
 
   map_public_ip_on_launch = true
@@ -79,7 +79,7 @@ module "vpc" {
   single_nat_gateway = true
 
   tags = {
-    Name = var.cluster_name
+    Name = "DO_NOT_USE"
   }
 }
 
