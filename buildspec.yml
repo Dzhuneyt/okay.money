@@ -22,6 +22,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Privisioning ECS cluster
+      - ls
       - ./scripts/terraform_create_ecs_cluster.sh
 #      - ./scripts/docker-compose-push.sh ${IMAGE_TAG}
 #      - echo Docker images pushed to ECR with tag ${IMAGE_TAG}
