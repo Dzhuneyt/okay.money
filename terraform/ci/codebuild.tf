@@ -137,7 +137,10 @@ data "aws_iam_policy_document" "codebuild_base_policy" {
   statement {
     # Allow CodeBuild to push ECR images
     actions = [
+      # Allow pushing
       "ecr:GetAuthorizationToken",
+
+      # Allow pulling
       "ecr:BatchCheckLayerAvailability",
       "ecr:GetDownloadUrlForLayer",
       "ecr:GetRepositoryPolicy",

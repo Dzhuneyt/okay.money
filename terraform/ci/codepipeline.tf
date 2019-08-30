@@ -62,7 +62,7 @@ EOF
 }
 
 resource "aws_codepipeline" "codepipeline" {
-  name     = "${var.tag}-pipeline"
+  name     = "${var.tag}-develop"
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
