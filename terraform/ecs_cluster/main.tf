@@ -15,7 +15,7 @@ module "ecs_cluster" {
   ssh_key_name           = ""
   vpc_id                 = var.vpc_id
   instance_type_spot     = "t3a.micro"
-  min_spot_instances     = "7"
+  min_spot_instances     = "0"
   max_spot_instances     = "10"
   min_ondemand_instances = "0"
   max_ondmand_instances  = "0"
