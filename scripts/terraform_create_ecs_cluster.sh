@@ -3,18 +3,26 @@
 # Exit on error
 set -e
 
-timestamp=$1
+# Create or upgrade the VPC infrastructure
+echo Creating or upgrading VPC infrastructure... &&
+  (cd ./terraform/vpc && terraform init && terraform apply -auto-approve) >/dev/null &&
+  echo VPC provisioning finished
 
-if [ -z "$1" ]
-  then
-    echo "No argument supplied"
-    timestamp=$(date -u +"%F-%H-%M-UTC")
-fi
+VPC_ID=$(cd ./terraform/vpc && terraform output vpc_id)
+PRIVATE_SUBNETS=$(cd ./terraform/vpc && terraform output private_subnets | tr -d '\n')
+PUBLIC_SUBNETS=$(cd ./terraform/vpc && terraform output public_subnets | tr -d '\n')
 
-TAG=$timestamp docker-compose build --parallel
-$(aws ecr get-login --no-include-email)
-TAG=$timestamp docker-compose push
+tmpfile=$(mktemp)
+# shellcheck disable=SC2129
+echo private_subnets="${PRIVATE_SUBNETS}" >>"$tmpfile"
+echo public_subnets="${PUBLIC_SUBNETS}" >>"$tmpfile"
+echo vpc_id="\"${VPC_ID}\"" >>"$tmpfile"
 
-cd ./terraform
-terraform init
-terraform apply -var "version_tag=$timestamp" -auto-approve
+echo "Creating CodePipeline & CodeBuild..."
+cd ./terraform/ecs_cluster &&
+  terraform init >/dev/null &&
+  terraform apply -var-file="$tmpfile" -auto-approve
+
+echo "CodePipeline & CodeBuild created"
+
+rm "$tmpfile"

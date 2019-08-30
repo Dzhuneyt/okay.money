@@ -18,10 +18,11 @@ echo private_subnets="${PRIVATE_SUBNETS}" >>"$tmpfile"
 echo public_subnets="${PUBLIC_SUBNETS}" >>"$tmpfile"
 echo vpc_id="\"${VPC_ID}\"" >>"$tmpfile"
 
-echo "Creating ECS cluster..."
-cd ./terraform/ecs_cluster &&
+echo "Creating CodePipeline & CodeBuild..."
+cd ./terraform/ci &&
   terraform init >/dev/null &&
   terraform apply -var-file="$tmpfile" -auto-approve
-echo "ECS cluster created"
+
+echo "CodePipeline & CodeBuild created"
 
 rm "$tmpfile"
