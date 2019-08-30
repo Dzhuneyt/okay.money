@@ -164,11 +164,6 @@ resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment_1" {
   role       = aws_iam_role.codebuild_role.name
 }
 
-# Allow CodeBuild to do Terraform operations
-resource "aws_iam_role_policy_attachment" "codebuild_terraform_policy_attachment" {
-  policy_arn = aws_iam_policy.terraform_policy.arn
-  role       = aws_iam_role.codebuild_role.name
-}
 resource "aws_iam_role_policy" "example" {
   role = aws_iam_role.codebuild_role.name
 
@@ -197,6 +192,7 @@ resource "aws_iam_role_policy" "example" {
         "ec2:DeleteNetworkInterface",
         "ec2:DescribeSubnets",
         "ec2:DescribeSecurityGroups",
+        "ec2:DescribeAvailabilityZones",
         "ec2:DescribeVpcs"
       ],
       "Resource": "*"
@@ -248,6 +244,11 @@ resource "aws_iam_role_policy_attachment" "codebuild_role_policy_attachment_1" {
 resource "aws_iam_role_policy_attachment" "codebuild_role_policy_attachment_2" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = data.aws_iam_policy.managed_policy_ecr_pusher.arn
+}
+# Allow CodeBuild to do Terraform operations
+resource "aws_iam_role_policy_attachment" "codebuild_terraform_policy_attachment" {
+  policy_arn = aws_iam_policy.terraform_policy.arn
+  role       = aws_iam_role.codebuild_role.name
 }
 
 resource "aws_security_group" "crypto" {
