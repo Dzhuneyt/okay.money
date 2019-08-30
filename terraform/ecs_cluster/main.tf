@@ -6,7 +6,7 @@ module "ecs_cluster" {
   providers = {
     aws = aws
   }
-  source       = "github.com/Dzhuneyt/Terraform-Module-AWS-ECS-Cluster?ref=v1.0.3"
+  source       = "github.com/Dzhuneyt/Terraform-Module-AWS-ECS-Cluster?ref=v1.0.4"
   create_vpc   = false
   aws_region   = var.region
   cluster_name = var.tag
