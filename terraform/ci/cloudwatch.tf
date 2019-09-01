@@ -1,3 +1,16 @@
+# Store build logs here and keep them for 14 days
+resource "aws_cloudwatch_log_group" "codebuild" {
+  name              = "${var.tag}-codebuild"
+  retention_in_days = 14
+}
+
+
+# Listen for activity on the CodeCommit repo and trigger the CodePipeline
+locals {
+  git_branch       = "develop"
+  codepipeline_arn = aws_codepipeline.codepipeline.arn
+  repo_arn         = data.aws_codecommit_repository.test.arn
+}
 resource "aws_cloudwatch_event_rule" "codecommit_activity" {
   name        = "${var.tag}-codecommit-activity"
   description = "Detect commits to CodeCommit repo of ${var.tag}"
@@ -6,14 +19,14 @@ resource "aws_cloudwatch_event_rule" "codecommit_activity" {
 {
   "source": [ "aws.codecommit" ],
   "detail-type": [ "CodeCommit Repository State Change" ],
-  "resources": [ "${data.aws_codecommit_repository.test.arn}" ],
+  "resources": [ "${local.repo_arn}" ],
   "detail": {
      "event": [
        "referenceCreated",
        "referenceUpdated"
       ],
      "referenceType":["branch"],
-     "referenceName": ["develop"]
+     "referenceName": ["${local.git_branch}"]
   }
 }
 PATTERN
@@ -22,7 +35,7 @@ PATTERN
 resource "aws_cloudwatch_event_target" "cloudwatch_triggers_pipeline" {
   target_id = "${var.tag}-commits-trigger-pipeline"
   rule      = aws_cloudwatch_event_rule.codecommit_activity.name
-  arn       = aws_codepipeline.codepipeline.arn
+  arn       = local.codepipeline_arn
   role_arn  = aws_iam_role.cloudwatch_ci_role.arn
 }
 
@@ -61,7 +74,7 @@ data "aws_iam_policy_document" "cloudwatch_ci_iam_policy" {
       "codepipeline:StartPipelineExecution"
     ]
     resources = [
-      aws_codepipeline.codepipeline.arn
+      local.codepipeline_arn
     ]
   }
 }

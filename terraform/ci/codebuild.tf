@@ -1,266 +1,10 @@
-resource "aws_cloudwatch_log_group" "codebuild" {
-  name              = "${var.tag}-codebuild"
-  retention_in_days = 14
-}
-# Add an inline policy
-resource "aws_iam_role" "codebuild_role" {
-  name = "${var.tag}-codebuild-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "codebuild.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-data "aws_iam_policy_document" "codebuild_base_policy" {
-  version = "2012-10-17"
-  statement {
-    # Allow CloudBuild to write its logs to CloudWatch
-    resources = [
-      "*"
-    ]
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-  }
-
-  statement {
-    actions = [
-      "ec2:CreateNetworkInterface",
-      "ec2:DescribeDhcpOptions",
-      "ec2:DescribeNetworkInterfaces",
-      "ec2:DetachNetworkInterface",
-      "ec2:DeleteNetworkInterface",
-      "ec2:DescribeSubnets",
-      "ec2:DescribeSecurityGroups",
-      "ec2:DescribeVpcs",
-    ]
-    resources = [
-      "*"
-    ]
-  }
-
-  statement {
-    # Allow only codebuild runners that are placed on these Subnets
-    # to be able to create network interfaces
-    actions = [
-      "ec2:CreateNetworkInterfacePermission"
-    ]
-    resources = [
-      "arn:aws:ec2:${data.aws_region.current.name}:216987438199:network-interface/*"
-    ]
-    condition {
-      test     = "StringEquals"
-      variable = "ec2:Subnet"
-      values = [
-        "arn:aws:ec2:${data.aws_region.current.name}:216987438199:subnet/${var.private_subnets[0]}",
-        "arn:aws:ec2:${data.aws_region.current.name}:216987438199:subnet/${var.private_subnets[1]}",
-      ]
-    }
-    condition {
-      test     = "StringEquals"
-      variable = "ec2:AuthorizedService"
-      values = [
-        "codebuild.amazonaws.com"
-      ]
-    }
-  }
-
-  statement {
-    # General requirement for other statements to work
-    actions = [
-      "s3:ListAllMyBuckets"
-    ]
-    resources = [
-      "*"
-    ]
-  }
-  statement {
-    # Allow CodeBuild to write to the CI S3 bucket
-    actions = [
-      "s3:*"
-    ]
-    resources = [
-      aws_s3_bucket.ci_bucket.arn,
-      "${aws_s3_bucket.ci_bucket.arn}/*",
-    ]
-  }
-  statement {
-    # Allow CodeBuild to deploy apps using a remote S3 state
-    # See https://www.terraform.io/docs/backends/types/s3.html#using-the-s3-remote-state
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket",
-      "s3:GetBucketLocation"
-    ]
-    resources = [
-      data.aws_s3_bucket.terraform_backend.arn,
-      "${data.aws_s3_bucket.terraform_backend.arn}/personal-finance/*.tfstate"
-    ]
-  }
-
-  statement {
-    # Allow CodeBuild to aqcuire remote state lock
-    resources = [
-      data.aws_dynamodb_table.terraform_remote_state_lock.arn
-    ]
-    actions = [
-      "dynamodb:GetItem",
-      "dynamodb:PutItem",
-      "dynamodb:DeleteItem"
-    ]
-  }
-
-  statement {
-    # Allow CloudBuild to read keys from Parameter Store
-    actions = [
-      "ssm:GetParameters"
-    ]
-    resources = [
-      "arn:aws:ssm:*:*:parameter/personalfinance*"
-    ]
-  }
-
-  statement {
-    # Allow CodeBuild to push ECR images
-    actions = [
-      # Allow pushing
-      "ecr:GetAuthorizationToken",
-
-      # Allow pulling
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:GetRepositoryPolicy",
-      "ecr:DescribeRepositories",
-      "ecr:ListImages",
-      "ecr:DescribeImages",
-      "ecr:BatchGetImage",
-      "ecr:InitiateLayerUpload",
-      "ecr:UploadLayerPart",
-      "ecr:CompleteLayerUpload",
-      "ecr:PutImage"
-    ]
-    resources = [
-      "arn:aws:ecr:*:*:repository/finance/*"
-    ]
-  }
-}
-resource "aws_iam_policy" "codebuild_base_policy" {
-  name_prefix = "${var.tag}-codebuild-policy"
-  policy      = data.aws_iam_policy_document.codebuild_base_policy.json
-}
-resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment_1" {
-  policy_arn = aws_iam_policy.codebuild_base_policy.arn
-  role       = aws_iam_role.codebuild_role.name
-}
-
-resource "aws_iam_role_policy" "example" {
-  role = aws_iam_role.codebuild_role.name
-
-  policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Resource": [
-        "*"
-      ],
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:CreateNetworkInterface",
-        "ec2:DescribeDhcpOptions",
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:DetachNetworkInterface",
-        "ec2:DeleteNetworkInterface",
-        "ec2:DescribeSubnets",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeAvailabilityZones",
-        "ec2:DescribeVpcs"
-      ],
-      "Resource": "*"
-    },
-    {
-        "Effect": "Allow",
-        "Action": [
-            "ec2:CreateNetworkInterfacePermission"
-        ],
-        "Resource": "arn:aws:ec2:${data.aws_region.current.name}:216987438199:network-interface/*",
-        "Condition": {
-            "StringEquals": {
-                "ec2:Subnet": [
-                    "arn:aws:ec2:${data.aws_region.current.name}:216987438199:subnet/${var.private_subnets[0]}",
-                    "arn:aws:ec2:${data.aws_region.current.name}:216987438199:subnet/${var.private_subnets[1]}"
-                ],
-                "ec2:AuthorizedService": "codebuild.amazonaws.com"
-            }
-        }
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:*"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.ci_bucket.arn}",
-        "${aws_s3_bucket.ci_bucket.arn}/*",
-        "${data.aws_s3_bucket.terraform_backend.arn}",
-        "${data.aws_s3_bucket.terraform_backend.arn}/personal-finance.tfstate"
-      ]
-    }
-  ]
-}
-POLICY
-}
-
-# Allow CodeBuild to invoke other AWS services
-data "aws_iam_policy" "managed_policy_codebuild" {
-  arn = "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
-}
-data "aws_iam_policy" "managed_policy_ecr_pusher" {
-  arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
-}
-resource "aws_iam_role_policy_attachment" "codebuild_role_policy_attachment_1" {
-  role       = aws_iam_role.codebuild_role.name
-  policy_arn = data.aws_iam_policy.managed_policy_codebuild.arn
-}
-resource "aws_iam_role_policy_attachment" "codebuild_role_policy_attachment_2" {
-  role       = aws_iam_role.codebuild_role.name
-  policy_arn = data.aws_iam_policy.managed_policy_ecr_pusher.arn
-}
-# Allow CodeBuild to do Terraform operations
-resource "aws_iam_role_policy_attachment" "codebuild_terraform_policy_attachment" {
-  policy_arn = aws_iam_policy.terraform_policy.arn
-  role       = aws_iam_role.codebuild_role.name
-}
-
-resource "aws_security_group" "crypto" {
-  vpc_id = var.vpc_id
-  name   = "${var.tag}-ci-sg"
+resource "aws_security_group" "sg_ci" {
+  vpc_id      = var.vpc_id
+  name_prefix = "${var.tag}-ci-sg-"
   tags = {
     Name = var.tag
   }
-  description = "${var.tag} SG"
+  description = "${var.tag} SG for CodeBuild"
   egress {
     from_port = 0
     to_port   = 65535
@@ -276,6 +20,9 @@ resource "aws_security_group" "crypto" {
     protocol = "TCP"
     cidr_blocks = [
     "0.0.0.0/0"]
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -370,7 +117,7 @@ resource "aws_codebuild_project" "build" {
     subnets = var.private_subnets
 
     security_group_ids = [
-      aws_security_group.crypto.id,
+      aws_security_group.sg_ci.id,
     ]
   }
 

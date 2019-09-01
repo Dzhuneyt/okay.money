@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "terraform_policy" {
+data "aws_iam_policy_document" "terraform_policy_ecs_cluster_manager" {
   statement {
     actions = [
       "ec2:Describe*",
@@ -115,7 +115,24 @@ data "aws_iam_policy_document" "terraform_policy" {
     ]
   }
 }
-resource "aws_iam_policy" "terraform_policy" {
-  name_prefix = "${var.tag}-terraform-"
-  policy      = data.aws_iam_policy_document.terraform_policy.json
+resource "aws_iam_policy" "terraform_policy_ecs_cluster_manager" {
+  name_prefix = "${var.tag}-terraform-ecs-manager-"
+  policy      = data.aws_iam_policy_document.terraform_policy_ecs_cluster_manager.json
+}
+
+
+data "aws_iam_policy_document" "terraform_policy_app_manager" {
+  statement {
+    actions = [
+      "route53:Get*",
+      "route53:List*",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+resource "aws_iam_policy" "terraform_policy_app_manager" {
+  name_prefix = "${var.tag}-terraform-app-manager-"
+  policy      = data.aws_iam_policy_document.terraform_policy_app_manager.json
 }
