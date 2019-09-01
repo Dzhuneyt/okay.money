@@ -23,7 +23,9 @@ phases:
       - ./scripts/docker-compose-push.sh ${IMAGE_TAG}
       #      - echo Docker images pushed to ECR with tag ${IMAGE_TAG}
 
-      #      - echo Initializing Terraform
+      - echo Initializing Terraform
+      - (cd ./terraform/vpc && terraform init)
+      - (cd ./terraform/ecs_cluster && terraform init)
       - echo Privisioning ECS cluster
       #      - chmod +x ./scripts/terraform_create_ecs_cluster.sh && ./scripts/terraform_create_ecs_cluster.sh
 
