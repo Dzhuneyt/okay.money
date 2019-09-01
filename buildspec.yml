@@ -28,7 +28,7 @@ phases:
       #      - chmod +x ./scripts/terraform_create_ecs_cluster.sh && ./scripts/terraform_create_ecs_cluster.sh
 
       - echo Privisioning app
-      - cd ./terraform/app && terraform init -backend-config="key=personal-finance/app-${BRANCH}.tfstate" && \
+      - cd ./terraform/app && terraform init -backend-config="key=personal-finance/${BRANCH}/app.tfstate" && \
       - cd ../.. && chmod +x ./scripts/terraform_create_app.sh && ./scripts/terraform_create_app.sh
   post_build:
     commands:
