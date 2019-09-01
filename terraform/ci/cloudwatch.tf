@@ -8,7 +8,7 @@ resource "aws_cloudwatch_log_group" "codebuild" {
 # Listen for activity on the CodeCommit repo and trigger the CodePipeline
 locals {
   git_branch       = "develop"
-  codepipeline_arn = aws_codepipeline.codepipeline.arn
+  codepipeline_arn = aws_codepipeline.codepipeline_develop.arn
   repo_arn         = data.aws_codecommit_repository.test.arn
 }
 resource "aws_cloudwatch_event_rule" "codecommit_activity" {

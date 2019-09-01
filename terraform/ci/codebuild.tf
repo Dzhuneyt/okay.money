@@ -1,33 +1,5 @@
-resource "aws_security_group" "sg_ci" {
-  vpc_id      = var.vpc_id
-  name_prefix = "${var.tag}-ci-sg-"
-  tags = {
-    Name = var.tag
-  }
-  description = "${var.tag} SG for CodeBuild"
-  egress {
-    from_port = 0
-    to_port   = 65535
-    # All outbound traffic
-    protocol = "TCP"
-    cidr_blocks = [
-    "0.0.0.0/0"]
-  }
-  ingress {
-    from_port = 433
-    to_port   = 433
-    # All output HTTPs traffic
-    protocol = "TCP"
-    cidr_blocks = [
-    "0.0.0.0/0"]
-  }
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_codebuild_project" "build" {
-  name          = "${var.tag}-build"
+resource "aws_codebuild_project" "codebuild_develop" {
+  name          = "${var.tag}-develop"
   description   = "Build and deploy of ${var.tag}"
   build_timeout = "20"
   service_role  = aws_iam_role.codebuild_role.arn
@@ -54,6 +26,10 @@ resource "aws_codebuild_project" "build" {
     environment_variable {
       name  = "TF_IN_AUTOMATION"
       value = "1"
+    }
+    environment_variable {
+      name  = "BRANCH"
+      value = "develop"
     }
 
     # Pass these env vars to the builder job
@@ -97,12 +73,6 @@ resource "aws_codebuild_project" "build" {
     }
   }
 
-  //  source {
-  //    type = "GITHUB"
-  //    location = "https://github.com/mitchellh/packer.git"
-  //    git_clone_depth = 1
-  //  }
-
   source {
     type      = "CODEPIPELINE"
     buildspec = "buildspec.yml"
@@ -122,6 +92,7 @@ resource "aws_codebuild_project" "build" {
   }
 
   tags = {
-    Environment = "Test"
+    Branch = "develop"
+    Name   = var.tag
   }
 }
