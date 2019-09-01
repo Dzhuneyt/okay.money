@@ -22,7 +22,6 @@ echo cluster_id="\"${CLUSTER_ID}\"" >>"$tmpfile"
 
 echo "Creating ECS app..."
 cd $BASEDIR/terraform/app &&
-  terraform init &&
   terraform apply -var-file="$tmpfile" -auto-approve
 
 echo "ECS app created"
