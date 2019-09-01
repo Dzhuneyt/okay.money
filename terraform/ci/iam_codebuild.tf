@@ -138,8 +138,16 @@ data "aws_iam_policy_document" "codebuild_base_policy" {
   }
 
   statement {
-    # Allow CodeBuild to push ECR images
     sid = "AllowCodeBuildToPushECRImages"
+    actions = [
+      "ecr:GetAuthorizationToken"
+    ]
+    resources = [
+    "*"]
+  }
+  statement {
+    # Allow CodeBuild to push ECR images
+    sid = "AllowCodeBuildToPullECRImages"
     actions = [
       # Allow pushing
       "ecr:GetAuthorizationToken",
