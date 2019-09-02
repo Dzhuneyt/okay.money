@@ -53,13 +53,13 @@ RUN chmod +x /migrations.sh
 
 # Bundle app inside container
 COPY . /app
-RUN chmod +x /app/scripts/*
 
 # Copy dependencies from Step 1 of multi-stage build
 COPY --from=vendor /app/vendor/ /app/vendor/
 
 # Prepare important config files
 RUN php init --env=Docker --overwrite=y
+RUN chmod +x /app/scripts/*
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]
