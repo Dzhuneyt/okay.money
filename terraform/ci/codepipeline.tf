@@ -53,17 +53,9 @@ resource "aws_codepipeline" "codepipeline_develop" {
 
       run_order = 1
     }
-  }
-
-
-  # TODO https://medium.com/@ruslanfg/aws-codepipeline-approval-and-configuring-it-via-terraform-24870322f40
-
-
-  stage {
-    name = "BuildAndPushToECR"
 
     action {
-      name     = "BuildAndPushToECR"
+      name     = "Build"
       category = "Build"
       owner    = "AWS"
       provider = "CodeBuild"
@@ -82,6 +74,16 @@ resource "aws_codepipeline" "codepipeline_develop" {
       run_order = 1
     }
   }
+
+
+  # TODO https://medium.com/@ruslanfg/aws-codepipeline-approval-and-configuring-it-via-terraform-24870322f40
+
+
+  //  stage {
+  //    name = "BuildAndPushToECR"
+  //
+  //
+  //  }
   tags = {
     Branch = "develop"
     Name   = var.tag
