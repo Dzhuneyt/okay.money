@@ -1,5 +1,5 @@
 resource "aws_codebuild_project" "codebuild_develop_deploy" {
-  name          = "${var.tag}-develop"
+  name          = "${var.tag}-develop-deploy"
   description   = "Build and deploy of ${var.tag}"
   build_timeout = "20"
   service_role  = aws_iam_role.codebuild_role.arn

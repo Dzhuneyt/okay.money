@@ -9,32 +9,16 @@ phases:
       docker: 18
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
       - aws --version
-      - echo Installing Terraform && wget -q https://releases.hashicorp.com/terraform/0.12.7/terraform_0.12.7_linux_amd64.zip && unzip terraform_0.12.7_linux_amd64.zip -d /usr/local/bin && chmod +x /usr/local/bin/terraform
       - echo Branch name is $BRANCH
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - echo Version name will be ${IMAGE_TAG}
-      - TF_CLI_ARGS="-no-color"
   build:
     commands:
-      - echo Build started on `date`
-
-      - ./scripts/docker-compose-push.sh ${IMAGE_TAG}
-      #      - echo Docker images pushed to ECR with tag ${IMAGE_TAG}
-
-      - echo Initializing Terraform
-      - (cd ./terraform/vpc && terraform init)
-      - (cd ./terraform/ecs_cluster && terraform init)
-      - echo Privisioning ECS cluster
-      #      - chmod +x ./scripts/terraform_create_ecs_cluster.sh && ./scripts/terraform_create_ecs_cluster.sh
-
-      - echo Privisioning app
-      - cd ./terraform/app && terraform init -backend-config="key=personal-finance/${BRANCH}/app.tfstate" && \
-      - cd ../.. && chmod +x ./scripts/terraform_create_app.sh && ./scripts/terraform_create_app.sh
+      - echo Tests started on `date`
+      - npm run tests
   post_build:
     commands:
-      - echo Build completed on `date`
+      - echo Tests completed on `date`
 #      - echo Writing image definitions file...
 #      - printf '[{"name":"%s","imageUri":"%s"}]' "$CONTAINER_NAME" "$REPO_URI:$IMAGE_TAG" | tee imagedefinitions.json
 #artifacts:

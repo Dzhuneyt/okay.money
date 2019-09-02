@@ -1,8 +1,8 @@
 resource "aws_codebuild_project" "codebuild_develop_tests" {
-  name          = "${var.tag}-develop-tests"
-  description   = "Execute tests for ${var.tag}"
+  name = "${var.tag}-develop-tests"
+  description = "Execute tests for ${var.tag}"
   build_timeout = "20"
-  service_role  = aws_iam_role.codebuild_tests_role.arn
+  service_role = aws_iam_role.codebuild_role.arn
 
   artifacts {
     type = "CODEPIPELINE"
@@ -11,36 +11,36 @@ resource "aws_codebuild_project" "codebuild_develop_tests" {
     type = "LOCAL"
     modes = [
       "LOCAL_DOCKER_LAYER_CACHE",
-    "LOCAL_SOURCE_CACHE"]
+      "LOCAL_SOURCE_CACHE"]
   }
 
   environment {
-    compute_type                = "BUILD_GENERAL1_SMALL"
-    image                       = "aws/codebuild/standard:1.0"
-    type                        = "LINUX_CONTAINER"
+    compute_type = "BUILD_GENERAL1_SMALL"
+    image = "aws/codebuild/standard:1.0"
+    type = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
-    privileged_mode             = true
+    privileged_mode = true
 
     environment_variable {
-      name  = "BRANCH"
+      name = "BRANCH"
       value = "develop"
     }
   }
 
   logs_config {
     cloudwatch_logs {
-      group_name  = aws_cloudwatch_log_group.codebuild.name
+      group_name = aws_cloudwatch_log_group.codebuild.name
       stream_name = "tests"
     }
 
     s3_logs {
-      status   = "ENABLED"
+      status = "ENABLED"
       location = "${aws_s3_bucket.ci_bucket.id}/develop-tests-log"
     }
   }
 
   source {
-    type      = "CODEPIPELINE"
+    type = "CODEPIPELINE"
     buildspec = "buildspec-tests.yml"
   }
 
@@ -59,6 +59,6 @@ resource "aws_codebuild_project" "codebuild_develop_tests" {
 
   tags = {
     Branch = "develop"
-    Name   = var.tag
+    Name = var.tag
   }
 }

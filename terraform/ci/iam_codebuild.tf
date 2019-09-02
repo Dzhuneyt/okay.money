@@ -17,25 +17,6 @@ resource "aws_iam_role" "codebuild_role" {
 EOF
 }
 
-resource "aws_iam_role" "codebuild_tests_role" {
-  name = "${var.tag}-codebuild-tests-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "codebuild.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
 data "aws_iam_policy_document" "codebuild_base_policy" {
   version = "2012-10-17"
   statement {
