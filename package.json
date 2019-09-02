@@ -13,7 +13,7 @@
     "feBuildAndWatch": "./scripts/frontend-build.sh",
     "beLiteServer": "cd backend && php yii server",
     "beUnitTests": "./scripts/backend-tests-unit.sh",
-    "beFunctionalTests": "./scripts/backend-tests-functional.sh",
+    "beFunctionalTests": "./scripts/backend-tests-functional.sh; exit $?",
     "beSeedDB": "cd backend && php yii fixture/load '*' --interactive=0"
   },
   "repository": {
