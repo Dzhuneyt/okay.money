@@ -16,14 +16,16 @@ phases:
       - export MYSQL_DB=db
       - export MYSQL_USER=root
       - export MYSQL_PASS=root
-      - (docker stop some-mysql && docker rm some-mysql) || true
+      - ((docker stop some-mysql && docker rm some-mysql) || true) > /dev/null
       - docker run --name some-mysql --rm -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=db -p 3306:3306 -d mysql:5.7
   build:
     commands:
       - echo Tests started on `date`
-      - npm run installDeps && npm run beMigrations
+      - npm run installDeps
+      - npm run beMigrations
       - npm run feUnitTests
-      - npm run beUnitTests && npm run beFunctionalTests
+      - npm run beUnitTests
+      - npm run beFunctionalTests
   post_build:
     commands:
       - echo Tests completed on `date`
@@ -31,3 +33,8 @@ phases:
 #      - printf '[{"name":"%s","imageUri":"%s"}]' "$CONTAINER_NAME" "$REPO_URI:$IMAGE_TAG" | tee imagedefinitions.json
 #artifacts:
 #  files: imagedefinitions.json
+
+cache:
+  paths:
+    - ./frontend/node_modules
+    - ./backend/vendor
