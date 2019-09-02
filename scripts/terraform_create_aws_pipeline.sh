@@ -22,7 +22,7 @@ echo vpc_id="\"${VPC_ID}\"" >>"$tmpfile"
 
 echo "Creating CodePipeline & CodeBuild..."
 cd "$BASEDIR"/terraform/ci &&
-#  terraform init > /dev/null &&
+  terraform init > /dev/null &&
   terraform apply -var-file="$tmpfile" -auto-approve -refresh=true
 
 echo "CodePipeline & CodeBuild created"

@@ -26,7 +26,7 @@ resource "aws_codepipeline" "codepipeline_develop" {
         RepositoryName = data.aws_codecommit_repository.test.repository_name
         BranchName     = "develop"
         # There is now a CloudWatch event for CodeCommit changes
-        //        PollForSourceChanges = false
+        PollForSourceChanges = false
       }
     }
   }
@@ -50,6 +50,8 @@ resource "aws_codepipeline" "codepipeline_develop" {
       configuration = {
         ProjectName = aws_codebuild_project.codebuild_develop_tests.name
       }
+
+      run_order = 1
     }
   }
 
@@ -58,10 +60,10 @@ resource "aws_codepipeline" "codepipeline_develop" {
 
 
   stage {
-    name = "Deploy"
+    name = "BuildAndPushToECR"
 
     action {
-      name     = "Deploy"
+      name     = "BuildAndPushToECR"
       category = "Build"
       owner    = "AWS"
       provider = "CodeBuild"
@@ -76,6 +78,8 @@ resource "aws_codepipeline" "codepipeline_develop" {
       configuration = {
         ProjectName = aws_codebuild_project.codebuild_develop_deploy.name
       }
+
+      run_order = 1
     }
   }
   tags = {
