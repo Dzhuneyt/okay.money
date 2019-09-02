@@ -1,6 +1,6 @@
-resource "aws_codebuild_project" "codebuild_develop_deploy" {
-  name          = "${var.tag}-develop-deploy"
-  description   = "Build and deploy of ${var.tag}"
+resource "aws_codebuild_project" "codebuild_develop_push_to_ecr" {
+  name          = "${var.tag}-develop-ecr-push"
+  description   = "Push images to ECR for ${var.tag}"
   build_timeout = "20"
   service_role  = aws_iam_role.codebuild_role.arn
 

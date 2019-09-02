@@ -32,7 +32,7 @@ resource "aws_codepipeline" "codepipeline_develop" {
   }
 
   stage {
-    name = "Test"
+    name = "TestBuildAndPushToECR"
 
     action {
       name     = "Test"
@@ -55,7 +55,7 @@ resource "aws_codepipeline" "codepipeline_develop" {
     }
 
     action {
-      name     = "Build"
+      name     = "PushToECR"
       category = "Build"
       owner    = "AWS"
       provider = "CodeBuild"
@@ -68,10 +68,10 @@ resource "aws_codepipeline" "codepipeline_develop" {
       version = "1"
 
       configuration = {
-        ProjectName = aws_codebuild_project.codebuild_develop_deploy.name
+        ProjectName = aws_codebuild_project.codebuild_develop_push_to_ecr.name
       }
 
-      run_order = 1
+      run_order = 2
     }
   }
 
