@@ -16,7 +16,7 @@ phases:
       - export MYSQL_DB=db
       - export MYSQL_USER=root
       - export MYSQL_PASS=root
-      - docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=db -d mysql:5.7
+      - docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=db -p 3306:3306 -d mysql:5.7
   build:
     commands:
       - echo Tests started on `date`
