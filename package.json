@@ -12,7 +12,7 @@
     "feUnitTests": "echo 'TO BE IMPLEMENTED' && exit 0; cd frontend && npm run test:cli",
     "feBuildAndWatch": "./scripts/frontend-build.sh",
     "beLiteServer": "cd backend && php yii server",
-    "beUnitTests": "./scripts/backend-tests-unit.sh",
+    "beUnitTests": "./scripts/backend-tests-unit.sh; exit $?",
     "beFunctionalTests": "./scripts/backend-tests-functional.sh; exit $?",
     "beSeedDB": "cd backend && php yii fixture/load '*' --interactive=0"
   },
