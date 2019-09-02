@@ -1,5 +1,24 @@
 resource "aws_iam_role" "codebuild_role" {
-  name = "${var.tag}-codebuild-role"
+  name = "${var.tag}-codebuild-deploy-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "codebuild.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role" "codebuild_tests_role" {
+  name = "${var.tag}-codebuild-tests-role"
 
   assume_role_policy = <<EOF
 {
@@ -59,14 +78,6 @@ data "aws_iam_policy_document" "codebuild_base_policy" {
     resources = [
       "arn:aws:ec2:${data.aws_region.current.name}:216987438199:network-interface/*"
     ]
-    condition {
-      test     = "StringEquals"
-      variable = "ec2:Subnet"
-      values = [
-        "arn:aws:ec2:${data.aws_region.current.name}:216987438199:subnet/${var.private_subnets[0]}",
-        "arn:aws:ec2:${data.aws_region.current.name}:216987438199:subnet/${var.private_subnets[1]}",
-      ]
-    }
     condition {
       test     = "StringEquals"
       variable = "ec2:AuthorizedService"

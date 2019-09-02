@@ -48,7 +48,7 @@ resource "aws_codepipeline" "codepipeline_develop" {
       version = "1"
 
       configuration = {
-        ProjectName = aws_codebuild_project.codebuild_develop.name
+        ProjectName = aws_codebuild_project.codebuild_develop_deploy.name
       }
     }
   }

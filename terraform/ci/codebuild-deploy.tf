@@ -1,4 +1,4 @@
-resource "aws_codebuild_project" "codebuild_develop" {
+resource "aws_codebuild_project" "codebuild_develop_deploy" {
   name          = "${var.tag}-develop"
   description   = "Build and deploy of ${var.tag}"
   build_timeout = "20"
@@ -64,12 +64,12 @@ resource "aws_codebuild_project" "codebuild_develop" {
   logs_config {
     cloudwatch_logs {
       group_name  = aws_cloudwatch_log_group.codebuild.name
-      stream_name = "build"
+      stream_name = "deploy"
     }
 
     s3_logs {
       status   = "ENABLED"
-      location = "${aws_s3_bucket.ci_bucket.id}/build-log"
+      location = "${aws_s3_bucket.ci_bucket.id}/develop-deploy-log"
     }
   }
 
