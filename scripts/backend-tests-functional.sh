@@ -5,4 +5,4 @@ set -e
 
 docker-compose -f docker-compose.yml -f docker-compose.local.override.yml up --no-ansi --exit-code-from backend_functional_tests_runner backend_functional_tests_runner
 
-echo $?
+exit $?
