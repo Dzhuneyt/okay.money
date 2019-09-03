@@ -1,6 +1,6 @@
-resource "aws_codebuild_project" "codebuild_develop_push_to_ecr" {
-  name = "${var.tag}-develop-ecr-push"
-  description = "Push images to ECR for ${var.tag}"
+resource "aws_codebuild_project" "codebuild_deploy_to_ecs" {
+  name = "${var.tag}-develop-deploy-to-ecs"
+  description = "Deploy new version of ${var.tag} to ECS"
   build_timeout = "20"
   service_role = aws_iam_role.codebuild_role.arn
 
@@ -75,7 +75,7 @@ resource "aws_codebuild_project" "codebuild_develop_push_to_ecr" {
 
   source {
     type = "CODEPIPELINE"
-    buildspec = "buildspec-ecr-push.yml"
+    buildspec = "buildspec-deploy-version.yml"
   }
 
   vpc_config {

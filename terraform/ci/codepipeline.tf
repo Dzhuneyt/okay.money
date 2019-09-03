@@ -1,21 +1,21 @@
 resource "aws_codepipeline" "codepipeline_develop" {
-  name     = "${var.tag}-develop"
+  name = "${var.tag}-develop"
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
     location = aws_s3_bucket.ci_bucket.bucket
-    type     = "S3"
+    type = "S3"
   }
 
   stage {
     name = "Source"
 
     action {
-      name     = "Source"
+      name = "Source"
       category = "Source"
-      owner    = "AWS"
+      owner = "AWS"
       provider = "CodeCommit"
-      version  = "1"
+      version = "1"
       output_artifacts = [
         "source_output"
       ]
@@ -24,7 +24,7 @@ resource "aws_codepipeline" "codepipeline_develop" {
         # Must match the name from
         # https://eu-west-1.console.aws.amazon.com/codesuite/codecommit/repositories?region=eu-west-1
         RepositoryName = data.aws_codecommit_repository.test.repository_name
-        BranchName     = "develop"
+        BranchName = "develop"
         # There is now a CloudWatch event for CodeCommit changes
         PollForSourceChanges = false
       }
@@ -35,9 +35,9 @@ resource "aws_codepipeline" "codepipeline_develop" {
     name = "TestBuildAndPushToECR"
 
     action {
-      name     = "Test"
+      name = "Test"
       category = "Test"
-      owner    = "AWS"
+      owner = "AWS"
       provider = "CodeBuild"
       input_artifacts = [
         "source_output"
@@ -55,15 +55,15 @@ resource "aws_codepipeline" "codepipeline_develop" {
     }
 
     action {
-      name     = "PushToECR"
+      name = "PushToECR"
       category = "Build"
-      owner    = "AWS"
+      owner = "AWS"
       provider = "CodeBuild"
       input_artifacts = [
         "source_output"
       ]
       output_artifacts = [
-        "deploy_output"
+        "ecr_push_output"
       ]
       version = "1"
 
@@ -71,21 +71,38 @@ resource "aws_codepipeline" "codepipeline_develop" {
         ProjectName = aws_codebuild_project.codebuild_develop_push_to_ecr.name
       }
 
-      run_order = 2
+      # TODO make this run after tests
+      run_order = 1
+    }
+  }
+  stage {
+    name = "DeployVersion"
+
+    action {
+      name = "Deploy"
+      category = "Deploy"
+      owner = "AWS"
+      provider = "CodeBuild"
+      input_artifacts = [
+        "ecr_push_output"
+      ]
+      output_artifacts = [
+        "deploy_output"
+      ]
+      version = "1"
+
+      configuration = {
+        ProjectName = aws_codebuild_project.codebuild_deploy_to_ecs.name
+      }
+
+      run_order = 1
     }
   }
 
-
   # TODO https://medium.com/@ruslanfg/aws-codepipeline-approval-and-configuring-it-via-terraform-24870322f40
 
-
-  //  stage {
-  //    name = "BuildAndPushToECR"
-  //
-  //
-  //  }
   tags = {
     Branch = "develop"
-    Name   = var.tag
+    Name = var.tag
   }
 }
