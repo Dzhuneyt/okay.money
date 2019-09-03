@@ -32,10 +32,10 @@ resource "aws_codepipeline" "codepipeline_develop" {
   }
 
   stage {
-    name = "TestBuildAndPushToECR"
+    name = "Build"
 
     action {
-      name = "Test"
+      name = "RunTests"
       category = "Test"
       owner = "AWS"
       provider = "CodeBuild"
@@ -76,7 +76,7 @@ resource "aws_codepipeline" "codepipeline_develop" {
     }
   }
   stage {
-    name = "DeployVersion"
+    name = "Deploy"
 
     action {
       name = "Deploy"
