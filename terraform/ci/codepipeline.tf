@@ -80,7 +80,7 @@ resource "aws_codepipeline" "codepipeline_develop" {
 
     action {
       name = "Deploy"
-      category = "Deploy"
+      category = "Build"
       owner = "AWS"
       provider = "CodeBuild"
       input_artifacts = [

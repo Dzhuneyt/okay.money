@@ -8,7 +8,8 @@ resource "aws_codebuild_project" "codebuild_develop_tests" {
     type = "CODEPIPELINE"
   }
   cache {
-    type = "LOCAL"
+    type = "S3"
+    location = "${aws_s3_bucket.ci_bucket.bucket}/codebuild/tests/cache"
     modes = [
       "LOCAL_DOCKER_LAYER_CACHE",
       "LOCAL_SOURCE_CACHE"]
