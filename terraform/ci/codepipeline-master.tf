@@ -1,21 +1,21 @@
-resource "aws_codepipeline" "codepipeline_develop" {
-  name = "${var.tag}-develop"
+resource "aws_codepipeline" "codepipeline_master" {
+  name     = "${var.tag}-prod"
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
     location = aws_s3_bucket.ci_bucket.bucket
-    type = "S3"
+    type     = "S3"
   }
 
   stage {
     name = "Source"
 
     action {
-      name = "Source"
+      name     = "Source"
       category = "Source"
-      owner = "AWS"
+      owner    = "AWS"
       provider = "CodeCommit"
-      version = "1"
+      version  = "1"
       output_artifacts = [
         "source_output"
       ]
@@ -24,7 +24,7 @@ resource "aws_codepipeline" "codepipeline_develop" {
         # Must match the name from
         # https://eu-west-1.console.aws.amazon.com/codesuite/codecommit/repositories?region=eu-west-1
         RepositoryName = data.aws_codecommit_repository.test.repository_name
-        BranchName = "develop"
+        BranchName     = "master"
         # There is now a CloudWatch event for CodeCommit changes
         PollForSourceChanges = false
       }
@@ -35,9 +35,9 @@ resource "aws_codepipeline" "codepipeline_develop" {
     name = "Build"
 
     action {
-      name = "RunTests"
+      name     = "RunTests"
       category = "Test"
-      owner = "AWS"
+      owner    = "AWS"
       provider = "CodeBuild"
       input_artifacts = [
         "source_output"
@@ -55,9 +55,9 @@ resource "aws_codepipeline" "codepipeline_develop" {
     }
 
     action {
-      name = "PushToECR"
+      name     = "PushToECR"
       category = "Build"
-      owner = "AWS"
+      owner    = "AWS"
       provider = "CodeBuild"
       input_artifacts = [
         "source_output"
@@ -79,9 +79,9 @@ resource "aws_codepipeline" "codepipeline_develop" {
     name = "Deploy"
 
     action {
-      name = "Deploy"
+      name     = "Deploy"
       category = "Build"
-      owner = "AWS"
+      owner    = "AWS"
       provider = "CodeBuild"
       input_artifacts = [
         "ecr_push_output"
@@ -103,6 +103,6 @@ resource "aws_codepipeline" "codepipeline_develop" {
 
   tags = {
     Branch = "develop"
-    Name = var.tag
+    Name   = var.tag
   }
 }

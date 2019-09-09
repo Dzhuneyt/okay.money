@@ -1,8 +1,8 @@
 resource "aws_codebuild_project" "codebuild_deploy_to_ecs" {
-  name = "${var.tag}-develop-deploy-to-ecs"
-  description = "Deploy new version of ${var.tag} to ECS"
+  name          = "${var.tag}-deploy-to-ecs"
+  description   = "Deploy new version of ${var.tag} to ECS"
   build_timeout = "20"
-  service_role = aws_iam_role.codebuild_role.arn
+  service_role  = aws_iam_role.codebuild_role.arn
 
   artifacts {
     type = "CODEPIPELINE"
@@ -11,70 +11,70 @@ resource "aws_codebuild_project" "codebuild_deploy_to_ecs" {
     type = "LOCAL"
     modes = [
       "LOCAL_DOCKER_LAYER_CACHE",
-      "LOCAL_SOURCE_CACHE"]
+    "LOCAL_SOURCE_CACHE"]
   }
 
   environment {
-    compute_type = "BUILD_GENERAL1_SMALL"
-    image = "aws/codebuild/standard:1.0"
-    type = "LINUX_CONTAINER"
+    compute_type                = "BUILD_GENERAL1_SMALL"
+    image                       = "aws/codebuild/standard:1.0"
+    type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
-    privileged_mode = true
+    privileged_mode             = true
 
     # Example on how to pass "regular" (non secret)
     # environment variables to the builder
     environment_variable {
-      name = "TF_IN_AUTOMATION"
+      name  = "TF_IN_AUTOMATION"
       value = "1"
     }
     environment_variable {
-      name = "BRANCH"
+      name  = "BRANCH"
       value = "develop"
     }
 
     # Pass these env vars to the builder job
     # They will be retrieved from AWS Parameter Store
     environment_variable {
-      name = "TF_VAR_domain_name"
+      name  = "TF_VAR_domain_name"
       value = "/personalfinance/domain_name"
-      type = "PARAMETER_STORE"
+      type  = "PARAMETER_STORE"
     }
     environment_variable {
-      name = "TF_VAR_MYSQL_HOST"
+      name  = "TF_VAR_MYSQL_HOST"
       value = "/personalfinance/MYSQL_HOST"
-      type = "PARAMETER_STORE"
+      type  = "PARAMETER_STORE"
     }
     environment_variable {
-      name = "TF_VAR_MYSQL_DB"
+      name  = "TF_VAR_MYSQL_DB"
       value = "/personalfinance/MYSQL_DB"
-      type = "PARAMETER_STORE"
+      type  = "PARAMETER_STORE"
     }
     environment_variable {
-      name = "TF_VAR_MYSQL_USER"
+      name  = "TF_VAR_MYSQL_USER"
       value = "/personalfinance/MYSQL_USER"
-      type = "PARAMETER_STORE"
+      type  = "PARAMETER_STORE"
     }
     environment_variable {
-      name = "TF_VAR_MYSQL_PASSWORD"
+      name  = "TF_VAR_MYSQL_PASSWORD"
       value = "/personalfinance/MYSQL_PASSWORD"
-      type = "PARAMETER_STORE"
+      type  = "PARAMETER_STORE"
     }
   }
 
   logs_config {
     cloudwatch_logs {
-      group_name = aws_cloudwatch_log_group.codebuild.name
+      group_name  = aws_cloudwatch_log_group.codebuild.name
       stream_name = "deploy"
     }
 
     s3_logs {
-      status = "ENABLED"
+      status   = "ENABLED"
       location = "${aws_s3_bucket.ci_bucket.id}/develop-deploy-log"
     }
   }
 
   source {
-    type = "CODEPIPELINE"
+    type      = "CODEPIPELINE"
     buildspec = "buildspec-deploy-version.yml"
   }
 
@@ -93,6 +93,6 @@ resource "aws_codebuild_project" "codebuild_deploy_to_ecs" {
 
   tags = {
     Branch = "develop"
-    Name = var.tag
+    Name   = var.tag
   }
 }

@@ -24,6 +24,7 @@ phases:
       - npm run installDeps
       - npm run feUnitTests
       - npm run beUnitTests
+      # TODO check why functional tests don't work on CodeBuild
 #      - npm run beFunctionalTests
   post_build:
     commands:

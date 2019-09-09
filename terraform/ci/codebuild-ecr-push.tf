@@ -1,8 +1,8 @@
 resource "aws_codebuild_project" "codebuild_develop_push_to_ecr" {
-  name = "${var.tag}-develop-ecr-push"
-  description = "Push images to ECR for ${var.tag}"
+  name          = "${var.tag}-ecr-push"
+  description   = "Push images to ECR for ${var.tag}"
   build_timeout = "20"
-  service_role = aws_iam_role.codebuild_role.arn
+  service_role  = aws_iam_role.codebuild_role.arn
 
   artifacts {
     type = "CODEPIPELINE"
@@ -11,36 +11,31 @@ resource "aws_codebuild_project" "codebuild_develop_push_to_ecr" {
     type = "LOCAL"
     modes = [
       "LOCAL_DOCKER_LAYER_CACHE",
-      "LOCAL_SOURCE_CACHE"]
+    "LOCAL_SOURCE_CACHE"]
   }
 
   environment {
-    compute_type = "BUILD_GENERAL1_SMALL"
-    image = "aws/codebuild/standard:1.0"
-    type = "LINUX_CONTAINER"
+    compute_type                = "BUILD_GENERAL1_SMALL"
+    image                       = "aws/codebuild/standard:1.0"
+    type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
-    privileged_mode = true
-
-    environment_variable {
-      name = "BRANCH"
-      value = "develop"
-    }
+    privileged_mode             = true
   }
 
   logs_config {
     cloudwatch_logs {
-      group_name = aws_cloudwatch_log_group.codebuild.name
+      group_name  = aws_cloudwatch_log_group.codebuild.name
       stream_name = "ecr-push"
     }
 
     s3_logs {
-      status = "ENABLED"
-      location = "${aws_s3_bucket.ci_bucket.id}/develop-ecr-push-log"
+      status   = "ENABLED"
+      location = "${aws_s3_bucket.ci_bucket.id}/ecr-push-log"
     }
   }
 
   source {
-    type = "CODEPIPELINE"
+    type      = "CODEPIPELINE"
     buildspec = "buildspec-ecr-push.yml"
   }
 
@@ -58,7 +53,7 @@ resource "aws_codebuild_project" "codebuild_develop_push_to_ecr" {
   }
 
   tags = {
-    Branch = "develop"
+    //    Branch = "develop"
     Name = var.tag
   }
 }
