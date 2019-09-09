@@ -4,6 +4,9 @@ import {TransactionModel} from 'src/app/models/transaction.model';
 import {Account} from 'src/app/models/account.model';
 import {map} from 'rxjs/operators';
 import {BackendService} from 'src/app/services/backend.service';
+import {DialogService} from 'src/app/services/dialog.service';
+import {AccountEditComponent} from 'src/app/account-edit/account-edit.component';
+import {MatSnackBar} from '@angular/material';
 
 const columns = [
   {
@@ -33,8 +36,21 @@ export class AccountListComponent implements OnInit {
     {
       label: 'Edit',
       icon: 'edit',
-      onClick: (transaction: Account) => {
-        alert('todo');
+      onClick: (account: Account) => {
+        this.dialog.open(AccountEditComponent, {
+            data: {
+              id: account.id,
+            },
+            width: '700px'
+          },
+          (res) => {
+            if (res) {
+              this.table.goToPage(this.table.currentPage);
+              // Refresh the table
+            } else {
+              this.snackbar.open('Editing failed');
+            }
+          });
       }
     },
     {
@@ -51,6 +67,8 @@ export class AccountListComponent implements OnInit {
 
   constructor(
     private backend: BackendService,
+    private dialog: DialogService,
+    private snackbar: MatSnackBar,
   ) {
   }
 

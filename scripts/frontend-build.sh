@@ -3,4 +3,4 @@
 # Exit on error
 set -e
 
-docker-compose -f docker-compose.yml -f docker-compose.local.override.yml up --build frontend_builder
+CURRENT_UID=$(id -u):$(id -g) docker-compose -f docker-compose.yml -f docker-compose.local.override.yml up --build frontend_builder

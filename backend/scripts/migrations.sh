@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+# TODO Deprecated script. To be deleted
+
 set -e
 
 echo Executing migrations
@@ -9,6 +11,5 @@ echo Executing migrations
 #echo MySQL password is ${MYSQL_PASS}
 
 dockerize -wait tcp://${MYSQL_HOST}:3306 && \
-    sleep 30 && \
     php yii migrate --interactive=0 && \
     exec "$@"

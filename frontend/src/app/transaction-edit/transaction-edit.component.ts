@@ -15,8 +15,6 @@ import {Account} from 'src/app/models/account.model';
 })
 export class TransactionEditComponent implements OnInit {
 
-  // @TODO display category dropdown
-  // @TODO display account dropdown
   public form = new FormGroup({
     id: new FormControl(null, []),
     description: new FormControl(null, []),

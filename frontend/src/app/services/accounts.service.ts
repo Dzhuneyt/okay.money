@@ -21,4 +21,8 @@ export class AccountsService {
         map(items => items['items'])
       );
   }
+
+  public getSingle(id: number): Observable<Account> {
+    return this.backend.request('v1/accounts/' + id, 'GET');
+  }
 }

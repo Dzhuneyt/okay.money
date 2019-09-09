@@ -28,9 +28,10 @@ import {MatListModule, MatSlideToggleModule} from '@angular/material';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';
-import {LoggedInGuard} from "src/app/guards/logged-in.guard";
-import {AnonymousUserGuard} from "src/app/guards/anonymous-user.guard";
-import {AccountListComponent} from "src/app/account-list/account-list.component";
+import {LoggedInGuard} from 'src/app/guards/logged-in.guard';
+import {AnonymousUserGuard} from 'src/app/guards/anonymous-user.guard';
+import {AccountListComponent} from 'src/app/account-list/account-list.component';
+import {AccountEditComponent} from 'src/app/account-edit/account-edit.component';
 
 const routes: Routes = [
   {
@@ -72,6 +73,7 @@ const routes: Routes = [
     DeleteConfirmComponent,
     TransactionEditComponent,
     AccountListComponent,
+    AccountEditComponent,
   ],
   imports: [
     BrowserModule,
@@ -102,6 +104,7 @@ const routes: Routes = [
     AddAccountComponent,
     DeleteConfirmComponent,
     TransactionEditComponent,
+    AccountEditComponent,
   ],
   bootstrap: [AppComponent]
 })

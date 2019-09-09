@@ -9,7 +9,7 @@
     <h4 mat-line>Transactions</h4>
     <p mat-line> See and manage all transactions </p>
   </mat-list-item>
-  <mat-list-item>
+  <mat-list-item [routerLink]="['/accounts']" routerLinkActive="true">
     <mat-icon mat-list-icon>category</mat-icon>
     <h4 mat-line>Accounts</h4>
     <p mat-line> Manage your accounts </p>

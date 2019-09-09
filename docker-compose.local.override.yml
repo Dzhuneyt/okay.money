@@ -2,23 +2,12 @@ version: '3'
 
 services:
   frontend_builder:
+    user: ${CURRENT_UID}
     build:
       context: frontend
       dockerfile: Dockerfile-builder
     volumes:
       - ./frontend:/app
-  backend_migrations:
-    build:
-      context: backend
-    command: ./scripts/migrations.sh
-    depends_on:
-      - mysql
-      - backend
-    environment:
-      - MYSQL_HOST=${MYSQL_HOST}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASS=${MYSQL_PASS}
-      - MYSQL_DB=${MYSQL_DB}
 
   backend_unit_tests_runner:
     build:
