@@ -53,27 +53,6 @@ resource "aws_codepipeline" "codepipeline_develop" {
 
       run_order = 1
     }
-
-    action {
-      name     = "PushToECR"
-      category = "Build"
-      owner    = "AWS"
-      provider = "CodeBuild"
-      input_artifacts = [
-        "source_output"
-      ]
-      output_artifacts = [
-        "ecr_push_output"
-      ]
-      version = "1"
-
-      configuration = {
-        ProjectName = aws_codebuild_project.codebuild_develop_push_to_ecr.name
-      }
-
-      # TODO make this run after tests
-      run_order = 1
-    }
   }
 
   # TODO https://medium.com/@ruslanfg/aws-codepipeline-approval-and-configuring-it-via-terraform-24870322f40
