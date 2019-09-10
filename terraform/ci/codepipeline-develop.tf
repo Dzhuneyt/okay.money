@@ -93,7 +93,8 @@ resource "aws_codepipeline" "codepipeline_develop" {
       version = "1"
 
       configuration = {
-        ProjectName = aws_codebuild_project.codebuild_deploy_to_ecs.name
+        ProjectName   = aws_codebuild_project.codebuild_deploy_to_ecs.name
+        PrimarySource = "source_output"
       }
 
       run_order = 1

@@ -32,8 +32,4 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - Deployed app version ${IMAGE_TAG}
-      - echo Writing image definitions file...
-      - echo $IMAGE_TAG >> version.txt
-artifacts:
-  files: version.txt
+      - echo Deployed app version ${IMAGE_TAG}
