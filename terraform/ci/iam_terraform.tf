@@ -81,6 +81,7 @@ data "aws_iam_policy_document" "terraform_policy" {
     actions = [
       "ecs:Describe*",
       "ecs:CreateCluster",
+      "ecs:RegisterTaskDefinition",
     ]
     resources = [
     "*"]
