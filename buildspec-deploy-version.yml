@@ -21,7 +21,8 @@ phases:
       - echo Build started on `date`
 
       - echo Initializing Terraform
-      - cat version.txt
+      - echo $CODEBUILD_SRC_DIR_ecr_push_output
+#      - cat version.txt
 #      - cd ./terraform/ && terraform init
 #      - ./scripts/terraform_apply.sh
 #      - (cd ./terraform/ecs_cluster && terraform init) && echo ECS cluster ok
