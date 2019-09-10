@@ -16,8 +16,8 @@ module "ecs_cluster" {
   # Not needed to access EC2 instances for now
   ssh_key_name           = ""
   vpc_id                 = module.vpc.vpc_id
-  instance_type_spot     = "t3a.micro"
-  min_spot_instances     = "6"
+  instance_type_spot     = "t3a.nano"
+  min_spot_instances     = "7"
   max_spot_instances     = "10"
   min_ondemand_instances = "0"
   max_ondmand_instances  = "0"
