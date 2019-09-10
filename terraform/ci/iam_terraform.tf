@@ -162,7 +162,8 @@ data "aws_iam_policy_document" "terraform_policy" {
 
   statement {
     actions = [
-      "events:Describe*"
+      "events:Describe*",
+      "events:List*",
     ]
     resources = [
       "*"
