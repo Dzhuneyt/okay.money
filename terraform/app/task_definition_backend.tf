@@ -2,7 +2,7 @@ data "template_file" "task_definition__backend" {
   template = file("${path.module}/task_definitions/backend.json")
 
   vars = {
-    image_url      = "216987438199.dkr.ecr.us-east-1.amazonaws.com/finance/backend:${var.version_tag}"
+    image_url      = "216987438199.dkr.ecr.eu-west-1.amazonaws.com/finance/backend:${var.version_tag}"
     container_name = "backend"
 
     log_group_region = data.aws_region.current.name
