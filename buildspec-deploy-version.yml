@@ -23,7 +23,8 @@ phases:
       - echo Initializing Terraform
       - cat $CODEBUILD_SRC_DIR_ecr_push_output/version.txt
 #      - cat version.txt
-#      - cd ./terraform/ && terraform init
+      - cd ./terraform/ && terraform init
+      - terraform apply -var "version_tag=$IMAGE_TAG" -auto-approve
 #      - ./scripts/terraform_apply.sh
 #      - (cd ./terraform/ecs_cluster && terraform init) && echo ECS cluster ok
 #      - echo Privisioning ECS cluster
