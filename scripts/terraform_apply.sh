@@ -10,9 +10,11 @@ if [ -z "$1" ]
     timestamp=$(date -u +"%F-%H-%M-UTC")
 fi
 
-TAG=$timestamp docker-compose build --parallel
-$(aws ecr get-login --no-include-email)
-TAG=$timestamp docker-compose push
+ECR_PREFIX="216987438199.dkr.ecr.eu-west-1.amazonaws.com/finance"
+
+ECR_PREFIX=$ECR_PREFIX TAG=$timestamp docker-compose build --parallel
+$(aws ecr get-login --no-include-email --region eu-west-1)
+ECR_PREFIX=$ECR_PREFIX TAG=$timestamp docker-compose push
 
 cd ./terraform
 terraform init

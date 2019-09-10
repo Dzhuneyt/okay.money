@@ -49,8 +49,7 @@ data "aws_iam_policy_document" "terraform_policy" {
       "iam:AttachRolePolicy",
       "iam:CreateInstanceProfile",
       "iam:DeleteInstanceProfile",
-      "iam:ListRolePolicies",
-      "iam:ListAttachedRolePolicies",
+      "iam:List*",
       "iam:PassRole",
       "iam:ListEntitiesForPolicy",
     ]
@@ -64,11 +63,13 @@ data "aws_iam_policy_document" "terraform_policy" {
   statement {
     # Allow people with this policy to manage everything that has the stack tag
     actions = [
-      "ec2:DeleteVpc",
-      "ec2:ModifyVpcAttribute",
+      "ec2:*",
+      "ecs:*",
+      "autoscaling:*",
     ]
     resources = [
-    "*"]
+      "*"
+    ]
     condition {
       test = "StringLike"
       values = [
@@ -91,7 +92,7 @@ data "aws_iam_policy_document" "terraform_policy" {
       "ecs:UpdateService"
     ]
     resources = [
-      "arn:aws:ecs:*:*:service/${var.tag}"
+      "arn:aws:ecs:*:*:service/${var.tag}*"
     ]
   }
   statement {
