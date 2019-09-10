@@ -11,7 +11,8 @@ resource "aws_codebuild_project" "codebuild_deploy_to_ecs" {
     type = "LOCAL"
     modes = [
       "LOCAL_DOCKER_LAYER_CACHE",
-    "LOCAL_SOURCE_CACHE"]
+      "LOCAL_SOURCE_CACHE",
+    ]
   }
 
   environment {

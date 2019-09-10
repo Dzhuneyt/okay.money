@@ -84,6 +84,7 @@ resource "aws_codepipeline" "codepipeline_develop" {
       owner    = "AWS"
       provider = "CodeBuild"
       input_artifacts = [
+        "source_output",
         "ecr_push_output"
       ]
       output_artifacts = [
