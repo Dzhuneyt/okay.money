@@ -18,8 +18,7 @@ data "aws_iam_policy_document" "terraform_policy" {
       "ec2:TerminateInstances",
       "iam:AddRoleToInstanceProfile",
       "servicediscovery:CreatePrivateDnsNamespace",
-      "servicediscovery:GetOperation",
-      "servicediscovery:GetNamespace",
+      "servicediscovery:Get*",
       "route53:CreateHostedZone",
     ]
     resources = [
@@ -51,13 +50,13 @@ data "aws_iam_policy_document" "terraform_policy" {
       "iam:CreateInstanceProfile",
       "iam:DeleteInstanceProfile",
       "iam:ListRolePolicies",
+      "iam:ListAttachedRolePolicies",
       "iam:PassRole",
       "iam:ListEntitiesForPolicy",
     ]
     resources = [
       "arn:aws:iam::*:policy/*",
       "arn:aws:iam::*:role/*",
-      "arn:aws:iam::*:role/PersonalFinance*",
       "arn:aws:iam::*:instance-profile/PersonalFinance*",
     ]
   }
@@ -82,12 +81,13 @@ data "aws_iam_policy_document" "terraform_policy" {
     actions = [
     "ecs:DescribeClusters"]
     resources = [
-    "arn:aws:ecs:*:*:cluster/${var.tag}"]
+    "*"]
   }
   statement {
     actions = [
       "ec2:Describe*",
       "autoscaling:Describe*",
+      "elasticloadbalancing:Describe*",
       "ec2:CreateVpc",
       "ec2:CreateSecurityGroup",
       "iam:CreatePolicy",
@@ -122,6 +122,24 @@ data "aws_iam_policy_document" "terraform_policy" {
     ]
     resources = [
       "*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "logs:Describe*",
+      "acm:DescribeCertificate",
+    ]
+    resources = [
+    "*"]
+  }
+
+  statement {
+    actions = [
+      "codecommit:GetRepository"
+    ]
+    resources = [
+      data.aws_codecommit_repository.test.arn
     ]
   }
 }

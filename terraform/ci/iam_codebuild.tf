@@ -114,7 +114,8 @@ data "aws_iam_policy_document" "codebuild_base_policy" {
     actions = [
       "dynamodb:GetItem",
       "dynamodb:PutItem",
-      "dynamodb:DeleteItem"
+      "dynamodb:DeleteItem",
+      "dynamodb:DescribeTable",
     ]
   }
 
