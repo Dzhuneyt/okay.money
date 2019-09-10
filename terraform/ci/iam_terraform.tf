@@ -79,7 +79,9 @@ data "aws_iam_policy_document" "terraform_policy" {
 
   statement {
     actions = [
-    "ecs:DescribeClusters"]
+      "ecs:Describe*",
+      "ecs:CreateCluster",
+    ]
     resources = [
     "*"]
   }
@@ -88,7 +90,6 @@ data "aws_iam_policy_document" "terraform_policy" {
       "ec2:Describe*",
       "ec2:CreateVpc",
       "ec2:CreateSecurityGroup",
-      "ecs:CreateCluster",
       "autoscaling:Describe*",
       "elasticloadbalancing:Describe*",
       "iam:CreatePolicy",
@@ -147,12 +148,32 @@ data "aws_iam_policy_document" "terraform_policy" {
 
   statement {
     actions = [
-    "codebuild:*"]
+      "codebuild:*",
+      "codepipeline:*",
+    ]
     resources = [
       aws_codebuild_project.codebuild_develop_tests.arn,
       aws_codebuild_project.codebuild_deploy_to_ecs.arn,
       aws_codebuild_project.codebuild_develop_push_to_ecr.arn,
+      aws_codepipeline.codepipeline_develop.arn,
+      aws_codepipeline.codepipeline_master.arn,
     ]
+  }
+
+  statement {
+    actions = [
+    "events:Describe*"]
+    resources = [
+      "arn:aws:events:*:*:rule/${var.tag}*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "dynamodb:ListTagsOfResource",
+    ]
+    resources = [
+    "*"]
   }
 }
 resource "aws_iam_policy" "terraform_policy" {

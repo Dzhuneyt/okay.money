@@ -117,6 +117,7 @@ data "aws_iam_policy_document" "codebuild_base_policy" {
       "dynamodb:PutItem",
       "dynamodb:DeleteItem",
       "dynamodb:Describe*",
+      "dynamodb:ListTagsOfResource",
     ]
   }
 
