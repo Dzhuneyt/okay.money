@@ -25,4 +25,12 @@ export class AccountsService {
   public getSingle(id: number): Observable<Account> {
     return this.backend.request('v1/accounts/' + id, 'GET');
   }
+
+  updateSingle(id: number, payload: {}) {
+    return this.backend.request('v1/accounts/' + id, 'PUT', {}, payload);
+  }
+
+  createSingle(payload: {}) {
+    return this.backend.request('v1/accounts', 'POST', {}, payload);
+  }
 }
