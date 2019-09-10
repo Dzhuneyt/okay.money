@@ -88,6 +88,14 @@ data "aws_iam_policy_document" "terraform_policy" {
   }
   statement {
     actions = [
+      "ecs:UpdateService"
+    ]
+    resources = [
+      "arn:aws:ecs:*:*:service/${var.tag}"
+    ]
+  }
+  statement {
+    actions = [
       "ec2:Describe*",
       "ec2:CreateVpc",
       "ec2:CreateSecurityGroup",
