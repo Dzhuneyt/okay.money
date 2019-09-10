@@ -109,7 +109,8 @@ data "aws_iam_policy_document" "codebuild_base_policy" {
     # Allow CodeBuild to aqcuire remote state lock
     sid = "AllowCodeBuildToAcquireTerraformBackendStateLock"
     resources = [
-      data.aws_dynamodb_table.terraform_remote_state_lock.arn
+      data.aws_dynamodb_table.terraform_remote_state_lock.arn,
+      "arn:aws:dynamodb:*:*:table/terraform-lock",
     ]
     actions = [
       "dynamodb:GetItem",

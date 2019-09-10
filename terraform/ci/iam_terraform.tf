@@ -86,12 +86,12 @@ data "aws_iam_policy_document" "terraform_policy" {
   statement {
     actions = [
       "ec2:Describe*",
-      "autoscaling:Describe*",
-      "elasticloadbalancing:Describe*",
       "ec2:CreateVpc",
       "ec2:CreateSecurityGroup",
-      "iam:CreatePolicy",
       "ecs:CreateCluster",
+      "autoscaling:Describe*",
+      "elasticloadbalancing:Describe*",
+      "iam:CreatePolicy",
       "sts:DecodeAuthorizationMessage",
     ]
     resources = [
@@ -128,7 +128,9 @@ data "aws_iam_policy_document" "terraform_policy" {
   statement {
     actions = [
       "logs:Describe*",
-      "acm:DescribeCertificate",
+      "logs:ListTagsLogGroup",
+      "acm:Describe*",
+      "acm:List*",
     ]
     resources = [
     "*"]

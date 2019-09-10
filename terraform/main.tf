@@ -83,7 +83,6 @@ module "vpc" {
   }
 }
 
-
 module "rds" {
   source = "./modules/rds"
   allowed_ingress_ips = [

@@ -1,5 +1,5 @@
 variable "aws_region" {
-  default = "us-east-1"
+  default = "eu-west-1"
 }
 variable "version_tag" {
   description = "The version of the Docker Images to pull from ECR"
