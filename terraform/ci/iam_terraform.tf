@@ -3,6 +3,7 @@ data "aws_iam_policy_document" "terraform_policy" {
     actions = [
       "ec2:Describe*",
       "ecs:TagResource",
+      "ecr:ListTagsForResource",
       "ec2:*Vpc*",
       "ec2:*Subnet*",
       "ec2:*Gateway*",
