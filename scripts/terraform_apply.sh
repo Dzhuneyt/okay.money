@@ -16,6 +16,6 @@ ECR_PREFIX=$ECR_PREFIX TAG=$timestamp docker-compose build --parallel
 $(aws ecr get-login --no-include-email --region eu-west-1)
 ECR_PREFIX=$ECR_PREFIX TAG=$timestamp docker-compose push
 
-cd ./terraform
-terraform init
+cd ./terraform && \
+terraform init && \
 terraform apply -var "version_tag=$timestamp" -auto-approve
