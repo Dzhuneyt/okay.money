@@ -24,7 +24,7 @@ resource "aws_codepipeline" "codepipeline_develop" {
         # Must match the name from
         # https://eu-west-1.console.aws.amazon.com/codesuite/codecommit/repositories?region=eu-west-1
         RepositoryName = data.aws_codecommit_repository.test.repository_name
-        BranchName     = "master"
+        BranchName     = "develop"
         # There is now a CloudWatch event for CodeCommit changes
         PollForSourceChanges = false
       }
