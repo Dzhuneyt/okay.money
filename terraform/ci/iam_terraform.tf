@@ -144,6 +144,16 @@ data "aws_iam_policy_document" "terraform_policy" {
       data.aws_codecommit_repository.test.arn
     ]
   }
+
+  statement {
+    actions = [
+    "codebuild:*"]
+    resources = [
+      aws_codebuild_project.codebuild_develop_tests.arn,
+      aws_codebuild_project.codebuild_deploy_to_ecs.arn,
+      aws_codebuild_project.codebuild_develop_push_to_ecr.arn,
+    ]
+  }
 }
 resource "aws_iam_policy" "terraform_policy" {
   name_prefix = "${var.tag}-terraform-ecs-manager-"
