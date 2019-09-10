@@ -8,7 +8,7 @@ module "ecs_cluster" {
   providers = {
     aws = aws
   }
-  source       = "github.com/Dzhuneyt/Terraform-Module-AWS-ECS-Cluster?ref=v1.0.3"
+  source       = "github.com/Dzhuneyt/Terraform-Module-AWS-ECS-Cluster?ref=v1.0.5"
   create_vpc   = false
   aws_region   = var.aws_region
   cluster_name = var.cluster_name
@@ -39,7 +39,7 @@ module "personal_finance" {
   providers = {
     aws = aws
   }
-  source          = "./modules/personal_finance"
+  source          = "./app"
   cluster_id      = module.ecs_cluster.cluster_id
   private_subnets = module.vpc.private_subnets
   public_subnets  = module.vpc.public_subnets
@@ -91,11 +91,10 @@ module "rds" {
   ]
 }
 module "ci" {
-  source             = "./modules/ci"
-  private_subnet_ids = module.vpc.private_subnets
-  public_subnet_ids  = module.vpc.public_subnets
-  vpc_id             = module.vpc.vpc_id
-
+  source          = "./ci"
+  private_subnets = module.vpc.private_subnets
+  public_subnets  = module.vpc.public_subnets
+  vpc_id          = module.vpc.vpc_id
   providers = {
     aws = aws
   }

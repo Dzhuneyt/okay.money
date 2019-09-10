@@ -20,15 +20,15 @@ phases:
     commands:
       - echo Build started on `date`
 
-      - echo Initializing Terraform
-      - (cd ./terraform/vpc && terraform init) && echo VPC ok
-      - (cd ./terraform/ecs_cluster && terraform init) && echo ECS cluster ok
-      - echo Privisioning ECS cluster
-      - chmod +x ./scripts/terraform_create_ecs_cluster.sh && ./scripts/terraform_create_ecs_cluster.sh
-
-      - echo Privisioning app
-      - cd ./terraform/app && terraform init -backend-config="key=personal-finance/${BRANCH}/app.tfstate"
-      - cd ../.. && chmod +x ./scripts/terraform_create_app.sh && ./scripts/terraform_create_app.sh
+#      - echo Initializing Terraform
+#      - (cd ./terraform/vpc && terraform init) && echo VPC ok
+#      - (cd ./terraform/ecs_cluster && terraform init) && echo ECS cluster ok
+#      - echo Privisioning ECS cluster
+#      - chmod +x ./scripts/terraform_create_ecs_cluster.sh && ./scripts/terraform_create_ecs_cluster.sh
+#
+#      - echo Privisioning app
+#      - cd ./terraform/app && terraform init -backend-config="key=personal-finance/${BRANCH}/app.tfstate"
+#      - cd ../.. && chmod +x ./scripts/terraform_create_app.sh && ./scripts/terraform_create_app.sh
   post_build:
     commands:
       - echo Build completed on `date`

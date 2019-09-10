@@ -20,6 +20,8 @@ echo public_subnets="${PUBLIC_SUBNETS}" >>"$tmpfile"
 echo vpc_id="\"${VPC_ID}\"" >>"$tmpfile"
 echo cluster_id="\"${CLUSTER_ID}\"" >>"$tmpfile"
 
+cat $tmpfile
+
 echo "Creating ECS app..."
 cd $BASEDIR/terraform/app &&
   terraform apply -var-file="$tmpfile" -auto-approve
