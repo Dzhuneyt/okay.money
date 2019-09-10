@@ -162,9 +162,10 @@ data "aws_iam_policy_document" "terraform_policy" {
 
   statement {
     actions = [
-    "events:Describe*"]
+      "events:Describe*"
+    ]
     resources = [
-      "arn:aws:events:*:*:rule/${var.tag}*"
+      "*"
     ]
   }
 
