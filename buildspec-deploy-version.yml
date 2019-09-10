@@ -21,7 +21,7 @@ phases:
       - echo Build started on `date`
 
       - echo Initializing Terraform
-      - echo $CODEBUILD_SRC_DIR_ecr_push_output
+      - echo $CODEBUILD_SRC_DIR_ecr_push_output/version.txt
 #      - cat version.txt
 #      - cd ./terraform/ && terraform init
 #      - ./scripts/terraform_apply.sh
