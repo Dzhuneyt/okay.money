@@ -7,7 +7,6 @@ timestamp=$1
 
 if [ -z "$1" ]
   then
-    echo "No argument supplied"
     timestamp=$(date -u +"%F-%H-%M-UTC")
 fi
 

@@ -24,7 +24,7 @@ resource "aws_codepipeline" "codepipeline_develop" {
         # Must match the name from
         # https://eu-west-1.console.aws.amazon.com/codesuite/codecommit/repositories?region=eu-west-1
         RepositoryName = data.aws_codecommit_repository.test.repository_name
-        BranchName     = "develop"
+        BranchName     = "master"
         # There is now a CloudWatch event for CodeCommit changes
         PollForSourceChanges = false
       }
@@ -49,6 +49,50 @@ resource "aws_codepipeline" "codepipeline_develop" {
 
       configuration = {
         ProjectName = aws_codebuild_project.codebuild_develop_tests.name
+      }
+
+      run_order = 1
+    }
+
+    action {
+      name     = "PushToECR"
+      category = "Build"
+      owner    = "AWS"
+      provider = "CodeBuild"
+      input_artifacts = [
+        "source_output"
+      ]
+      output_artifacts = [
+        "ecr_push_output"
+      ]
+      version = "1"
+
+      configuration = {
+        ProjectName = aws_codebuild_project.codebuild_develop_push_to_ecr.name
+      }
+
+      # TODO make this run after tests
+      run_order = 1
+    }
+  }
+  stage {
+    name = "Deploy"
+
+    action {
+      name     = "Deploy"
+      category = "Build"
+      owner    = "AWS"
+      provider = "CodeBuild"
+      input_artifacts = [
+        "ecr_push_output"
+      ]
+      output_artifacts = [
+        "deploy_output"
+      ]
+      version = "1"
+
+      configuration = {
+        ProjectName = aws_codebuild_project.codebuild_deploy_to_ecs.name
       }
 
       run_order = 1

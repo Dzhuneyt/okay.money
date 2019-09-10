@@ -40,4 +40,8 @@ export class AccountEditComponent implements OnInit {
     return !this.data.id;
   }
 
+  submit() {
+    alert('todo');
+  }
+
 }
