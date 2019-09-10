@@ -56,8 +56,15 @@ data "aws_iam_policy_document" "terraform_policy" {
     resources = [
       "arn:aws:iam::*:policy/*",
       "arn:aws:iam::*:role/*",
-      "arn:aws:iam::*:instance-profile/PersonalFinance*",
+      "arn:aws:iam::*:instance-profile/${var.tag}*",
     ]
+  }
+
+  statement {
+    actions = [
+    "iam:DeletePolicyVersion"]
+    resources = [
+    "arn:aws:iam::*:policy/${var.tag}*"]
   }
 
   statement {
@@ -139,7 +146,7 @@ data "aws_iam_policy_document" "terraform_policy" {
   statement {
     actions = [
       "logs:Describe*",
-      "logs:ListTagsLogGroup",
+      "logs:List*",
       "acm:Describe*",
       "acm:List*",
     ]
