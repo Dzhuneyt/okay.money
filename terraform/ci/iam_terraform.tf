@@ -91,6 +91,7 @@ data "aws_iam_policy_document" "terraform_policy" {
       "ecs:Describe*",
       "ecs:CreateCluster",
       "ecs:RegisterTaskDefinition",
+      "ecs:DeregisterTaskDefinition",
     ]
     resources = [
     "*"]
