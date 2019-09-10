@@ -20,8 +20,10 @@ phases:
     commands:
       - echo Build started on `date`
 
-#      - echo Initializing Terraform
-#      - (cd ./terraform/vpc && terraform init) && echo VPC ok
+      - echo Initializing Terraform
+      - cat version.txt
+#      - cd ./terraform/ && terraform init
+#      - ./scripts/terraform_apply.sh
 #      - (cd ./terraform/ecs_cluster && terraform init) && echo ECS cluster ok
 #      - echo Privisioning ECS cluster
 #      - chmod +x ./scripts/terraform_create_ecs_cluster.sh && ./scripts/terraform_create_ecs_cluster.sh
