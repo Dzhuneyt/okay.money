@@ -101,7 +101,7 @@ data "aws_iam_policy_document" "codebuild_base_policy" {
     ]
     resources = [
       data.aws_s3_bucket.terraform_backend.arn,
-      "${data.aws_s3_bucket.terraform_backend.arn}/personal-finance/*.tfstate"
+      "${data.aws_s3_bucket.terraform_backend.arn}/personal-finance*"
     ]
   }
 
