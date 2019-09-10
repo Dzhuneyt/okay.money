@@ -173,11 +173,7 @@ resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment_1" {
 
 # Allow CodeBuild to invoke other AWS services
 # Allow CodeBuild to do Terraform operations
-//resource "aws_iam_role_policy_attachment" "codebuild_terraform_policy_attachment_1" {
-//  policy_arn = aws_iam_policy.terraform_policy_ecs_cluster_manager.arn
-//  role = aws_iam_role.codebuild_role.name
-//}
-resource "aws_iam_role_policy_attachment" "codebuild_terraform_policy_attachment_2" {
-  policy_arn = aws_iam_policy.terraform_policy_app_manager.arn
+resource "aws_iam_role_policy_attachment" "codebuild_terraform_policy_attachment_1" {
+  policy_arn = aws_iam_policy.terraform_policy.arn
   role       = aws_iam_role.codebuild_role.name
 }
