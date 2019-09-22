@@ -64,9 +64,9 @@ data "aws_iam_policy_document" "terraform_policy" {
 
   statement {
     actions = [
-    "iam:DeletePolicyVersion"]
+      "iam:DeletePolicyVersion"]
     resources = [
-    "arn:aws:iam::*:policy/${var.tag}*"]
+      "arn:aws:iam::*:policy/${var.tag}*"]
   }
 
   statement {
@@ -82,7 +82,7 @@ data "aws_iam_policy_document" "terraform_policy" {
     condition {
       test = "StringLike"
       values = [
-      var.tag]
+        var.tag]
       variable = "iam:ResourceTag/Name"
     }
   }
@@ -95,7 +95,7 @@ data "aws_iam_policy_document" "terraform_policy" {
       "ecs:DeregisterTaskDefinition",
     ]
     resources = [
-    "*"]
+      "*"]
   }
   statement {
     actions = [
@@ -117,7 +117,16 @@ data "aws_iam_policy_document" "terraform_policy" {
       "sts:DecodeAuthorizationMessage",
     ]
     resources = [
-    "*"]
+      "*"]
+  }
+
+  statement {
+    actions = [
+      "elasticloadbalancing:ModifyLoadBalancerAttributes"
+    ]
+    resources = [
+      "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/personal-finance*"
+    ]
   }
 
   statement {
@@ -131,7 +140,7 @@ data "aws_iam_policy_document" "terraform_policy" {
 
   statement {
     actions = [
-    "autoscaling:*"]
+      "autoscaling:*"]
     resources = [
       "arn:aws:autoscaling:*:*:autoScalingGroup:*:autoScalingGroupName/${var.tag}*"
     ]
@@ -155,12 +164,13 @@ data "aws_iam_policy_document" "terraform_policy" {
       "acm:List*",
     ]
     resources = [
-    "*"]
+      "*"]
   }
 
   statement {
     actions = [
-      "logs:PutRetentionPolicy"
+      "logs:PutRetentionPolicy",
+      "logs:DeleteLogGroup",
     ]
     resources = [
       "arn:aws:logs:*:*:log-group:personal-finance*"
@@ -205,10 +215,10 @@ data "aws_iam_policy_document" "terraform_policy" {
       "dynamodb:ListTagsOfResource",
     ]
     resources = [
-    "*"]
+      "*"]
   }
 }
 resource "aws_iam_policy" "terraform_policy" {
   name_prefix = "${var.tag}-${var.branch_name}-cb-terraform-"
-  policy      = data.aws_iam_policy_document.terraform_policy.json
+  policy = data.aws_iam_policy_document.terraform_policy.json
 }
