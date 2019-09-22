@@ -122,7 +122,8 @@ data "aws_iam_policy_document" "terraform_policy" {
 
   statement {
     actions = [
-      "elasticloadbalancing:ModifyLoadBalancerAttributes"
+      "elasticloadbalancing:ModifyLoadBalancerAttributes",
+      "elasticloadbalancing:DeleteLoadBalancer",
     ]
     resources = [
       "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/personal-finance*"
