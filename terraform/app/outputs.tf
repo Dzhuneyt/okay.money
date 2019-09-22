@@ -7,3 +7,6 @@ output "security_group_apps_id" {
 output "domain_name" {
   value = var.domain_name
 }
+output "alb_url" {
+  value = aws_alb.main.dns_name
+}

@@ -1,3 +1,3 @@
-output "domain" {
-  value = var.domain_name
+output "alb_url" {
+  value = module.personal_finance.alb_url
 }

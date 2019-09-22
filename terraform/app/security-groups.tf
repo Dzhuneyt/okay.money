@@ -1,5 +1,5 @@
 resource "aws_security_group" "sg_for_ecs_apps" {
-  name_prefix = "${var.app_name}_sg_for_ecs_apps_"
+  name_prefix = "${var.app_name}_${var.env_name}_sg_for_ecs_apps_"
   description = "Security group that allows incoming HTTP/HTTPS traffic and ALB traffic to the ECS tasks within the cluster"
   vpc_id      = var.vpc_id
 
@@ -53,7 +53,7 @@ resource "aws_security_group" "sg_for_ecs_apps" {
 }
 
 resource "aws_security_group" "sg_for_alb" {
-  name_prefix = "${var.app_name}_sg_for_alb"
+  name_prefix = "${var.app_name}_${var.env_name}_sg_for_alb_"
   description = "A security group for the Application Load Balancer. Allows HTTP traffic in"
   vpc_id      = var.vpc_id
 

@@ -40,7 +40,7 @@ module "personal_finance" {
     aws = aws
   }
   source          = "./app"
-  cluster_id      = local.cluster_id
+  cluster_id      = data.aws_ecs_cluster.ecs_cluster.cluster_name
   private_subnets = var.private_subnets
   public_subnets  = var.public_subnets
 
@@ -52,6 +52,7 @@ module "personal_finance" {
   domain_name = var.domain_name
   version_tag = var.version_tag
   vpc_id      = var.vpc_id
+  env_name    = var.env_name
 }
 
 // VPC management moved to centralized repo

@@ -15,12 +15,12 @@ data "template_file" "task_definition__backend" {
   }
 }
 resource "aws_ecs_task_definition" "backend" {
-  family                = var.app_name
+  family                = "${var.app_name}-${var.env_name}-backend"
   container_definitions = data.template_file.task_definition__backend.rendered
   network_mode          = "awsvpc"
 }
 resource "aws_ecs_service" "backend" {
-  name                               = "${var.app_name}_backend"
+  name                               = "${var.app_name}-${var.env_name}-backend"
   cluster                            = var.cluster_id
   task_definition                    = aws_ecs_task_definition.backend.arn
   desired_count                      = "2"
@@ -47,9 +47,16 @@ resource "aws_ecs_service" "backend" {
     container_name = "backend"
     container_port = 80
   }
+
+  ordered_placement_strategy {
+    type  = "spread"
+    field = "instanceId"
+  }
+
   depends_on = [
     aws_alb.main,
-    aws_alb_listener.https_traffic,
+    aws_alb_listener.http_traffic,
+    //    aws_alb_listener.https_traffic,
   ]
 }
 resource "aws_service_discovery_service" "backend" {

@@ -7,11 +7,6 @@ variable "version_tag" {
 variable "domain_name" {
   description = "The domain name to use for the whole stack. This will be used to create a Route 53 record and many other resources depend on it"
 }
-variable "cluster_name" {
-  description = "Create an ECS cluster with this name"
-  default     = "PersonalFinance"
-}
-
 variable "vpc_id" {
   default = "vpc-09809706f2f0bff29"
 }

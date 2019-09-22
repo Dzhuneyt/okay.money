@@ -11,7 +11,7 @@ data "template_file" "task_definition__frontend" {
 }
 
 resource "aws_ecs_task_definition" "frontend" {
-  family                = var.app_name
+  family                = "${var.app_name}-${var.env_name}-frontend"
   container_definitions = data.template_file.task_definition__frontend.rendered
   network_mode          = "awsvpc"
   depends_on = [
@@ -22,7 +22,7 @@ resource "aws_ecs_task_definition" "frontend" {
 }
 
 resource "aws_ecs_service" "frontend" {
-  name                               = "${var.app_name}_frontend"
+  name                               = "${var.app_name}-${var.env_name}-frontend"
   cluster                            = var.cluster_id
   task_definition                    = aws_ecs_task_definition.frontend.arn
   desired_count                      = "2"
@@ -50,8 +50,9 @@ resource "aws_ecs_service" "frontend" {
     container_port = 80
   }
 
-  lifecycle {
-    create_before_destroy = true
+  ordered_placement_strategy {
+    type  = "spread"
+    field = "instanceId"
   }
 
   depends_on = [

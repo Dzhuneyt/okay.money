@@ -1,6 +1,9 @@
 variable "app_name" {
   default = "personal-finance"
 }
+variable "env_name" {
+  description = "The environment which to use to name resource and ALB urls"
+}
 variable "region" {
   description = "AWS region where to launch the app. Make sure the cluster is also in this region"
   default     = "eu-west-1"
