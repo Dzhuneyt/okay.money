@@ -20,9 +20,9 @@ phases:
     commands:
       - echo Build started on `date`
 
-      - echo Initializing Terraform
-      - cat $CODEBUILD_SRC_DIR_ecr_push_output/version.txt
-      - echo $BRANCH
+#      - cat $CODEBUILD_SRC_DIR_ecr_push_output/version.txt
+      - echo Initializing Terraform for branch $BRANCH
+      - cd ./terraform && ./terraform-init.sh ${BRANCH}
   #      - cd ./terraform/ && terraform init
   #      - terraform apply -var "version_tag=$IMAGE_TAG" -auto-approve
   #      - ./scripts/terraform_apply.sh
