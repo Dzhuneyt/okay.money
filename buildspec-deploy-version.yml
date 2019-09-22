@@ -22,9 +22,7 @@ phases:
 
       - echo Initializing Terraform
       - cat $CODEBUILD_SRC_DIR_ecr_push_output/version.txt
-      #      - cat version.txt
-      - echo $CODEBUILD_SOURCE_VERSION
-      - git status
+      - echo $BRANCH
   #      - cd ./terraform/ && terraform init
   #      - terraform apply -var "version_tag=$IMAGE_TAG" -auto-approve
   #      - ./scripts/terraform_apply.sh
