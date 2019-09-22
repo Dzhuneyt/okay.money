@@ -23,7 +23,7 @@ phases:
       - cd ./terraform && chmod +x ./terraform-init.sh && ./terraform-init.sh ${BRANCH}
       - export TF_VAR_env_name=${BRANCH} && export TF_VAR_version_tag=${IMAGE_TAG}
       - echo Planning infrastructure
-      - terraform apply
+      - terraform apply -auto-approve
   post_build:
     commands:
       - echo Build completed on `date`
