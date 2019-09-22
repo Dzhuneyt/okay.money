@@ -101,7 +101,7 @@ data "aws_iam_policy_document" "terraform_policy" {
       "ecs:UpdateService"
     ]
     resources = [
-      "arn:aws:ecs:*:*:service/${var.tag}*"
+      "arn:aws:ecs:*:*:service/*personal-finance*"
     ]
   }
   statement {
