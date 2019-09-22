@@ -19,6 +19,7 @@ data "aws_iam_policy_document" "terraform_policy" {
       "ec2:TerminateInstances",
       "iam:AddRoleToInstanceProfile",
       "servicediscovery:CreatePrivateDnsNamespace",
+      "servicediscovery:CreateService",
       "servicediscovery:Get*",
       "route53:CreateHostedZone",
     ]
@@ -111,6 +112,7 @@ data "aws_iam_policy_document" "terraform_policy" {
       "ec2:CreateSecurityGroup",
       "autoscaling:Describe*",
       "elasticloadbalancing:Describe*",
+      "elasticloadbalancing:CreateLoadBalancer",
       "iam:CreatePolicy",
       "sts:DecodeAuthorizationMessage",
     ]
@@ -154,6 +156,15 @@ data "aws_iam_policy_document" "terraform_policy" {
     ]
     resources = [
     "*"]
+  }
+
+  statement {
+    actions = [
+      "logs:PutRetentionPolicy"
+    ]
+    resources = [
+      "arn:aws:logs:*:*:log-group:personal-finance*"
+    ]
   }
 
   statement {
