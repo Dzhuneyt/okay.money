@@ -23,6 +23,11 @@ phases:
 #      - cat $CODEBUILD_SRC_DIR_ecr_push_output/version.txt
       - echo Initializing Terraform for branch $BRANCH
       - cd ./terraform && chmod +x ./terraform-init.sh && ./terraform-init.sh ${BRANCH}
+      - echo env_name="${BRANCH}" >> terraform.tfvars
+      - cat terraform.tfvars
+
+#      - echo Planning infrastructure
+#      - terraform plan
   #      - cd ./terraform/ && terraform init
   #      - terraform apply -var "version_tag=$IMAGE_TAG" -auto-approve
   #      - ./scripts/terraform_apply.sh
