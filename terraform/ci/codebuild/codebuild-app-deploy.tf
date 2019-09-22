@@ -1,6 +1,6 @@
 resource "aws_codebuild_project" "codebuild_deploy_to_ecs" {
-  name          = "${var.tag}-deploy-to-ecs"
-  description   = "Deploy new version of ${var.tag} to ECS"
+  name          = "${var.tag}-${var.branch_name}-deploy-to-ecs"
+  description   = "Deploy new version of ${var.tag}, env ${var.branch_name} to ECS"
   build_timeout = "20"
   service_role  = aws_iam_role.codebuild_role.arn
 
@@ -30,7 +30,7 @@ resource "aws_codebuild_project" "codebuild_deploy_to_ecs" {
     }
     environment_variable {
       name  = "BRANCH"
-      value = "develop"
+      value = var.branch_name
     }
 
     # Pass these env vars to the builder job
@@ -70,7 +70,7 @@ resource "aws_codebuild_project" "codebuild_deploy_to_ecs" {
 
     s3_logs {
       status   = "ENABLED"
-      location = "${aws_s3_bucket.ci_bucket.id}/develop-deploy-log"
+      location = "${var.s3_ci_bucket}/codebuild/logs/${var.branch_name}/codebuild-deploy.txt"
     }
   }
 
@@ -93,7 +93,7 @@ resource "aws_codebuild_project" "codebuild_deploy_to_ecs" {
   }
 
   tags = {
-    Branch = "develop"
+    Branch = var.branch_name
     Name   = var.tag
   }
 }

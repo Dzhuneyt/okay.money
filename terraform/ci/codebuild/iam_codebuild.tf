@@ -1,5 +1,5 @@
 resource "aws_iam_role" "codebuild_role" {
-  name = "${var.tag}-codebuild-deploy-role"
+  name_prefix = "${var.tag}-${var.branch_name}-cb-"
 
   assume_role_policy = <<EOF
 {
@@ -85,8 +85,8 @@ data "aws_iam_policy_document" "codebuild_base_policy" {
       "s3:*"
     ]
     resources = [
-      aws_s3_bucket.ci_bucket.arn,
-      "${aws_s3_bucket.ci_bucket.arn}/*",
+      data.aws_s3_bucket.ci_bucket.arn,
+      "${data.aws_s3_bucket.ci_bucket.arn}/*",
     ]
   }
   statement {

@@ -1,5 +1,5 @@
 resource "aws_codebuild_project" "codebuild_develop_push_to_ecr" {
-  name          = "${var.tag}-ecr-push"
+  name          = "${var.tag}-${var.branch_name}-ecr-push"
   description   = "Push images to ECR for ${var.tag}"
   build_timeout = "20"
   service_role  = aws_iam_role.codebuild_role.arn
@@ -11,7 +11,8 @@ resource "aws_codebuild_project" "codebuild_develop_push_to_ecr" {
     type = "LOCAL"
     modes = [
       "LOCAL_DOCKER_LAYER_CACHE",
-    "LOCAL_SOURCE_CACHE"]
+      "LOCAL_SOURCE_CACHE"
+    ]
   }
 
   environment {
@@ -25,12 +26,12 @@ resource "aws_codebuild_project" "codebuild_develop_push_to_ecr" {
   logs_config {
     cloudwatch_logs {
       group_name  = aws_cloudwatch_log_group.codebuild.name
-      stream_name = "ecr-push"
+      stream_name = "ecr-push-${var.branch_name}"
     }
 
     s3_logs {
       status   = "ENABLED"
-      location = "${aws_s3_bucket.ci_bucket.id}/ecr-push-log"
+      location = "${var.s3_ci_bucket}/codebuild/logs/${var.branch_name}/ecr-push.txt"
     }
   }
 
@@ -53,7 +54,7 @@ resource "aws_codebuild_project" "codebuild_develop_push_to_ecr" {
   }
 
   tags = {
-    //    Branch = "develop"
-    Name = var.tag
+    Branch = var.branch_name
+    Name   = var.tag
   }
 }

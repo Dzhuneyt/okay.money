@@ -8,3 +8,10 @@ data "aws_s3_bucket" "terraform_backend" {
 
 data "aws_region" "current" {}
 data "aws_billing_service_account" "main" {}
+
+data "aws_codecommit_repository" "test" {
+  repository_name = "Personal-Finance"
+}
+data "aws_s3_bucket" "ci_bucket" {
+  bucket = var.s3_ci_bucket
+}

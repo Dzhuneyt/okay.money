@@ -48,7 +48,7 @@ resource "aws_codepipeline" "codepipeline_master" {
       version = "1"
 
       configuration = {
-        ProjectName = aws_codebuild_project.codebuild_develop_tests.name
+        ProjectName = module.codebuild_master.codebuild_tests
       }
 
       run_order = 1
@@ -68,7 +68,7 @@ resource "aws_codepipeline" "codepipeline_master" {
       version = "1"
 
       configuration = {
-        ProjectName = aws_codebuild_project.codebuild_develop_push_to_ecr.name
+        ProjectName = module.codebuild_master.codebuild_ecr_push
       }
 
       # TODO make this run after tests
@@ -92,7 +92,7 @@ resource "aws_codepipeline" "codepipeline_master" {
       version = "1"
 
       configuration = {
-        ProjectName = aws_codebuild_project.codebuild_deploy_to_ecs.name
+        ProjectName = module.codebuild_master.codebuild_app_deploy
       }
 
       run_order = 1

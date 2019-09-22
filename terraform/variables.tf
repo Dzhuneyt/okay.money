@@ -9,7 +9,7 @@ variable "domain_name" {
 }
 variable "cluster_name" {
   description = "Create an ECS cluster with this name"
-  default = "PersonalFinance"
+  default     = "PersonalFinance"
 }
 
 variable "vpc_id" {
@@ -37,3 +37,6 @@ variable "MYSQL_HOST" {}
 variable "MYSQL_DB" {}
 variable "MYSQL_USER" {}
 variable "MYSQL_PASSWORD" {}
+variable "env_name" {
+  description = "The environment name, which to use to launch the application. This is usually the Git branch name"
+}

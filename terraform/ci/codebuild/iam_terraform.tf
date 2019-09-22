@@ -165,19 +165,19 @@ data "aws_iam_policy_document" "terraform_policy" {
     ]
   }
 
-  statement {
-    actions = [
-      "codebuild:*",
-      "codepipeline:*",
-    ]
-    resources = [
-      aws_codebuild_project.codebuild_develop_tests.arn,
-      aws_codebuild_project.codebuild_deploy_to_ecs.arn,
-      aws_codebuild_project.codebuild_develop_push_to_ecr.arn,
-      aws_codepipeline.codepipeline_develop.arn,
-      aws_codepipeline.codepipeline_master.arn,
-    ]
-  }
+  //  statement {
+  //    actions = [
+  //      "codebuild:*",
+  //      "codepipeline:*",
+  //    ]
+  //    resources = [
+  //      aws_codebuild_project.codebuild_tests.arn,
+  //      aws_codebuild_project.codebuild_deploy_to_ecs.arn,
+  //      aws_codebuild_project.codebuild_develop_push_to_ecr.arn,
+  //      aws_codepipeline.codepipeline_develop.arn,
+  //      aws_codepipeline.codepipeline_master.arn,
+  //    ]
+  //  }
 
   statement {
     actions = [
@@ -198,6 +198,6 @@ data "aws_iam_policy_document" "terraform_policy" {
   }
 }
 resource "aws_iam_policy" "terraform_policy" {
-  name_prefix = "${var.tag}-terraform-ecs-manager-"
+  name_prefix = "${var.tag}-${var.branch_name}-cb-terraform-"
   policy      = data.aws_iam_policy_document.terraform_policy.json
 }

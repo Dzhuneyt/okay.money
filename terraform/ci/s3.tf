@@ -12,6 +12,4 @@ resource "aws_s3_bucket" "ci_bucket" {
   }
 }
 
-data "aws_s3_bucket" "terraform_backend" {
-  bucket = "terraform-backends-dz"
-}
+

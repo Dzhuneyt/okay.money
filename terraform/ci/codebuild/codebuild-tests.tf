@@ -1,5 +1,5 @@
-resource "aws_codebuild_project" "codebuild_develop_tests" {
-  name          = "${var.tag}-tests"
+resource "aws_codebuild_project" "codebuild_tests" {
+  name          = "${var.tag}-${var.branch_name}-tests"
   description   = "Execute tests for ${var.tag}"
   build_timeout = "20"
   service_role  = aws_iam_role.codebuild_role.arn
@@ -9,11 +9,7 @@ resource "aws_codebuild_project" "codebuild_develop_tests" {
   }
   cache {
     type     = "S3"
-    location = "${aws_s3_bucket.ci_bucket.bucket}/codebuild/tests/cache"
-    modes = [
-      "LOCAL_DOCKER_LAYER_CACHE",
-      "LOCAL_SOURCE_CACHE",
-    ]
+    location = "${var.s3_ci_bucket}/codebuild/cache/${var.branch_name}/tests"
   }
 
   environment {
@@ -27,12 +23,12 @@ resource "aws_codebuild_project" "codebuild_develop_tests" {
   logs_config {
     cloudwatch_logs {
       group_name  = aws_cloudwatch_log_group.codebuild.name
-      stream_name = "tests"
+      stream_name = "tests-${var.branch_name}"
     }
 
     s3_logs {
       status   = "ENABLED"
-      location = "${aws_s3_bucket.ci_bucket.id}/tests-log"
+      location = "${var.s3_ci_bucket}/codebuild/logs/${var.branch_name}/codebuild-tests"
     }
   }
 
@@ -55,7 +51,7 @@ resource "aws_codebuild_project" "codebuild_develop_tests" {
   }
 
   tags = {
-    //    Branch = "develop"
-    Name = var.tag
+    Branch = var.branch_name
+    Name   = var.tag
   }
 }
