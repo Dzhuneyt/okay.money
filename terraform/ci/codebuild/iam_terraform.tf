@@ -114,6 +114,7 @@ data "aws_iam_policy_document" "terraform_policy" {
       "elasticloadbalancing:Describe*",
       "elasticloadbalancing:CreateLoadBalancer",
       "elasticloadbalancing:CreateTargetGroup",
+      "elasticloadbalancing:AddTags",
       "iam:CreatePolicy",
       "sts:DecodeAuthorizationMessage",
     ]
