@@ -1,0 +1,32 @@
+@import "theme";
+
+body, html {
+  height: 100%;
+  display: block;
+  background: #f0f0f0;
+}
+
+// Global styles
+.mat-drawer-container {
+  background: transparent;
+}
+
+.mat-table {
+  background: transparent;
+}
+
+.red-bg {
+  background: #F44336;
+}
+
+.red-text {
+  color: #F44336;
+}
+
+.green-bg {
+  background: #4CAF50;
+}
+
+.green-text {
+  color: #4CAF50;
+}

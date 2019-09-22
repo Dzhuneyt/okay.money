@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  build:
+  build_backend:
     docker:
       # Base version where the app runs
       - image: circleci/php:7.1-browsers
@@ -19,11 +19,12 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/mysql:9.4
 
-    working_directory: ~/repo
+    working_directory: ~/repo/backend
 
     steps:
-      - checkout
-      - run: sudo apt install -y libsqlite3-dev zlib1g-dev
+      - checkout:
+          path: ~/repo
+      - run: sudo apt install -qq libsqlite3-dev zlib1g-dev
       - run: |
           sudo docker-php-ext-install pdo_mysql
           sudo docker-php-ext-enable pdo_mysql
@@ -35,7 +36,7 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: composer install -n --prefer-dist
+      - run: composer install -n --prefer-dist --quiet --optimize-autoloader
 
       - save_cache:
           paths:
@@ -63,3 +64,30 @@ jobs:
       - run:
           name: Functional tests
           command: composer test-functional
+
+  build_frontend:
+    docker:
+      - image: circleci/node:8-browsers
+
+    working_directory: ~/repo/frontend
+
+    steps:
+      - checkout:
+          path: ~/repo
+      - restore_cache:
+          key: AngularCircleCI-{{ .Branch }}-{{ checksum "package.json" }}
+      - run: npm install
+      - save_cache:
+          key: AngularCircleCI-{{ .Branch }}-{{ checksum "package.json" }}
+          paths:
+            - "node_modules"
+      - run: xvfb-run -a npm run build:prod
+#      - run: xvfb-run -a npm run test -- --single-run --no-progress --browser=ChromeNoSandbox
+#      - run: xvfb-run -a npm run e2e -- --no-progress --config=protractor-ci.conf.js
+
+workflows:
+  version: 2
+  backend_and_frontend:
+    jobs:
+      - build_backend
+      - build_frontend

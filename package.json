@@ -1,0 +1,34 @@
+{
+  "name": "personal-finance",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run installDeps && npx concurrently -n stack,fe_build 'npm run dockerComposeUpDev' 'npm run feBuildAndWatch'",
+    "tests": "npm run installDeps && npm run beMigrations && npx  concurrently 'npm run feUnitTests' 'npm run beUnitTests && npm run beFunctionalTests'",
+    "installDeps": "npx concurrently --success=\"all\" 'cd backend && composer install -q --prefer-dist' 'cd frontend && npm i -q --no-audit'",
+    "beMigrations": "cd backend && php yii migrate --interactive=0",
+    "feLiteServer": "cd frontend && npm run serve",
+    "feUnitTests": "echo 'TO BE IMPLEMENTED' && exit 0; cd frontend && npm run test:cli",
+    "dockerComposeUpDev": "TAG=latest docker-compose up --remove-orphans",
+    "feBuildAndWatch": "./scripts/frontend-build.sh",
+    "beLiteServer": "cd backend && php yii server",
+    "beUnitTests": "./scripts/backend-tests-unit.sh; exit $?",
+    "beFunctionalTests": "./scripts/backend-tests-functional.sh; exit $?",
+    "beSeedDB": "TAG=latest docker-compose run --rm backend php yii fixture/load \"*\","
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dzhuneyt/Personal-Finance.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dzhuneyt/Personal-Finance/issues"
+  },
+  "homepage": "https://github.com/Dzhuneyt/Personal-Finance#readme",
+  "dependencies": {
+    "concurrently": "^4.1.1"
+  }
+}

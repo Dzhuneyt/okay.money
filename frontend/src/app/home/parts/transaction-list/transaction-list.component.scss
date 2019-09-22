@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  margin: 0.5em;
+}
+
+::ng-deep {
+  .mat-column-created_at {
+    flex: 0 1 200px;
+  }
+
+  .mat-column-description {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    flex: 1 1;
+  }
+
+  .mat-column-sum {
+    flex: 0 1 120px;
+  }
+
+  .mat-column-category_name,
+  .mat-column-account_name {
+    flex: 0 1 150px;
+    margin-right: 1em;
+  }
+}

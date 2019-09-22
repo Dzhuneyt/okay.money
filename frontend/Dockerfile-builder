@@ -1,0 +1,11 @@
+FROM node:10
+
+WORKDIR /app
+
+RUN rm -rf /app/*
+COPY . .
+
+RUN mkdir /.npm-global && npm config set prefix '/.npm-global' &&  export PATH=/.npm-global/bin:$PATH
+
+CMD npm ci --no-audit && \
+    npm run build:watch

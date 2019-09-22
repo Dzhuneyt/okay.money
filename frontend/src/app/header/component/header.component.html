@@ -1,0 +1,57 @@
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <button
+      (click)="toggleMenu()"
+      *ngIf="isLoggedIn"
+      aria-label="Home page"
+      class="hamburger"
+      mat-icon-button>
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span routerLink="['/home']" routerLinkActive="true">Finance</span>
+    <span class="example-spacer"></span>
+
+    <button
+      *ngIf="isLoggedIn"
+      [routerLink]="['/home']"
+      aria-label="Transactions and accounts list"
+      class="navbar-icon"
+      mat-button
+      routerLinkActive="true">
+      <mat-icon inline="true">account_balance</mat-icon>
+      Overview
+    </button>
+
+    <button
+      *ngIf="isLoggedIn"
+      (click)="createTransaction()"
+      aria-label="Create Transaction"
+      class="navbar-icon"
+      mat-button>
+      <mat-icon inline="true">add</mat-icon>
+      Create transaction
+    </button>
+    <!--    <mat-icon [routerLink]="['/profile']" class="navbar-icon" routerLinkActive="true">person</mat-icon>-->
+
+
+    <button (click)="logout()"
+            *ngIf="isLoggedIn"
+            aria-label="Logout"
+            class="navbar-icon"
+            mat-button>
+      <mat-icon inline="true">exit_to_app</mat-icon>
+      Logout
+    </button>
+
+    <button *ngIf="!isLoggedIn"
+            [routerLink]="['/login']"
+            aria-label="Login"
+            class="navbar-icon"
+            mat-button
+            routerLinkActive="true">
+      <mat-icon inline="true">lock_open</mat-icon>
+      Login
+    </button>
+
+  </mat-toolbar-row>
+</mat-toolbar>

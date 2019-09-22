@@ -1,0 +1,13 @@
+<app-header></app-header>
+
+<mat-sidenav-container *ngIf="appReady" class="example-container">
+  <mat-sidenav #sidenav (click)="sidenav.toggle()" [(opened)]="menuService.isOpened" mode="side">
+    <div class="sidenav-wrap">
+      <app-sidenav></app-sidenav>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+

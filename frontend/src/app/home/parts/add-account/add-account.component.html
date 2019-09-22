@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>
+  Create a new account
+</h2>
+<mat-dialog-content>
+  <mat-form-field fxFill>
+    <mat-label>Account name</mat-label>
+    <input
+      matNativeControl
+      [(ngModel)]="name"
+      placeholder="Account name (e.g. Cash at hand, Credit Card)"
+    />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+  <button mat-button (click)="submit()">Create</button>
+</mat-dialog-actions>

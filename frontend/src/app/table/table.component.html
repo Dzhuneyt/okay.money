@@ -1,0 +1,55 @@
+<mat-table *ngIf="currentPageItems.length" [dataSource]="currentPageItems">
+
+  <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column.code">
+    <!--These handle the actual header and cell rendering-->
+    <mat-header-cell *matHeaderCellDef> {{column.label}} </mat-header-cell>
+
+    <!--Here follow the different types of columns, e.g. datetime-->
+
+    <mat-cell *matCellDef="let element" mat-cell>
+      <span
+        *ngIf="(!column.renderer && !column.type) || column.type==='standard'">
+        {{element[column.code]}}
+      </span>
+      <span
+        *ngIf="column.type==='datetime'">
+        {{element[column.code] | timeAgo}}
+      </span>
+      <span *ngIf="column.renderer" [innerHTML]="column.renderer(element)"></span>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container *ngIf="actions.length>0" [matColumnDef]="'actions'">
+    <!--These handle the actual header and cell rendering-->
+    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+
+    <!--Here follow the different types of columns, e.g. datetime-->
+
+    <mat-cell *matCellDef="let element" mat-cell>
+      <button (click)="action.onClick(element)"
+              *ngFor="let action of actions"
+              mat-icon-button>
+        <mat-icon>{{action.icon}}</mat-icon>
+      </button>
+    </mat-cell>
+  </ng-container>
+
+  <!--Don't touch these. They are just "definitions"-->
+  <mat-header-row *matHeaderRowDef="displayedColumnCodes"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumnCodes;"></mat-row>
+  <!--Don't touch these. They are just "definitions"-->
+</mat-table>
+
+<div *ngIf="!currentPageItems.length">
+  No results
+</div>
+
+<!--Hide the pagination when there are no results on the first page -->
+<mat-paginator
+  *ngIf="!(currentPage===0 && !currentPageItems.length)"
+  [length]="totalCount"
+  [pageSize]="pageSize"
+  [pageSizeOptions]="[]"
+  [hidePageSize]="true"
+  (page)="goToPage($event.pageIndex)">
+</mat-paginator>

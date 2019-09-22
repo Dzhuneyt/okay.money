@@ -1,0 +1,66 @@
+<h2 mat-dialog-title>
+  {{isNewRecord() ? 'Create a transaction' : 'Modify transaction'}}
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1em">
+      <mat-form-field
+        appearance="outline"
+        fxFlex="70%"
+      >
+        <mat-label>Sum</mat-label>
+        <input formControlName="sum" matInput min="0" placeholder="e.g. 3.55" step="0.01" type="number">
+        <mat-icon matSuffix>attach_money</mat-icon>
+
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        fxFlex="30%"
+      >
+        <mat-label>Transaction type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option [value]="'expense'">Expense</mat-option>
+          <mat-option [value]="'income'">Income</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+    <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1em">
+      <mat-form-field
+        appearance="outline"
+        fxFlex
+      >
+        <mat-label>Account</mat-label>
+        <mat-select formControlName="account_id">
+          <mat-option *ngFor="let account of accounts" [value]="account.id">{{account.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field
+        appearance="outline"
+        fxFlex
+      >
+        <mat-label>Category</mat-label>
+        <mat-select formControlName="category_id">
+          <mat-option *ngFor="let category of categories" [value]="category.id">{{category.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea cdkTextareaAutosize
+                formControlName="description"
+                matInput></textarea>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+  <button (click)="submit()" [disabled]="!form.valid" mat-button>Save</button>
+</mat-dialog-actions>

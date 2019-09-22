@@ -1,0 +1,12 @@
+.mat-column-actions {
+  flex: 0 0 100px;
+  justify-content: flex-end;
+
+  span {
+    cursor: pointer;
+  }
+}
+
+.mat-header-row {
+  min-height: 35px;
+}

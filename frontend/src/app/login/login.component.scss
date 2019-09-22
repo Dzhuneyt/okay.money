@@ -1,0 +1,14 @@
+.example-card {
+  width: 300px;
+  margin: 200px auto;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+:host {
+  height: 100%;
+  min-height: 99vh;
+  display: block;
+}

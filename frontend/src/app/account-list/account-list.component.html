@@ -1,0 +1,16 @@
+<mat-card>
+  <mat-card-title>Accounts</mat-card-title>
+  <mat-card-subtitle>Organize your assets and transactions into accounts for an easier overview. Examples of accounts:
+    cash at hand, checking account, bitcoin wallet, etc.
+  </mat-card-subtitle>
+</mat-card>
+<br/>
+<mat-card>
+  <app-table
+      #table
+      [actions]="tableActions"
+      [displayedColumns]="displayedColumns"
+      [pageSize]="pageSize"
+      [pagination]="getPage"
+  ></app-table>
+</mat-card>
