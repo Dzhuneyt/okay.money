@@ -1,5 +1,5 @@
 resource "aws_codepipeline" "codepipeline_master" {
-  name     = "${var.tag}-prod"
+  name     = "${var.tag}-master"
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
