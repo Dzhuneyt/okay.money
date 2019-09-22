@@ -84,6 +84,7 @@ resource "aws_codepipeline" "codepipeline_master" {
       owner    = "AWS"
       provider = "CodeBuild"
       input_artifacts = [
+        "source_output",
         "ecr_push_output"
       ]
       output_artifacts = [
@@ -92,7 +93,8 @@ resource "aws_codepipeline" "codepipeline_master" {
       version = "1"
 
       configuration = {
-        ProjectName = module.codebuild_master.codebuild_app_deploy
+        ProjectName   = module.codebuild_master.codebuild_app_deploy
+        PrimarySource = "source_output"
       }
 
       run_order = 1

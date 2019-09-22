@@ -19,23 +19,11 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-
-#      - cat $CODEBUILD_SRC_DIR_ecr_push_output/version.txt
       - echo Initializing Terraform for branch $BRANCH
       - cd ./terraform && chmod +x ./terraform-init.sh && ./terraform-init.sh ${BRANCH}
       - export TF_VAR_env_name=${BRANCH} && export TF_VAR_version_tag=${IMAGE_TAG}
       - echo Planning infrastructure
-      - terraform plan
-  #      - cd ./terraform/ && terraform init
-  #      - terraform apply -var "version_tag=$IMAGE_TAG" -auto-approve
-  #      - ./scripts/terraform_apply.sh
-  #      - (cd ./terraform/ecs_cluster && terraform init) && echo ECS cluster ok
-  #      - echo Privisioning ECS cluster
-  #      - chmod +x ./scripts/terraform_create_ecs_cluster.sh && ./scripts/terraform_create_ecs_cluster.sh
-  #
-  #      - echo Privisioning app
-  #      - cd ./terraform/app && terraform init -backend-config="key=personal-finance/${BRANCH}/app.tfstate"
-  #      - cd ../.. && chmod +x ./scripts/terraform_create_app.sh && ./scripts/terraform_create_app.sh
+      - terraform apply
   post_build:
     commands:
       - echo Build completed on `date`
