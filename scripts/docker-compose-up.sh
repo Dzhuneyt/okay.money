@@ -1,6 +1,9 @@
-##!/usr/bin/env sh
+#!/usr/bin/env bash
 
 timestamp=$(date -u +"%F-%H-UTC")
 
-TAG=$timestamp docker-compose build --parallel
-TAG=$timestamp docker-compose up
+REGION="eu-west-1"
+ECR_PREFIX="216987438199.dkr.ecr.${REGION}.amazonaws.com/finance"
+
+ECR_PREFIX=$ECR_PREFIX TAG=$timestamp docker-compose build --parallel
+ECR_PREFIX=$ECR_PREFIX TAG=$timestamp docker-compose up

@@ -1,9 +1,14 @@
 <mat-card>
+  <mat-card-title>Transactions</mat-card-title>
+  <mat-card-subtitle>Where your money goes, or where your money comes from.</mat-card-subtitle>
+</mat-card>
+<br/>
+<mat-card>
   <app-table
-    #table
-    [actions]="tableActions"
-    [displayedColumns]="displayedColumns"
-    [pageSize]="pageSize"
-    [pagination]="getPage"
+      #table
+      [actions]="tableActions"
+      [displayedColumns]="displayedColumns"
+      [pageSize]="pageSize"
+      [pagination]="getPage"
   ></app-table>
 </mat-card>
