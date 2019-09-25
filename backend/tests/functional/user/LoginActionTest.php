@@ -5,6 +5,8 @@ namespace tests\functional\user;
 
 use tests\functional\FunctionalTestCase;
 
+
+
 class LoginActionTest extends FunctionalTestCase
 {
 
@@ -29,6 +31,18 @@ class LoginActionTest extends FunctionalTestCase
         $this->assertNotNull($result['auth_key'], 'Login API did not return auth key');
 
         $this->deleteUser($user->id);
+    }
+
+    public function testLoginAttemptWithNoUsernameField()
+    {
+        $result = $this->apiCall('v1/user/login',
+            'POST',
+            [
+                'password' => self::PASSWORD,
+            ]);
+        $this->assertArrayHasKey('errors', $result, 'Login API did not return "errors" array');
+        $this->assertArrayHasKey('username', $result['errors'],
+            'Login API did not return an error for empty "username"');
     }
 
     protected function setUp()
