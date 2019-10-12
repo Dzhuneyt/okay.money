@@ -15,7 +15,7 @@
     "beLiteServer": "cd backend && php yii server",
     "beUnitTests": "./scripts/backend-tests-unit.sh; exit $?",
     "beFunctionalTests": "./scripts/backend-tests-functional.sh; exit $?",
-    "beSeedDB": "TAG=latest docker-compose run --rm backend php yii fixture/load \"*\","
+    "beSeedDB": "ECR_PREFIX=216987438199.dkr.ecr.eu-west-1.amazonaws.com/finance TAG=latest docker-compose run --rm backend php yii fixture/load \"*\","
   },
   "repository": {
     "type": "git",
