@@ -32,6 +32,7 @@ import {LoggedInGuard} from 'src/app/guards/logged-in.guard';
 import {AnonymousUserGuard} from 'src/app/guards/anonymous-user.guard';
 import {AccountListComponent} from 'src/app/account-list/account-list.component';
 import {AccountEditComponent} from 'src/app/account-edit/account-edit.component';
+import {ProfileComponent} from 'src/app/profile/profile.component';
 
 const routes: Routes = [
   {
@@ -55,6 +56,11 @@ const routes: Routes = [
     canActivate: [LoggedInGuard],
   },
   {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [LoggedInGuard],
+  },
+  {
     path: '**',
     redirectTo: '/home',
   }
@@ -74,6 +80,7 @@ const routes: Routes = [
     TransactionEditComponent,
     AccountListComponent,
     AccountEditComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
