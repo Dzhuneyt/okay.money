@@ -24,6 +24,8 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASS=${MYSQL_PASS}
       - MYSQL_DB=${MYSQL_DB}
+    env_file:
+      - .env
     ports:
       - "8081:80"
     depends_on:
