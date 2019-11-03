@@ -44,6 +44,7 @@ class RestModule extends Module implements BootstrapInterface
                     'extraPatterns' => [
                         'POST login' => 'login',
                         'PUT profile' => 'profile',
+                        'GET profile' => 'profile_get',
                         'OPTIONS <action:\w+>' => 'options',
                     ],
                 ],

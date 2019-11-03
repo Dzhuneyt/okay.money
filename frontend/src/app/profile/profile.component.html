@@ -1,3 +1,30 @@
-<p>
-  profile works!
-</p>
+<mat-card>
+  <mat-card-title>Profile</mat-card-title>
+  <mat-card-subtitle>
+    Edit your account information
+  </mat-card-subtitle>
+</mat-card>
+<br/>
+<mat-card>
+  <form [formGroup]="form">
+    <div class="example-container">
+      <mat-form-field>
+        <input matInput placeholder="Email" formControlName="email">
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput placeholder="Firstname" formControlName="firstname">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Lastname" formControlName="lastname">
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput placeholder="Current password" [type]="'password'" formControlName="old_password">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="New password" [type]="'password'" formControlName="new_password">
+      </mat-form-field>
+    </div>
+  </form>
+</mat-card>
