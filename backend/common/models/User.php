@@ -1,16 +1,22 @@
 <?php
+
 namespace common\models;
+
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\filters\RateLimitInterface;
 use yii\web\IdentityInterface;
 
+
+
 /**
  * User model
  *
  * @property integer $id
  * @property string $username
+ * @property string $firstname
+ * @property string $lastname
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $email
@@ -20,10 +26,11 @@ use yii\web\IdentityInterface;
  * @property integer $updated_at
  * @property string $password write-only password
  */
-class User extends ActiveRecord implements IdentityInterface , RateLimitInterface
+class User extends ActiveRecord implements IdentityInterface, RateLimitInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
+
     /**
      * @inheritdoc
      */
@@ -31,6 +38,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         return '{{%user}}';
     }
+
     /**
      * @inheritdoc
      */
@@ -40,6 +48,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
             TimestampBehavior::className(),
         ];
     }
+
     /**
      * @inheritdoc
      */
@@ -48,8 +57,10 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+            ['email', 'safe']
         ];
     }
+
     /**
      * @inheritdoc
      */
@@ -57,6 +68,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
     }
+
     /**
      * @inheritdoc
      */
@@ -64,6 +76,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         return static::findOne(['auth_key' => $token]);
     }
+
     /**
      * Finds user by username
      *
@@ -74,6 +87,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
     }
+
     /**
      * Finds user by password reset token
      *
@@ -90,6 +104,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
             'status' => self::STATUS_ACTIVE,
         ]);
     }
+
     /**
      * Finds out if password reset token is valid
      *
@@ -103,9 +118,10 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
         }
         $expire = Yii::$app->params['user.passwordResetTokenExpire'];
         $parts = explode('_', $token);
-        $timestamp = (int) end($parts);
+        $timestamp = (int)end($parts);
         return $timestamp + $expire >= time();
     }
+
     /**
      * @inheritdoc
      */
@@ -113,6 +129,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         return $this->getPrimaryKey();
     }
+
     /**
      * @inheritdoc
      */
@@ -120,6 +137,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         return $this->auth_key;
     }
+
     /**
      * @inheritdoc
      */
@@ -127,6 +145,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         return $this->getAuthKey() === $authKey;
     }
+
     /**
      * Validates password
      *
@@ -137,6 +156,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
+
     /**
      * Generates password hash from password and sets it to the model
      *
@@ -146,6 +166,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
+
     /**
      * Generates "remember me" authentication key
      */
@@ -153,6 +174,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         $this->auth_key = Yii::$app->security->generateRandomString();
     }
+
     /**
      * Generates new password reset token
      */
@@ -160,6 +182,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
     }
+
     /**
      * Removes password reset token
      */
@@ -167,6 +190,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
     {
         $this->password_reset_token = null;
     }
+
     /**
      * @inheritdoc
      */
@@ -178,6 +202,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
 
         return [Yii::$app->params['maxGetRateLimit'], Yii::$app->params['perGetRateLimit']];
     }
+
     /**
      * @inheritdoc
      */
@@ -188,6 +213,7 @@ class User extends ActiveRecord implements IdentityInterface , RateLimitInterfac
             \Yii::$app->cache->get($request->getPathInfo() . $request->getMethod() . '_ts')
         ];
     }
+
     /**
      * @inheritdoc
      */

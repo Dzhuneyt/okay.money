@@ -3,9 +3,13 @@
 namespace rest\versions\v1\controllers;
 
 use rest\versions\v1\actions\user\LoginAction;
+use rest\versions\v1\actions\user\ProfileAction;
+use yii\filters\auth\QueryParamAuth;
 use yii\filters\Cors;
 use yii\rest\Controller;
 use yii\rest\OptionsAction;
+
+
 
 /**
  * Class UserController
@@ -19,7 +23,14 @@ class UserController extends Controller
         return array_merge(parent::behaviors(), [
             'cors' => [
                 'class' => Cors::class,
-            ]
+            ],
+            'authenticator' => [
+                'class' => QueryParamAuth::class,
+                'except' => [
+                    'options',
+                    'login',
+                ]
+            ],
         ]);
     }
 
@@ -28,6 +39,9 @@ class UserController extends Controller
         return [
             'login' => [
                 'class' => LoginAction::class,
+            ],
+            'profile' => [
+                'class' => ProfileAction::class,
             ],
             'options' => [
                 'class' => OptionsAction::class,

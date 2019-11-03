@@ -38,6 +38,8 @@ class UserFixture extends ActiveFixture
             $data[] = [
                 'id' => $index + 1,
                 'username' => $username,
+                'firstname' => $faker->firstName,
+                'lastname' => $faker->lastName,
                 'auth_key' => 'auth-token-' . $index,
                 'password_hash' => $passwordHash,
                 'password_reset_token' => $passwordHash,

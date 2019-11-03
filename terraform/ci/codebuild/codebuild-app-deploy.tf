@@ -42,22 +42,22 @@ resource "aws_codebuild_project" "codebuild_deploy_to_ecs" {
     }
     environment_variable {
       name  = "TF_VAR_MYSQL_HOST"
-      value = "/personalfinance/MYSQL_HOST"
+      value = "/personalfinance/${var.branch_name}/MYSQL_HOST"
       type  = "PARAMETER_STORE"
     }
     environment_variable {
       name  = "TF_VAR_MYSQL_DB"
-      value = "/personalfinance/MYSQL_DB"
+      value = "/personalfinance/${var.branch_name}/MYSQL_DB"
       type  = "PARAMETER_STORE"
     }
     environment_variable {
       name  = "TF_VAR_MYSQL_USER"
-      value = "/personalfinance/MYSQL_USER"
+      value = "/personalfinance/${var.branch_name}/MYSQL_USER"
       type  = "PARAMETER_STORE"
     }
     environment_variable {
       name  = "TF_VAR_MYSQL_PASSWORD"
-      value = "/personalfinance/MYSQL_PASSWORD"
+      value = "/personalfinance/${var.branch_name}/MYSQL_PASSWORD"
       type  = "PARAMETER_STORE"
     }
   }

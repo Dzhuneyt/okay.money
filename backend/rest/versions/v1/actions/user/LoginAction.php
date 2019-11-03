@@ -6,6 +6,8 @@ use common\models\Login;
 use common\models\User;
 use yii\rest\Action;
 
+
+
 class LoginAction extends Action
 {
     public $modelClass = User::class;
@@ -13,8 +15,11 @@ class LoginAction extends Action
     public function run()
     {
         $model = new Login();
+        $model->load(
+            \Yii::$app->getRequest()
+                      ->getBodyParams(), '');
 
-        if ($model->load(\Yii::$app->getRequest()->getBodyParams(), '') && $model->login()) {
+        if ($model->validate() && $model->login()) {
             return [
                 'auth_key' => \Yii::$app->user->identity->getAuthKey()
             ];

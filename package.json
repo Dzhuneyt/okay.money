@@ -4,18 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run installDeps && npx concurrently -n stack,fe_build 'npm run dockerComposeUpDev' 'npm run feBuildAndWatch'",
+    "dev": "npm run installDeps && npx concurrently --kill-others-on-fail -n stack,fe_build 'npm run util:docker-compose-up' 'npm run feBuildAndWatch'",
+    "frontend:build": "cd frontend && docker build . --file Dockerfile-builder --tag frontend_builder && docker run -u $(id -u ${USER}):$(id -g ${USER}) -w='/app' --volume=$(pwd):/app --rm frontend_builder",
     "tests": "npm run installDeps && npm run beMigrations && npx  concurrently 'npm run feUnitTests' 'npm run beUnitTests && npm run beFunctionalTests'",
-    "installDeps": "npx concurrently --success=\"all\" 'cd backend && composer install -q --prefer-dist' 'cd frontend && npm i -q --no-audit'",
+    "installDeps": "npx concurrently --kill-others-on-fail 'cd backend && composer install -q --prefer-dist' 'cd frontend && npm i -q --no-audit'",
     "beMigrations": "cd backend && php yii migrate --interactive=0",
     "feLiteServer": "cd frontend && npm run serve",
     "feUnitTests": "echo 'TO BE IMPLEMENTED' && exit 0; cd frontend && npm run test:cli",
-    "dockerComposeUpDev": "TAG=latest docker-compose up --remove-orphans",
+    "util:docker-compose-up": "./scripts/docker-compose-up.sh",
     "feBuildAndWatch": "./scripts/frontend-build.sh",
     "beLiteServer": "cd backend && php yii server",
     "beUnitTests": "./scripts/backend-tests-unit.sh; exit $?",
     "beFunctionalTests": "./scripts/backend-tests-functional.sh; exit $?",
-    "beSeedDB": "TAG=latest docker-compose run --rm backend php yii fixture/load \"*\","
+    "beSeedDB": "ECR_PREFIX=216987438199.dkr.ecr.eu-west-1.amazonaws.com/finance TAG=latest docker-compose run --rm backend php yii fixture/load \"*\","
   },
   "repository": {
     "type": "git",

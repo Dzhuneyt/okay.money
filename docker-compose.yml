@@ -24,6 +24,8 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASS=${MYSQL_PASS}
       - MYSQL_DB=${MYSQL_DB}
+    env_file:
+      - .env
     ports:
       - "8081:80"
     depends_on:
@@ -40,6 +42,8 @@ services:
   mysql:
     image: mysql:5.7
     restart: always
+    ports:
+      - 3306
     environment:
       MYSQL_DATABASE: 'db'
       # So you don't have to use root, but you can if you like
