@@ -6,6 +6,7 @@ use common\models\Login;
 use common\models\User;
 use Yii;
 use yii\rest\Action;
+use yii\web\HttpException;
 
 
 
@@ -61,13 +62,31 @@ class ProfileAction extends Action
 
     private function updatePassword($oldPassword, $newPassword)
     {
-        if ($oldPassword != $newPassword) {
-            // @TODO step 1, check if old password is correct
-
-            // @TODO step 2, check if new password is complex enough
-
-            // @TODO step 3, update with new password
+        if (empty($oldPassword) || empty($newPassword)) {
+            return;
         }
+
+        if ($oldPassword === $newPassword) {
+            throw new HttpException('Old and new password can not be the same');
+        }
+        $user = Yii::$app->user;
+        /**
+         * @var $user User
+         */
+
+        if (!$user->validatePassword($oldPassword)) {
+            throw new HttpException('Your current password is not correct');
+        }
+
+        // Check if new password is complex enough
+        if (strlen($newPassword) < 6) {
+            throw new HttpException('Password is too simple');
+        }
+
+        // Old password is correct, set new password
+        Yii::$app->user->identity->setPassword($newPassword);
+        Yii::$app->user->identity->save();
+        Yii::$app->user->identity->refresh();
     }
 
     private function updateNames($firstname, $lastname)
