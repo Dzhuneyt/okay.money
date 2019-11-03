@@ -24,6 +24,9 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASS=${MYSQL_PASS}
       - MYSQL_DB=${MYSQL_DB}
+      - MAILER_HOST=${MAILER_HOST}
+      - MAILER_USERNAME=${MAILER_USERNAME}
+      - MAILER_PASSWORD=${MAILER_PASSWORD}
     env_file:
       - .env
     ports:
