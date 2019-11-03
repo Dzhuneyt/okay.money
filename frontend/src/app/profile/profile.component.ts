@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
 import {BackendService} from 'src/app/services/backend.service';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-profile',
@@ -19,6 +20,7 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private backend: BackendService,
+    private snackbar: MatSnackBar,
   ) {
   }
 
@@ -35,4 +37,14 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  save() {
+    this.backend.request('v1/user/profile', 'PUT', {}, this.form.getRawValue()).subscribe(res => {
+      console.log(res);
+    }, error => {
+      console.log(error);
+      this.snackbar.open(error.error.message, null, {
+        duration: 5000,
+      });
+    });
+  }
 }
