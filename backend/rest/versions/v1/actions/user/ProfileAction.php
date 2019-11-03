@@ -57,7 +57,7 @@ class ProfileAction extends Action
             Yii::$app->user->identity->email = $newEmail;
             if (!Yii::$app->user->identity->save()) {
                 Yii::error(Yii::$app->user->getErrors());
-                throw new HttpException('Can not save email due to an internal error');
+                throw new HttpException(400, 'Can not save email due to an internal error');
             }
             Yii::$app->user->identity->refresh();
             // @TODO send confirmation email
@@ -85,27 +85,24 @@ class ProfileAction extends Action
             return;
         }
 
-        if ($oldPassword === $newPassword) {
-            throw new HttpException('Old and new password can not be the same');
+        if (!Yii::$app->user->identity->validatePassword($oldPassword)) {
+            throw new HttpException(400, 'Your current password is not correct');
         }
-        /**
-         * @var $user User
-         */
 
-        if (!Yii::$app->user->validatePassword($oldPassword)) {
-            throw new HttpException('Your current password is not correct');
+        if ($oldPassword === $newPassword) {
+            throw new HttpException(400, 'Old and new password can not be the same');
         }
 
         // Check if new password is complex enough
         if (strlen($newPassword) < 6) {
-            throw new HttpException('Password is too simple. Must be more than 6 characters');
+            throw new HttpException(400, 'Password is too simple. Must be more than 6 characters');
         }
 
         // Old password is correct, set new password
         Yii::$app->user->identity->setPassword($newPassword);
         if (!Yii::$app->user->identity->save()) {
             Yii::error(Yii::$app->user->getErrors());
-            throw new HttpException('Can not save new password');
+            throw new HttpException(400, 'Can not save new password');
         }
         Yii::$app->user->identity->refresh();
     }
