@@ -27,6 +27,7 @@ services:
       - MAILER_HOST=${MAILER_HOST}
       - MAILER_USERNAME=${MAILER_USERNAME}
       - MAILER_PASSWORD=${MAILER_PASSWORD}
+      - PLATFORM_OWNER_EMAIL=${PLATFORM_OWNER_EMAIL}
     env_file:
       - .env
     ports:

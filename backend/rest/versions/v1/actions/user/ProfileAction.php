@@ -35,7 +35,7 @@ class ProfileAction extends Action
 
         $this->updateEmail($newEmail);
         $this->updatePassword($oldPassword, $newPassword);
-        $this->updateNames($firstname, $lastname);
+        $this->updateFirstnameLastname($firstname, $lastname);
 
         if (Yii::$app->user->identity->validate() && Yii::$app->user->identity->save()) {
             return [
@@ -51,13 +51,32 @@ class ProfileAction extends Action
 
     private function updateEmail($newEmail)
     {
-        if ($newEmail !== null && $newEmail != Yii::$app->user->identity->email) {
+        $oldEmail = Yii::$app->user->identity->email;
+        if ($newEmail !== null && $newEmail != $oldEmail) {
+            Yii::info('Email is being changed from ' . $oldEmail . ' to ' . $newEmail . '. Sending confirmations');
             Yii::$app->user->identity->email = $newEmail;
-            Yii::$app->user->identity->save();
+            if (!Yii::$app->user->identity->save()) {
+                Yii::error(Yii::$app->user->getErrors());
+                throw new HttpException('Can not save email due to an internal error');
+            }
             Yii::$app->user->identity->refresh();
             // @TODO send confirmation email
+
+            Yii::$app->mailer->compose()
+                             ->setFrom(getenv('PLATFORM_OWNER_EMAIL'))
+                             ->setTo($oldEmail)
+                             ->setSubject('Your account email has changed')
+                             ->setTextBody('You have recently changed your account email from ' . $oldEmail . ' to ' . $newEmail . '. This message is just to confirm that this change happened. No further action is needed on your side. If you did not do this change, please contact us immediately.')
+                             ->send();
+            Yii::$app->mailer->compose()
+                             ->setFrom(getenv('PLATFORM_OWNER_EMAIL'))
+                             ->setTo($newEmail)
+                             ->setSubject('Your account email has changed')
+                             ->setTextBody('You have recently changed your account email from ' . $oldEmail . ' to ' . $newEmail . '. This message is just to confirm that this change happened. No further action is needed on your side. If you did not do this change, please contact us immediately.')
+                             ->send();
             return true;
         }
+        Yii::info('Email not changed');
     }
 
     private function updatePassword($oldPassword, $newPassword)
@@ -69,27 +88,29 @@ class ProfileAction extends Action
         if ($oldPassword === $newPassword) {
             throw new HttpException('Old and new password can not be the same');
         }
-        $user = Yii::$app->user;
         /**
          * @var $user User
          */
 
-        if (!$user->validatePassword($oldPassword)) {
+        if (!Yii::$app->user->validatePassword($oldPassword)) {
             throw new HttpException('Your current password is not correct');
         }
 
         // Check if new password is complex enough
         if (strlen($newPassword) < 6) {
-            throw new HttpException('Password is too simple');
+            throw new HttpException('Password is too simple. Must be more than 6 characters');
         }
 
         // Old password is correct, set new password
         Yii::$app->user->identity->setPassword($newPassword);
-        Yii::$app->user->identity->save();
+        if (!Yii::$app->user->identity->save()) {
+            Yii::error(Yii::$app->user->getErrors());
+            throw new HttpException('Can not save new password');
+        }
         Yii::$app->user->identity->refresh();
     }
 
-    private function updateNames($firstname, $lastname)
+    private function updateFirstnameLastname($firstname, $lastname)
     {
         if ($firstname != null) {
             Yii::$app->user->identity->firstname = $firstname;
