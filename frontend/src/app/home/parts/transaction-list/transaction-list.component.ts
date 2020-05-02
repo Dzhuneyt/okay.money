@@ -54,7 +54,7 @@ export class TransactionListComponent implements OnInit {
 
   public pageSize = 10;
 
-  @ViewChild(TableComponent) table: TableComponent;
+  @ViewChild(TableComponent, { static: true }) table: TableComponent;
 
   public displayedColumns: TableColumn[] = columns;
 

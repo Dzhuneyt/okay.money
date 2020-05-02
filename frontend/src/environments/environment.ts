@@ -4,8 +4,9 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'http://localhost:8080/'
+  baseUrl: 'https://9c33dk8j79.execute-api.eu-west-1.amazonaws.com/prod/',
 };
+
 
 /*
  * For easier debugging in development mode, you can import the following file

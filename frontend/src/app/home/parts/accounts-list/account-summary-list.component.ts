@@ -10,7 +10,7 @@ import {TableColumn, TableComponent} from "../../../table/table.component";
 })
 export class AccountSummaryListComponent implements OnInit {
 
-  @ViewChild(TableComponent) table: TableComponent;
+  @ViewChild(TableComponent, { static: true }) table: TableComponent;
 
   public displayedColumns: TableColumn[] = [
     {

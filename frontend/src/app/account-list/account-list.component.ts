@@ -62,7 +62,7 @@ export class AccountListComponent implements OnInit {
     },
   ];
   public displayedColumns: TableColumn[] = columns;
-  @ViewChild(TableComponent) table: TableComponent;
+  @ViewChild(TableComponent, { static: true }) table: TableComponent;
   public pageSize = 10;
 
   constructor(

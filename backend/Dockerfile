@@ -1,23 +1,3 @@
-# Step 1: Install app dependencies in /vendor
-FROM composer:1.9.0 as vendor
-
-WORKDIR /app
-
-# Reuse an existing /vendor folder for faster builds
-# on dev environments
-#COPY /vendor /app/vendor
-
-COPY composer.json composer.json
-COPY composer.lock composer.lock
-
-RUN composer install \
-    --ignore-platform-reqs \
-    --no-interaction \
-    --no-plugins \
-    --no-scripts \
-    --prefer-dist --quiet
-
-# Step 2: Serve the PHP app
 FROM php:7.3-apache
 
 WORKDIR /app
@@ -47,15 +27,7 @@ RUN wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VE
 EXPOSE 80
 
 COPY ./scripts/entrypoint.sh /entrypoint.sh
-COPY ./scripts/migrations.sh /migrations.sh
 RUN chmod +x /entrypoint.sh
-RUN chmod +x /migrations.sh
-
-# Bundle app inside container
-COPY . /app
-
-# Copy dependencies from Step 1 of multi-stage build
-COPY --from=vendor /app/vendor/ /app/vendor/
 
 # Prepare important config files
 RUN php init --env=Docker --overwrite=y

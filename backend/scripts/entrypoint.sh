@@ -9,6 +9,6 @@ echo MySQL host is ${MYSQL_HOST}
 #echo MySQL user is ${MYSQL_USER}
 #echo MySQL password is ${MYSQL_PASS}
 
-dockerize -wait tcp://${MYSQL_HOST}:3306 && \
+dockerize -wait tcp://${MYSQL_HOST}:3306 -timeout 30s && \
     php yii migrate --interactive=0 && \
     exec "$@"

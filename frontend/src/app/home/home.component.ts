@@ -12,9 +12,9 @@ import {AccountSummaryListComponent} from 'src/app/home/parts/accounts-list/acco
 })
 export class HomeComponent implements OnInit {
 
-  @ViewChild(AccountSummaryListComponent) accountListComponent;
+  @ViewChild(AccountSummaryListComponent, { static: true }) accountListComponent;
 
-  @ViewChild(MatTabGroup) public tabs: MatTabGroup;
+  @ViewChild(MatTabGroup, { static: false }) public tabs: MatTabGroup;
 
   constructor(
     private backend: BackendService,
