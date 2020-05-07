@@ -1,8 +1,16 @@
-import {LambdaIntegration, RestApi} from '@aws-cdk/aws-apigateway';
-import {UserPool} from '@aws-cdk/aws-cognito';
-import {AttributeType, BillingMode, Table} from '@aws-cdk/aws-dynamodb';
+import {
+    AccessLogFormat,
+    AuthorizationType,
+    CfnAuthorizer,
+    LambdaIntegration,
+    LogGroupLogDestination,
+    RestApi
+} from '@aws-cdk/aws-apigateway';
+import {CfnUserPoolResourceServer, UserPool} from '@aws-cdk/aws-cognito';
+import {AttributeType, BillingMode, ProjectionType, Table} from '@aws-cdk/aws-dynamodb';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Code} from '@aws-cdk/aws-lambda';
+import {LogGroup, RetentionDays} from '@aws-cdk/aws-logs';
 import * as cdk from '@aws-cdk/core';
 import {CfnOutput, Duration, RemovalPolicy, StackProps} from '@aws-cdk/core';
 import * as path from 'path';
@@ -23,14 +31,38 @@ export class RestApisStack extends cdk.Stack {
         category: Table,
         transaction: Table,
     };
+    private cognitoResourceServer: CfnUserPoolResourceServer;
+
+    private readonly defaultCognitoScope = "default";
+    private readonly cognitoAuthorizer: CfnAuthorizer;
 
     constructor(scope: cdk.Construct, id: string, props: Props) {
         super(scope, id, props);
 
-        this.api = new RestApi(this, this.stackName, {});
-        this.api.root.addMethod('ANY');
-
         this.userPool = props.userPool;
+
+        this.createCognitoResourceServerForRestAPIs();
+
+        const logGroup = new LogGroup(this, 'api-logs', {
+            removalPolicy: RemovalPolicy.DESTROY,
+            retention: RetentionDays.FOUR_MONTHS,
+        });
+        this.api = new RestApi(this, this.stackName, {
+            deployOptions: {
+                accessLogDestination: new LogGroupLogDestination(logGroup),
+                accessLogFormat: AccessLogFormat.jsonWithStandardFields(),
+                tracingEnabled: true,
+            }
+        });
+        this.cognitoAuthorizer = new CfnAuthorizer(this, 'authorizer', {
+            name: `default-authorizer`,
+            identitySource: 'method.request.header.Authorization',
+            restApiId: this.api.restApiId,
+            type: AuthorizationType.COGNITO,
+            providerArns: [this.userPool.userPoolArn],
+        });
+
+        this.api.root.addMethod('ANY');
 
         new CfnOutput(this, 'rest-api', {
             value: this.api.url,
@@ -45,7 +77,15 @@ export class RestApisStack extends cdk.Stack {
     }
 
     private createAccountAPIs() {
-        const accounts = this.api.root.addResource('account');
+        const accounts = this.api.root.addResource('account', {
+            defaultMethodOptions: {
+                authorizer: {
+                    authorizerId: this.cognitoAuthorizer.logicalId,
+                    authorizationType: AuthorizationType.COGNITO,
+                }
+            }
+        });
+        accounts.node.addDependency(this.cognitoAuthorizer);
 
         const fnAccountList = new Lambda(this, 'fn-account-list', {
             code: this.lambdaCode,
@@ -55,22 +95,52 @@ export class RestApisStack extends cdk.Stack {
             }
         });
         this.dynamoTables.account.grantReadData(fnAccountList);
-        accounts.addMethod('GET', new LambdaIntegration(fnAccountList));
-        accounts.addMethod('POST');
+        accounts.addMethod('GET', new LambdaIntegration(fnAccountList), {
+            authorizationType: AuthorizationType.COGNITO,
+            authorizer: {
+                authorizerId: this.cognitoAuthorizer.ref,
+            },
+        });
 
-        const account = accounts.addResource('{id}');
-        account.addMethod('GET');
-        account.addMethod('DELETE');
+        const fnAccountCreate = new Lambda(this, 'fn-account-create', {
+            code: this.lambdaCode,
+            handler: 'account-create.handler',
+            environment: {
+                TABLE_NAME: this.dynamoTables.account.tableName,
+            }
+        });
+        this.dynamoTables.account.grantWriteData(fnAccountCreate);
+        accounts.addMethod('POST', new LambdaIntegration(fnAccountCreate), {
+            authorizationType: AuthorizationType.COGNITO,
+            authorizer: {
+                authorizerId: this.cognitoAuthorizer.ref,
+            },
+        });
+
+        // @TODO account view and delete APIs
     }
 
     private createCategoryAPIs() {
-        const categories = this.api.root.addResource('category');
-        categories.addMethod('GET');
-        categories.addMethod('POST');
+        const categories = this.api.root.addResource('category', {
+            defaultMethodOptions: {
+                authorizer: {
+                    authorizerId: this.cognitoAuthorizer.logicalId,
+                    authorizationType: AuthorizationType.COGNITO,
+                }
+            }
+        });
+        categories.node.addDependency(this.cognitoAuthorizer);
 
-        const category = categories.addResource('{id}');
-        category.addMethod('GET');
-        category.addMethod('DELETE');
+        // Category listing
+        const fnCategoryList = new Lambda(this, 'fn-category-list', {
+            code: this.lambdaCode,
+            handler: 'category-list.handler',
+            environment: {
+                TABLE_NAME: this.dynamoTables.category.tableName,
+            }
+        });
+        this.dynamoTables.account.grantReadData(fnCategoryList);
+        categories.addMethod('GET', new LambdaIntegration(fnCategoryList));
 
     }
 
@@ -100,11 +170,7 @@ export class RestApisStack extends cdk.Stack {
             account: new Table(this, 'account', {
                 billingMode: BillingMode.PAY_PER_REQUEST,
                 partitionKey: {
-                    name: "pk",
-                    type: AttributeType.STRING,
-                },
-                sortKey: {
-                    name: "sk",
+                    name: "id",
                     type: AttributeType.STRING,
                 },
                 removalPolicy,
@@ -134,6 +200,14 @@ export class RestApisStack extends cdk.Stack {
                 removalPolicy,
             })
         };
+
+        this.dynamoTables.account.addGlobalSecondaryIndex({
+            indexName: 'author_id',
+            partitionKey: {
+                type: AttributeType.STRING,
+                name: "author_id",
+            },
+        })
     }
 
     private createLoginAPI() {
@@ -158,5 +232,19 @@ export class RestApisStack extends cdk.Stack {
 
         const login = this.api.root.addResource('login');
         login.addMethod('POST', new LambdaIntegration(fnLogin));
+    }
+
+    private createCognitoResourceServerForRestAPIs() {
+        this.cognitoResourceServer = new CfnUserPoolResourceServer(this, 'cognit-resource-server', {
+            identifier: 'https://my-weather-api.example.com',
+            name: 'RestAPIsResourceServer',
+            userPoolId: this.userPool.userPoolId,
+            scopes: [
+                {
+                    scopeName: this.defaultCognitoScope,
+                    scopeDescription: "Default scope",
+                }
+            ]
+        });
     }
 }
