@@ -34,6 +34,7 @@
     "@aws-cdk/core": "^1.37.0",
     "@types/uuid": "^7.0.3",
     "aws-sdk": "^2.670.0",
+    "class-validator": "^0.12.2",
     "source-map-support": "^0.5.16",
     "ts-loader": "^7.0.2",
     "uuid": "^8.0.0",

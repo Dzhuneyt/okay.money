@@ -20,10 +20,13 @@ interface Props extends StackProps {
     userPool: UserPool;
 }
 
+function getLambdaCode(lambdaName: string) {
+    return Code.fromAsset(path.resolve(__dirname, '../dist/lambdas/', lambdaName))
+}
+
 export class RestApisStack extends cdk.Stack {
     private api: RestApi;
 
-    private lambdaCode = Code.fromAsset(path.resolve(__dirname, '../dist/lambdas/'));
     private userPool: UserPool;
 
     private dynamoTables: {
@@ -88,8 +91,8 @@ export class RestApisStack extends cdk.Stack {
         accounts.node.addDependency(this.cognitoAuthorizer);
 
         const fnAccountList = new Lambda(this, 'fn-account-list', {
-            code: this.lambdaCode,
-            handler: 'account-list.handler',
+            code: getLambdaCode("account-list"),
+            handler: 'index.handler',
             environment: {
                 TABLE_NAME: this.dynamoTables.account.tableName,
             }
@@ -103,8 +106,8 @@ export class RestApisStack extends cdk.Stack {
         });
 
         const fnAccountCreate = new Lambda(this, 'fn-account-create', {
-            code: this.lambdaCode,
-            handler: 'account-create.handler',
+            code: getLambdaCode("account-create"),
+            handler: 'index.handler',
             environment: {
                 TABLE_NAME: this.dynamoTables.account.tableName,
             }
@@ -133,14 +136,43 @@ export class RestApisStack extends cdk.Stack {
 
         // Category listing
         const fnCategoryList = new Lambda(this, 'fn-category-list', {
-            code: this.lambdaCode,
-            handler: 'category-list.handler',
+            code: getLambdaCode("category-list"),
+            handler: 'index.handler',
             environment: {
                 TABLE_NAME: this.dynamoTables.category.tableName,
-            }
+            },
         });
-        this.dynamoTables.account.grantReadData(fnCategoryList);
-        categories.addMethod('GET', new LambdaIntegration(fnCategoryList));
+        fnCategoryList.addToRolePolicy(new PolicyStatement({
+            sid: "ReadFromTableAndIndexes",
+            actions: ["dynamodb:*"],
+            resources: [
+                this.dynamoTables.category.tableArn,
+                this.dynamoTables.category.tableArn + "*",
+            ]
+        }))
+        this.dynamoTables.category.grantReadData(fnCategoryList);
+        categories.addMethod('GET', new LambdaIntegration(fnCategoryList), {
+            authorizationType: AuthorizationType.COGNITO,
+            authorizer: {
+                authorizerId: this.cognitoAuthorizer.ref,
+            },
+        });
+
+        // Category creation
+        const fnCategoryCreate = new Lambda(this, 'fn-category-create', {
+            code: getLambdaCode("category-create"),
+            handler: 'index.handler',
+            environment: {
+                TABLE_NAME: this.dynamoTables.category.tableName,
+            },
+        });
+        this.dynamoTables.category.grantReadWriteData(fnCategoryCreate);
+        categories.addMethod('POST', new LambdaIntegration(fnCategoryCreate), {
+            authorizationType: AuthorizationType.COGNITO,
+            authorizer: {
+                authorizerId: this.cognitoAuthorizer.ref,
+            },
+        })
 
     }
 
@@ -170,7 +202,7 @@ export class RestApisStack extends cdk.Stack {
             account: new Table(this, 'account', {
                 billingMode: BillingMode.PAY_PER_REQUEST,
                 partitionKey: {
-                    name: "id",
+                    name: "pk",
                     type: AttributeType.STRING,
                 },
                 removalPolicy,
@@ -181,20 +213,12 @@ export class RestApisStack extends cdk.Stack {
                     name: "pk",
                     type: AttributeType.STRING,
                 },
-                sortKey: {
-                    name: "sk",
-                    type: AttributeType.STRING,
-                },
                 removalPolicy,
             }),
             transaction: new Table(this, 'transaction', {
                 billingMode: BillingMode.PAY_PER_REQUEST,
                 partitionKey: {
                     name: "pk",
-                    type: AttributeType.STRING,
-                },
-                sortKey: {
-                    name: "sk",
                     type: AttributeType.STRING,
                 },
                 removalPolicy,
@@ -207,13 +231,28 @@ export class RestApisStack extends cdk.Stack {
                 type: AttributeType.STRING,
                 name: "author_id",
             },
-        })
+        });
+        this.dynamoTables.category.addGlobalSecondaryIndex({
+            indexName: 'author_id',
+            partitionKey: {
+                type: AttributeType.STRING,
+                name: "author_id",
+            },
+        });
+        this.dynamoTables.transaction.addGlobalSecondaryIndex({
+            indexName: 'author_id',
+            partitionKey: {
+                type: AttributeType.STRING,
+                name: "author_id",
+            },
+        });
+
     }
 
     private createLoginAPI() {
         const fnLogin = new Lambda(this, 'fn-login', {
-            code: this.lambdaCode,
-            handler: 'login.handler',
+            code: getLambdaCode("login"),
+            handler: 'index.handler',
             timeout: Duration.seconds(30),
         });
         fnLogin.addEnvironment('COGNITO_USERPOOL_ID', this.userPool.userPoolId);

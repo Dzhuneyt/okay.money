@@ -16,7 +16,7 @@ export const handler = async (event: IEvent, context: any) => {
     } catch (e) {
         return {
             statusCode: 500,
-            body: e,
+            body: JSON.stringify(e),
         }
     }
 

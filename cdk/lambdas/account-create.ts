@@ -11,7 +11,7 @@ export const handler = async (event: IEvent, context: any) => {
     console.log('Lambda called', event);
 
     const userId = event.requestContext.authorizer.claims.sub
-    const params: Input = JSON.parse(event.body);
+    const params: Input = JSON.parse(event.body || '{}');
 
     if (!params.title) {
         return {
@@ -25,7 +25,7 @@ export const handler = async (event: IEvent, context: any) => {
     const result = await dynamodb.putItem({
         TableName: tableName,
         Item: DynamoDB.Converter.marshall({
-            id: uuidv4(),
+            pk: uuidv4(),
             author_id: userId,
             title: params.title,
         }),
