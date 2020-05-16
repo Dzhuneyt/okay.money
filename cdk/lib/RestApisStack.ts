@@ -112,7 +112,7 @@ export class RestApisStack extends cdk.Stack {
                 TABLE_NAME: this.dynamoTables.account.tableName,
             }
         });
-        this.dynamoTables.account.grantWriteData(fnAccountCreate);
+        this.dynamoTables.account.grantReadWriteData(fnAccountCreate);
         accounts.addMethod('POST', new LambdaIntegration(fnAccountCreate), {
             authorizationType: AuthorizationType.COGNITO,
             authorizer: {
@@ -177,23 +177,32 @@ export class RestApisStack extends cdk.Stack {
     }
 
     private createUserManagementAPIs() {
-        const users = this.api.root.addResource('user');
-        users.addMethod('GET');
-        users.addMethod('POST');
-
-        const user = users.addResource('{id}');
-        user.addMethod('GET');
-        user.addMethod('DELETE');
+        // const users = this.api.root.addResource('user');
+        // users.addMethod('GET');
+        // users.addMethod('POST');
+        //
+        // const user = users.addResource('{id}');
+        // user.addMethod('GET');
+        // user.addMethod('DELETE');
     }
 
     private createTransactionAPIs() {
-        const transactions = this.api.root.addResource('transaction');
-        transactions.addMethod('GET');
-        transactions.addMethod('POST');
+        const fnTransactionCreate = new Lambda(this, 'fn-transaction-create', {
+            code: getLambdaCode("transaction-create"),
+            handler: 'index.handler',
+            environment: {
+                TABLE_NAME: this.dynamoTables.transaction.tableName,
+            },
+        });
+        this.dynamoTables.category.grantReadWriteData(fnTransactionCreate);
 
-        const transaction = transactions.addResource('{id}');
-        transaction.addMethod('GET');
-        transaction.addMethod('DELETE');
+        const transactions = this.api.root.addResource('transaction');
+        transactions.addMethod('POST', new LambdaIntegration(fnTransactionCreate), {
+            authorizationType: AuthorizationType.COGNITO,
+            authorizer: {
+                authorizerId: this.cognitoAuthorizer.ref,
+            },
+        })
     }
 
     private createDynamoDBtables() {
@@ -202,7 +211,7 @@ export class RestApisStack extends cdk.Stack {
             account: new Table(this, 'account', {
                 billingMode: BillingMode.PAY_PER_REQUEST,
                 partitionKey: {
-                    name: "pk",
+                    name: "id",
                     type: AttributeType.STRING,
                 },
                 removalPolicy,
@@ -210,7 +219,7 @@ export class RestApisStack extends cdk.Stack {
             category: new Table(this, 'category', {
                 billingMode: BillingMode.PAY_PER_REQUEST,
                 partitionKey: {
-                    name: "pk",
+                    name: "id",
                     type: AttributeType.STRING,
                 },
                 removalPolicy,
@@ -218,7 +227,7 @@ export class RestApisStack extends cdk.Stack {
             transaction: new Table(this, 'transaction', {
                 billingMode: BillingMode.PAY_PER_REQUEST,
                 partitionKey: {
-                    name: "pk",
+                    name: "id",
                     type: AttributeType.STRING,
                 },
                 removalPolicy,

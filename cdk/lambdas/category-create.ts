@@ -10,8 +10,6 @@ interface Input {
 
 export const handler = async (event: IEvent) => {
     try {
-        console.log('Lambda called', event);
-
         const userId = event.requestContext.authorizer.claims.sub
         const params: Input = JSON.parse(event.body || '{}');
 
@@ -24,10 +22,11 @@ export const handler = async (event: IEvent) => {
 
         const tableName = process.env.TABLE_NAME as string;
         const dynamodb = new AWS.DynamoDB();
+        const uuid = uuidv4();
         const result = await dynamodb.putItem({
             TableName: tableName,
             Item: DynamoDB.Converter.marshall({
-                pk: uuidv4(),
+                id: uuid,
                 author_id: userId,
                 title: params.title,
             }),
@@ -40,9 +39,17 @@ export const handler = async (event: IEvent) => {
             }
         }
 
+        const item = await dynamodb.getItem({
+            Key: {
+                id: {
+                    S: uuid
+                },
+            },
+            TableName: tableName
+        }).promise();
         return {
             statusCode: 200,
-            body: JSON.stringify(result.$response),
+            body: JSON.stringify(DynamoDB.Converter.unmarshall(item.Item!)),
         }
     } catch (e) {
         return {

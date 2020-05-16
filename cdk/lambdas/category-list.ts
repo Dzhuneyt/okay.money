@@ -1,14 +1,13 @@
-import * as AWS from 'aws-sdk';
 import {IEvent} from './interfaces/IEvent';
-import {dynamoDbGetList} from './shared/dynamoDbGetList';
+import {DynamoManager} from './shared/DynamoManager';
 
 export const handler = async (event: IEvent, context: any) => {
-    console.log('list accounts called', event);
-
-    const userId = event.requestContext.authorizer.claims.sub
-
     try {
-        const items = await dynamoDbGetList(process.env.TABLE_NAME as string, userId);
+        const userId = event.requestContext.authorizer.claims.sub;
+        const items = await new DynamoManager(process.env.TABLE_NAME as string)
+            .forUser(userId)
+            .list();
+
         return {
             statusCode: 200,
             body: JSON.stringify(items),
