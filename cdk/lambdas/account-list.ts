@@ -1,9 +1,12 @@
 import {IEvent} from './interfaces/IEvent';
 import {DynamoManager} from './shared/DynamoManager';
+import {Handler} from './shared/Handler';
 
-export const handler = async (event: IEvent) => {
+const originalHandler = async (event: IEvent) => {
+    console.log(JSON.stringify(event));
     try {
-        const userId = event.requestContext.authorizer.claims.sub;
+        const userId = event.requestContext.authorizer.sub;
+        console.log(userId);
         const items = await new DynamoManager(process.env.TABLE_NAME as string)
             .forUser(userId)
             .list();
@@ -19,3 +22,5 @@ export const handler = async (event: IEvent) => {
         }
     }
 }
+
+export const handler = new Handler(originalHandler).create();

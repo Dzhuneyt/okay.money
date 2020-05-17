@@ -9,8 +9,6 @@ interface Props extends StackProps {
 
 }
 
-const lambdaCode = Code.fromAsset(path.resolve(__dirname, '../dist/lambdas/'));
-
 export class CognitoStack extends Stack {
     public userPool: UserPool;
 
@@ -28,9 +26,9 @@ export class CognitoStack extends Stack {
         });
 
         const fnCreateUser = new Lambda(this, 'fn-create-user', {
-            code: lambdaCode,
-            handler: 'user-create.handler',
-            timeout: Duration.seconds(30),
+            code: Code.fromAsset(path.resolve(__dirname, '../dist/lambdas/user-create')),
+            handler: 'index.handler',
+            timeout: Duration.seconds(10),
         });
         fnCreateUser.addEnvironment('COGNITO_USERPOOL_ID', this.userPool.userPoolId);
         fnCreateUser.addToRolePolicy(new PolicyStatement({

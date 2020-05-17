@@ -3,16 +3,15 @@ import {IAccount} from './interfaces/IAccount';
 import {IEvent} from './interfaces/IEvent';
 import DynamoDB = require('aws-sdk/clients/dynamodb');
 import {v4 as uuidv4} from 'uuid';
+import {Handler} from './shared/Handler';
 
 interface Input {
     title: string,
 }
 
-export const handler = async (event: IEvent, context: any) => {
-    console.log('Lambda called', event);
-
+const originalHandler = async (event: IEvent,) => {
     try {
-        const userId = event.requestContext.authorizer.claims.sub
+        const userId = event.requestContext.authorizer.sub
         const params: Input = JSON.parse(event.body || '{}');
 
         if (!params.title) {
@@ -61,3 +60,4 @@ export const handler = async (event: IEvent, context: any) => {
         }
     }
 }
+export const handler = new Handler(originalHandler).create();

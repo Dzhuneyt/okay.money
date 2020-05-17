@@ -3,20 +3,27 @@ import {IsNotEmpty, Length} from 'class-validator';
 import {IEvent} from './interfaces/IEvent';
 import DynamoDB = require('aws-sdk/clients/dynamodb');
 import {v4 as uuidv4} from 'uuid';
+import {Handler} from './shared/Handler';
 
 interface Input {
     title: string,
 }
 
-export const handler = async (event: IEvent) => {
+const originalHandler = async (event: IEvent) => {
     try {
-        const userId = event.requestContext.authorizer.claims.sub
+        const userId = event.requestContext.authorizer.sub
         const params: Input = JSON.parse(event.body || '{}');
 
         if (!params['title']) {
             return {
                 statusCode: 400,
-                body: `Invalid "title" parameter`
+                body: `Invalid "title" parameter`,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                    "Access-Control-Allow-Methods": "*",
+                    'Access-Control-Allow-Credentials': true,
+                },
             }
         }
 
@@ -50,11 +57,26 @@ export const handler = async (event: IEvent) => {
         return {
             statusCode: 200,
             body: JSON.stringify(DynamoDB.Converter.unmarshall(item.Item!)),
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "*",
+                'Access-Control-Allow-Credentials': true,
+            },
         }
     } catch (e) {
         return {
             statusCode: 500,
             body: JSON.stringify(e),
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "*",
+                'Access-Control-Allow-Credentials': true,
+            },
         }
     }
 }
+
+export const handler = new Handler(originalHandler)
+    .create();

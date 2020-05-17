@@ -12,15 +12,16 @@ const columns = [
   {
     label: 'Account Name',
     code: 'name',
-    renderer: (element: Account) => {
-      return element.name;
+    renderer: (account: Account) => {
+      return account.title;
     }
   },
   {
     label: 'Current Balance',
     code: 'current_balance',
     renderer: (element: Account) => {
-      return element.current_balance;
+      return "to be implemented";
+      // return element.current_balance;
     }
   },
 ];
@@ -62,7 +63,7 @@ export class AccountListComponent implements OnInit {
     },
   ];
   public displayedColumns: TableColumn[] = columns;
-  @ViewChild(TableComponent, { static: true }) table: TableComponent;
+  @ViewChild(TableComponent, {static: true}) table: TableComponent;
   public pageSize = 10;
 
   constructor(
@@ -79,7 +80,7 @@ export class AccountListComponent implements OnInit {
     let totalCount;
     return this.backend
       .request(
-        'v1/accounts',
+        'account',
         'get',
         {
           page: page,
@@ -88,18 +89,10 @@ export class AccountListComponent implements OnInit {
         }
       )
       .pipe(
-        map(apiResult => {
+        map((apiResult: Account[]) => {
           // Extract total count
-          totalCount = apiResult['_meta']['totalCount'];
+          totalCount = apiResult.length;
           return apiResult;
-        }),
-        map(apiResult => apiResult['items']),
-        map(items => {
-          items.forEach(item => {
-            // item['created_at'] = parseInt(item['created_at'] + `000`, 10);
-            // item['category_name'] = item['category']['name'];
-          });
-          return items;
         }),
         map(items => {
           return {

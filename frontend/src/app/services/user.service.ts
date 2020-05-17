@@ -24,7 +24,7 @@ export class UserService {
     return new Observable(observer => {
       // fill the initial value on app boot time
       if (!this.loginStageChanges.getValue().loggedIn) {
-        this.localStorage.getItem('auth_key')
+        this.localStorage.getItem('access_token')
           .pipe(take(1))
           .subscribe(res => {
             if (res) {
@@ -45,9 +45,9 @@ export class UserService {
     });
   }
 
-  public setAuthKey(key): Observable<boolean> {
+  public setAccessToken(key): Observable<boolean> {
     return new Observable((observer: Observer<boolean>) => {
-      this.localStorage.setItem('auth_key', key).subscribe(() => {
+      this.localStorage.setItem('access_token', key).subscribe(() => {
         observer.next(true);
         observer.complete();
       });

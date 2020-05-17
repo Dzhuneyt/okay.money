@@ -31,14 +31,15 @@ export class LoginComponent implements OnInit {
   }
 
   login(): Observable<boolean> {
-    return Observable.create((observer: Observer<boolean>) => {
+    return new Observable<boolean>((observer: Observer<boolean>) => {
       this.showSpinner = true;
       this.backendService
-        .request('v1/user/login', 'post', {}, {
+        .request('login', 'post', {}, {
           username: this.username,
           password: this.password,
         })
         .subscribe(result => {
+          console.log(result);
           console.log('Login success');
           this.showSpinner = false;
 
@@ -53,8 +54,7 @@ export class LoginComponent implements OnInit {
           }
 
 
-          const authKey = result['auth_key'];
-          this.userService.setAuthKey(authKey).subscribe(() => {
+          this.userService.setAccessToken(result).subscribe(() => {
             this.userService.setIsLoggedIn(true);
 
             this.snackar.open('Login successful', null, {

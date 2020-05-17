@@ -7,7 +7,6 @@ interface Request {
 }
 
 export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
-    console.log(event);
     const cognito = new AWS.CognitoIdentityServiceProvider();
     const userPoolClientId = process.env.COGNITO_USERPOOL_CLIENT_ID as string;
 
@@ -28,11 +27,23 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
             return {
                 statusCode: 200,
                 body: JSON.stringify(result.AuthenticationResult),
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                    "Access-Control-Allow-Methods": "*",
+                    'Access-Control-Allow-Credentials': true,
+                },
             }
         } else {
             return {
                 statusCode: 400,
                 body: "Invalid credentials",
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                    "Access-Control-Allow-Methods": "*",
+                    'Access-Control-Allow-Credentials': true,
+                },
             }
         }
     } catch (e) {
@@ -41,8 +52,12 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
         return {
             statusCode: 500,
             body: 'Login failed due to an internal error',
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "*",
+                'Access-Control-Allow-Credentials': true,
+            },
         }
     }
-
-
 }

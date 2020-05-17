@@ -14,19 +14,19 @@ export const handler = async (event: IEvent, context: any) => {
     console.log('Lambda called', event);
 
     try {
-        const userId = event.requestContext.authorizer.claims.sub
+        const userId = event.requestContext.authorizer.sub
         const params: Input = JSON.parse(event.body || '{}');
 
-        [
-            'title',
-            'category_id',
-            'account_id',
-        ].forEach((requiredParam: string) => {
-            // @ts-ignore
-            if (!params[requiredParam]) {
-                throw new Error(`Invalid parameter ${requiredParam}`);
-            }
-        })
+        if (!params.title) {
+            throw new Error(`Invalid parameter "title"`);
+        }
+
+        if (!params.category_id) {
+            throw new Error(`Invalid parameter "category_id"`);
+        }
+        if (!params.account_id) {
+            throw new Error(`Invalid parameter "account_id"`);
+        }
 
         const tableName = process.env.TABLE_NAME as string;
         const dynamodb = new AWS.DynamoDB();
@@ -61,9 +61,10 @@ export const handler = async (event: IEvent, context: any) => {
             body: JSON.stringify(DynamoDB.Converter.unmarshall(item.Item!)),
         }
     } catch (e) {
+        console.log(e);
         return {
             statusCode: 500,
-            body: JSON.stringify(e),
+            body: e.toString()
         }
     }
 }

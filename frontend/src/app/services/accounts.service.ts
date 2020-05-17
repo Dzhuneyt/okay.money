@@ -27,10 +27,10 @@ export class AccountsService {
   }
 
   updateSingle(id: number, payload: {}) {
-    return this.backend.request('v1/accounts/' + id, 'PUT', {}, payload);
+    return this.backend.request('account' + id, 'PUT', {}, payload);
   }
 
   createSingle(payload: {}) {
-    return this.backend.request('v1/accounts', 'POST', {}, payload);
+    return this.backend.request('account', 'POST', {}, payload);
   }
 }

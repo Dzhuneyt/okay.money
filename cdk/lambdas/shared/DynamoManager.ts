@@ -17,6 +17,10 @@ export class DynamoManager {
     }
 
     async list() {
+
+        if (!this.userId) {
+            throw new Error(`userId not provided for listing`);
+        }
         const result = await this.connection.query({
             ExpressionAttributeValues: {
                 ":author_id": {

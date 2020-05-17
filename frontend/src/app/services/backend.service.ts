@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {LocalStorage} from '@ngx-pwa/local-storage';
 import {catchError, flatMap} from 'rxjs/operators';
@@ -23,14 +23,17 @@ export class BackendService {
   request(path: string, method: string = 'get', queryParams = {}, bodyParams = {}): Observable<any> {
     const absoluteUrl = this.baseUrl + path;
 
-    return this.localStorage.getItem('auth_key')
+    return this.localStorage.getItem('access_token')
       .pipe(flatMap(authKey => {
-        if (authKey) {
-          queryParams['access-token'] = authKey;
-        }
+        console.log(`Making APi call to ${method} ${path}`);
+        const headers = new HttpHeaders({
+          'Authorization': authKey['AccessToken'],
+        })
+        console.log('headers', headers);
         return this.http.request(method, absoluteUrl, {
           body: bodyParams,
           params: queryParams,
+          headers,
         }).pipe(
           catchError(err => {
             console.log(err);

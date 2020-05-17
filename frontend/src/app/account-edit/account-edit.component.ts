@@ -13,7 +13,7 @@ export class AccountEditComponent implements OnInit {
 
   public form = new FormGroup({
     id: new FormControl(null, []),
-    name: new FormControl(null, []),
+    title: new FormControl(null, []),
   });
 
   constructor(
@@ -30,7 +30,7 @@ export class AccountEditComponent implements OnInit {
       // @TODO Load data from backend and populate form
       this.account.getSingle(this.data.id).subscribe((account: Account) => {
         this.form.controls['id'].setValue(account.id);
-        this.form.controls['name'].setValue(account.name);
+        this.form.controls['title'].setValue(account.title);
 
         this.elementRef.detectChanges();
       });
@@ -44,7 +44,7 @@ export class AccountEditComponent implements OnInit {
   submit() {
     const payload = {};
 
-    payload['name'] = this.form.controls['name'].value;
+    payload['title'] = this.form.controls['title'].value;
 
     if (this.isNewRecord()) {
       this.account.createSingle(payload).subscribe(() => {

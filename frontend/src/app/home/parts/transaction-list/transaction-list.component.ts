@@ -36,7 +36,7 @@ const columns = [
     label: 'Account',
     code: 'account_name',
     renderer: (element: TransactionModel) => {
-      return element.account.name;
+      return element.account.title;
     }
   },
   {
@@ -54,7 +54,7 @@ export class TransactionListComponent implements OnInit {
 
   public pageSize = 10;
 
-  @ViewChild(TableComponent, { static: true }) table: TableComponent;
+  @ViewChild(TableComponent, {static: true}) table: TableComponent;
 
   public displayedColumns: TableColumn[] = columns;
 
