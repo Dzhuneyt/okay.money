@@ -25,10 +25,11 @@ export class BackendService {
 
     return this.localStorage.getItem('access_token')
       .pipe(flatMap(authKey => {
-        console.log(`Making APi call to ${method} ${path}`);
-        const headers = new HttpHeaders({
+        console.log('authKey', authKey)
+        console.log(`Making API call to ${method} ${path}`);
+        const headers = new HttpHeaders(authKey ? {
           'Authorization': authKey['AccessToken'],
-        })
+        } : {})
         console.log('headers', headers);
         return this.http.request(method, absoluteUrl, {
           body: bodyParams,

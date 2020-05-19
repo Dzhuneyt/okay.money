@@ -16,10 +16,7 @@ export class AccountsService {
   }
 
   public getList(): Observable<Account[]> {
-    return this.backend.request('v1/accounts', 'GET')
-      .pipe(
-        map(items => items['items'])
-      );
+    return this.backend.request('account', 'GET');
   }
 
   public getSingle(id: number): Observable<Account> {

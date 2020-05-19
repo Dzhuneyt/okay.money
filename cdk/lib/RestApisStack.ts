@@ -237,7 +237,7 @@ export class RestApisStack extends cdk.Stack {
                 TABLE_NAME: this.dynamoTables.transaction.tableName,
             },
         });
-        this.dynamoTables.category.grantReadWriteData(fnTransactionCreate);
+        this.dynamoTables.transaction.grantReadWriteData(fnTransactionCreate);
 
         const transactions = this.api.root.addResource('transaction', {});
         transactions.addMethod('POST', new LambdaIntegration(fnTransactionCreate), {
@@ -251,7 +251,15 @@ export class RestApisStack extends cdk.Stack {
                 TABLE_NAME: this.dynamoTables.transaction.tableName,
             },
         });
-        this.dynamoTables.category.grantReadWriteData(fnTransactionList);
+        fnTransactionList.addToRolePolicy(new PolicyStatement({
+            sid: "ReadFromTableAndIndexes",
+            actions: ["dynamodb:*"],
+            resources: [
+                this.dynamoTables.transaction.tableArn,
+                this.dynamoTables.transaction.tableArn + "*",
+            ]
+        }))
+        this.dynamoTables.transaction.grantReadData(fnTransactionList);
         transactions.addMethod('GET', new LambdaIntegration(fnTransactionList), {
             authorizer: this.authorizer,
         })

@@ -5,8 +5,7 @@ import {map} from "rxjs/operators";
 
 export interface Category {
   id: number;
-  name: string;
-  description: string;
+  title: string;
 }
 
 @Injectable({
@@ -20,10 +19,7 @@ export class CategoriesService {
   }
 
   public getList(): Observable<Category[]> {
-    return this.backend.request('v1/categories', 'GET')
-      .pipe(
-        map(items => items['items'])
-      );
+    return this.backend.request('category', 'GET');
   }
 
   /**

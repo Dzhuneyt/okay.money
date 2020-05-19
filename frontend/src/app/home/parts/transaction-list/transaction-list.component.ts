@@ -130,7 +130,7 @@ export class TransactionListComponent implements OnInit {
     let totalCount;
     return this.backend
       .request(
-        'v1/transactions',
+        'transaction',
         'get',
         {
           page: page,
