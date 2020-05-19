@@ -10,6 +10,10 @@ export interface IEvent {
         }
     },
 
+    pathParameters: {
+        [key: string]: string,
+    },
+
     // Request body
     body: string,
 }

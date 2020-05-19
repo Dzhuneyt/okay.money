@@ -36,8 +36,6 @@ export const handler = async (event: any) => {
             AccessToken: token,
         }).promise();
 
-        console.log('Cognito response', user.Username);
-
         const policy = generatePolicy('user', 'Allow', event.methodArn);
         policy.context = {};
         policy.context['username'] = user.Username;
@@ -47,7 +45,7 @@ export const handler = async (event: any) => {
         console.log(JSON.stringify(policy));
         return policy;
     } catch (e) {
-        throw new Error('Failed to authorize with Cognito');
+        return generatePolicy('user', 'Deny', event.methodArn);
     }
 
 }

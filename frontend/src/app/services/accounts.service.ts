@@ -23,7 +23,7 @@ export class AccountsService {
   }
 
   public getSingle(id: number): Observable<Account> {
-    return this.backend.request('v1/accounts/' + id, 'GET');
+    return this.backend.request('account/' + id, 'GET');
   }
 
   updateSingle(id: number, payload: {}) {

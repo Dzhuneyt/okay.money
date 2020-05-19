@@ -1,8 +1,8 @@
 import {
     AccessLogFormat,
-    AuthorizationType,
+    AuthorizationType, GatewayResponse,
     LambdaIntegration,
-    LogGroupLogDestination,
+    LogGroupLogDestination, ResponseType,
     RestApi,
     TokenAuthorizer
 } from '@aws-cdk/aws-apigateway';
@@ -86,8 +86,20 @@ export class RestApisStack extends cdk.Stack {
                     authorizerId: "",
                     authorizationType: AuthorizationType.NONE,
                 },
+            },
+        });
+
+        const gwR = new GatewayResponse(this, 'gw-response-default-400', {
+            restApi: this.api,
+            type: ResponseType.DEFAULT_4XX,
+            responseHeaders: {
+                "Access-Control-Allow-Origin": "'*'"
+            },
+            templates: {
+                "application/json": "{\n     \"message\": $context.error.messageString,\n     \"type\":  \"$context.error.responseType\",\n     \"stage\":  \"$context.stage\",\n     \"resourcePath\":  \"$context.resourcePath\",\n     \"stageVariables.a\":  \"$stageVariables.a\",\n     \"statusCode\": \"'404'\"\n}"
             }
         });
+        gwR.node.addDependency(this.api);
         // this.cognitoAuthorizer = new CfnAuthorizer(this, 'authorizer', {
         //     name: `default-authorizer`,
         //     identitySource: 'method.request.header.Authorization',
@@ -142,6 +154,20 @@ export class RestApisStack extends cdk.Stack {
             //     authorizerId: this.cognitoAuthorizer.ref,
             // },
         });
+
+        const fnView = new Lambda(this, 'fn-account-view', {
+            code: getLambdaCode("account-view"),
+            handler: 'index.handler',
+            environment: {
+                TABLE_NAME: this.dynamoTables.account.tableName,
+            }
+        });
+        this.dynamoTables.account.grantReadData(fnView);
+        accounts
+            .addResource('{account_id}')
+            .addMethod('GET', new LambdaIntegration(fnView), {
+                authorizer: this.authorizer,
+            });
 
         // @TODO account view and delete APIs
     }
