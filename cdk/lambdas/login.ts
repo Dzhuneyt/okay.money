@@ -1,12 +1,16 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
 import * as AWS from 'aws-sdk';
+import {IEvent} from './interfaces/IEvent';
+import {Handler} from './shared/Handler';
 
 interface Request {
     username: string;
     password: string;
 }
 
-export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+const originalHandler = async (event: IEvent, context: Context): Promise<APIGatewayProxyResult> => {
+    console.log(event);
+    console.log("context", context);
     const cognito = new AWS.CognitoIdentityServiceProvider();
     const userPoolClientId = process.env.COGNITO_USERPOOL_CLIENT_ID as string;
 
@@ -61,3 +65,4 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
         }
     }
 }
+export const handler = new Handler(originalHandler).create();

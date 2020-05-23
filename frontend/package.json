@@ -7,7 +7,7 @@
     "serve": "npx ng serve",
     "build": "npx ng build",
     "util:lite-server": "npx lite-server --baseDir='dist/frontend'",
-    "build:watch": "npx ng build --watch=true --progress=true",
+    "build:watch": "npx ng build --watch=true --progress=true --poll 800",
     "build:prod": "npx ng build --prod",
     "test": "npx ng test --sourceMap=false",
     "test:cli": "npx ng test --sourceMap=false --browsers=ChromeHeadless --watch=false",

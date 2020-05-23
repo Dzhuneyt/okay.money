@@ -6,11 +6,22 @@ export const originalHandler = async (event: any) => {
         const userId = event.requestContext.authorizer.sub;
         const items = await new DynamoManager(process.env.TABLE_NAME as string)
             .forUser(userId)
-            .list();
+            .list() as ITransaction[]
+
+        const result: any[] = [];
+        items.forEach((item) => {
+            item.category = {
+                id: item.category_id,
+            };
+            item.account = {
+                id: item.account_id,
+            }
+            result.push(item);
+        })
 
         return {
             statusCode: 200,
-            body: JSON.stringify(items),
+            body: JSON.stringify(result),
         }
     } catch (e) {
         return {

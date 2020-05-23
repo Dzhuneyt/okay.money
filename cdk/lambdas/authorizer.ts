@@ -45,7 +45,8 @@ export const handler = async (event: any) => {
         console.log(JSON.stringify(policy));
         return policy;
     } catch (e) {
-        return generatePolicy('user', 'Deny', event.methodArn);
+        throw new Error('Unauthorized');
+        // return generatePolicy('user', 'Deny', event.methodArn);
     }
 
 }

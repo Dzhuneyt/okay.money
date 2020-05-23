@@ -3,6 +3,7 @@ import {IAccount} from './interfaces/IAccount';
 import {IEvent} from './interfaces/IEvent';
 import DynamoDB = require('aws-sdk/clients/dynamodb');
 import {v4 as uuidv4} from 'uuid';
+import {Handler} from './shared/Handler';
 
 interface Input extends ITransaction {
     // Since the input is unpredictable, allow any other values
@@ -10,7 +11,7 @@ interface Input extends ITransaction {
     [key: string]: any,
 }
 
-export const handler = async (event: IEvent, context: any) => {
+const originalHandler = async (event: IEvent, context: any) => {
     console.log('Lambda called', event);
 
     try {
@@ -19,7 +20,6 @@ export const handler = async (event: IEvent, context: any) => {
 
         [
             'sum',
-            'type',
             'category_id',
             'account_id'
         ].forEach((value: string | number) => {
@@ -68,3 +68,5 @@ export const handler = async (event: IEvent, context: any) => {
         }
     }
 }
+
+export const handler = new Handler(originalHandler).create();

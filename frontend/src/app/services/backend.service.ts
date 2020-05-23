@@ -25,12 +25,10 @@ export class BackendService {
 
     return this.localStorage.getItem('access_token')
       .pipe(flatMap(authKey => {
-        console.log('authKey', authKey)
         console.log(`Making API call to ${method} ${path}`);
         const headers = new HttpHeaders(authKey ? {
           'Authorization': authKey['AccessToken'],
         } : {})
-        console.log('headers', headers);
         return this.http.request(method, absoluteUrl, {
           body: bodyParams,
           params: queryParams,
@@ -38,9 +36,12 @@ export class BackendService {
         }).pipe(
           catchError(err => {
             console.log(err);
-            if (err.status === 401) {
-              // Unauthorized
-              this.router.navigate(['/login']);
+            if (err.status === 401 || err.status === 403) {
+              // Unauthorized. Most likely Access token has expired
+              this.localStorage.removeItem('access_token').subscribe(() => {
+                this.router.navigate(['/login']);
+              })
+
             }
             throw err;
           })

@@ -24,6 +24,6 @@ export class TransactionService {
   }
 
   createSingle(payload: {}) {
-    return this.backend.request('v1/transactions', 'POST', {}, payload);
+    return this.backend.request('transaction', 'POST', {}, payload);
   }
 }

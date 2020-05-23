@@ -141,13 +141,13 @@ export class TransactionListComponent implements OnInit {
       .pipe(
         map(apiResult => {
           // Extract total count
-          totalCount = apiResult['_meta']['totalCount'];
+          totalCount = apiResult.length;
           return apiResult;
         }),
-        map(apiResult => apiResult['items']),
         map(items => {
           items.forEach(item => {
-            item['created_at'] = parseInt(item['created_at'] + `000`, 10);
+            // @TODO fix created_at
+            item['created_at'] = parseInt(10000000 + `000`, 10);
             item['category_name'] = item['category']['name'];
           });
           return items;

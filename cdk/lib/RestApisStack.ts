@@ -1,7 +1,6 @@
 import {
     AccessLogFormat,
     AuthorizationType, GatewayResponse,
-    LambdaIntegration,
     LogGroupLogDestination, ResponseType,
     RestApi,
     TokenAuthorizer
@@ -15,6 +14,7 @@ import * as cdk from '@aws-cdk/core';
 import {CfnOutput, Duration, RemovalPolicy, StackProps} from '@aws-cdk/core';
 import * as path from 'path';
 import {Lambda} from './constructs/Lambda';
+import {LambdaIntegration} from './constructs/LambdaIntegration';
 
 interface Props extends StackProps {
     userPool: UserPool;
@@ -89,24 +89,45 @@ export class RestApisStack extends cdk.Stack {
             },
         });
 
-        const gwR = new GatewayResponse(this, 'gw-response-default-400', {
-            restApi: this.api,
-            type: ResponseType.DEFAULT_4XX,
-            responseHeaders: {
-                "Access-Control-Allow-Origin": "'*'"
-            },
-            templates: {
-                "application/json": "{\n     \"message\": $context.error.messageString,\n     \"type\":  \"$context.error.responseType\",\n     \"stage\":  \"$context.stage\",\n     \"resourcePath\":  \"$context.resourcePath\",\n     \"stageVariables.a\":  \"$stageVariables.a\",\n     \"statusCode\": \"'404'\"\n}"
-            }
-        });
-        gwR.node.addDependency(this.api);
-        // this.cognitoAuthorizer = new CfnAuthorizer(this, 'authorizer', {
-        //     name: `default-authorizer`,
-        //     identitySource: 'method.request.header.Authorization',
-        //     restApiId: this.api.restApiId,
-        //     type: AuthorizationType.COGNITO,
-        //     providerArns: [this.userPool.userPoolArn],
-        // });
+        [
+            ResponseType.DEFAULT_4XX,
+            ResponseType.DEFAULT_5XX,
+            ResponseType.UNAUTHORIZED,
+            ResponseType.ACCESS_DENIED,
+            ResponseType.API_CONFIGURATION_ERROR,
+            ResponseType.AUTHORIZER_FAILURE,
+            ResponseType.AUTHORIZER_CONFIGURATION_ERROR,
+            ResponseType.MISSING_AUTHENTICATION_TOKEN,
+            ResponseType.BAD_REQUEST_BODY,
+            ResponseType.BAD_REQUEST_PARAMETERS,
+            ResponseType.EXPIRED_TOKEN,
+            ResponseType.INTEGRATION_FAILURE,
+            ResponseType.INTEGRATION_TIMEOUT,
+            ResponseType.INVALID_SIGNATURE,
+            ResponseType.INVALID_API_KEY,
+            ResponseType.RESOURCE_NOT_FOUND,
+            ResponseType.THROTTLED,
+            ResponseType.UNSUPPORTED_MEDIA_TYPE,
+        ].forEach(type => {
+            // Reformat errors from API gateway into a more friendly and less revealing
+            // response body. Also attach CORS headers so that the frontend can read the actual
+            // status code and body and react. Otherwise, the browser rejects the request
+            // and prevents the frontend from reacting properly. For example, on expired
+            // authorization token, the frontend can not detect this error and redirect
+            // to the /login page
+            const gatewayResponse = new GatewayResponse(this, 'gw-response-' + type.responseType, {
+                restApi: this.api,
+                type,
+                responseHeaders: {
+                    "Access-Control-Allow-Origin": "'*'",
+                    "Access-Control-Allow-Headers": "'*'"
+                },
+                templates: {
+                    "application/json": "{\n     \"message\": $context.error.messageString,\n     \"type\":  \"$context.error.responseType\",\n     \"resourcePath\":  \"$context.resourcePath\",\n }"
+                }
+            });
+            gatewayResponse.node.addDependency(this.api);
+        })
 
         // this.api.root.addMethod('ANY', new MockIntegration({}), {
         //     authorizationType: AuthorizationType.NONE,
@@ -135,7 +156,7 @@ export class RestApisStack extends cdk.Stack {
             }
         });
         this.dynamoTables.account.grantReadData(fnAccountList);
-        accounts.addMethod('GET', new LambdaIntegration(fnAccountList), {
+        accounts.addMethod('GET', new LambdaIntegration(fnAccountList, {}), {
             authorizer: this.authorizer,
         });
 
@@ -198,7 +219,7 @@ export class RestApisStack extends cdk.Stack {
                 this.dynamoTables.category.tableArn,
                 this.dynamoTables.category.tableArn + "*",
             ]
-        }))
+        }));
         this.dynamoTables.category.grantReadData(fnCategoryList);
         categories.addMethod('GET', new LambdaIntegration(fnCategoryList), {
             authorizer: this.authorizer,
@@ -343,7 +364,14 @@ export class RestApisStack extends cdk.Stack {
 
         const login = this.api.root.addResource('login');
 
-        login.addMethod('POST', new LambdaIntegration(fnLogin, {}), {});
+        login.addMethod('POST', new LambdaIntegration(fnLogin), {
+            // methodResponses: [
+            //     {
+            //         statusCode: "200",
+            //         responseModels: {}
+            //     }
+            // ]
+        });
     }
 
     private createCognitoResourceServerForRestAPIs() {
