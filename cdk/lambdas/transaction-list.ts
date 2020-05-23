@@ -1,4 +1,5 @@
 import {IAccount} from './interfaces/IAccount';
+import {ITransaction} from './interfaces/ITransaction';
 import {DynamoManager} from './shared/DynamoManager';
 import {Handler} from './shared/Handler';
 

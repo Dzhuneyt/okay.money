@@ -148,13 +148,6 @@ export class TransactionListComponent implements OnInit {
           return apiResult;
         }),
         map(items => {
-          items.forEach(item => {
-            // @TODO fix created_at
-            item['created_at'] = parseInt(10000000 + `000`, 10);
-          });
-          return items;
-        }),
-        map(items => {
           return {
             items: items,
             totalCount: totalCount

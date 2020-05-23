@@ -43,7 +43,8 @@ const originalHandler = async (event: IEvent, context: any) => {
         const obj: ITransaction = {
             ...params,
             id: uuid,
-            author_id: userId
+            author_id: userId,
+            created_at: new Date().getTime(),
         };
         const putItem = await dynamodb.putItem({
             TableName: tableName,
@@ -73,7 +74,7 @@ const originalHandler = async (event: IEvent, context: any) => {
         console.log(e);
         return {
             statusCode: 500,
-            body: e.toString()
+            body: JSON.stringify(e),
         }
     }
 }

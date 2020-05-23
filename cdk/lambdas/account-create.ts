@@ -28,6 +28,7 @@ const originalHandler = async (event: IEvent,) => {
             id: uuid,
             author_id: userId,
             title: params.title,
+            created_at: new Date().getTime(),
         };
         const result = await dynamodb.putItem({
             TableName: tableName,

@@ -147,6 +147,7 @@ export class RestApisStack extends cdk.Stack {
 
     private createAccountAPIs() {
         const accounts = this.api.root.addResource('account', {});
+        // const account = accounts.addResource('{id}', {});
 
         const fnAccountList = new Lambda(this, 'fn-account-list', {
             code: getLambdaCode("account-list"),
@@ -184,11 +185,10 @@ export class RestApisStack extends cdk.Stack {
             }
         });
         this.dynamoTables.account.grantReadData(fnView);
-        accounts
-            .addResource('{account_id}')
-            .addMethod('GET', new LambdaIntegration(fnView), {
-                authorizer: this.authorizer,
-            });
+        // account
+        //     .addMethod('GET', new LambdaIntegration(fnView), {
+        //         authorizer: this.authorizer,
+        //     });
 
         // @TODO account view and delete APIs
     }
@@ -256,6 +256,8 @@ export class RestApisStack extends cdk.Stack {
             handler: 'index.handler',
             environment: {
                 TABLE_NAME: this.dynamoTables.transaction.tableName,
+                TABLE_NAME_ACCOUNTS: this.dynamoTables.account.tableName,
+                TABLE_NAME_CATEGORIES: this.dynamoTables.category.tableName,
             },
         });
 
