@@ -1,3 +1,4 @@
+import {PolicyStatement} from '@aws-cdk/aws-iam';
 import * as lambda from '@aws-cdk/aws-lambda'
 import {Code} from '@aws-cdk/aws-lambda/lib/code';
 import {FunctionOptions} from '@aws-cdk/aws-lambda/lib/function';
@@ -36,5 +37,12 @@ export class Lambda extends lambda.Function {
             ...props,
             runtime: props.runtime ? props.runtime : Runtime.NODEJS_12_X,
         });
+        this.addToRolePolicy(new PolicyStatement({
+            sid: "ReadAndWriteFromTablesAndIndexes",
+            actions: ["dynamodb:*"],
+            resources: [
+                "*",
+            ]
+        }))
     }
 }

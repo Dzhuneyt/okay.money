@@ -16,11 +16,11 @@ export class TransactionService {
   }
 
   public getSingle(id: number): Observable<TransactionModel> {
-    return this.backend.request('v1/transactions/' + id, 'GET');
+    return this.backend.request('transaction/' + id, 'GET');
   }
 
   updateSingle(id: number, payload: {}) {
-    return this.backend.request('v1/transactions/' + id, 'PUT', {}, payload);
+    return this.backend.request('transaction/' + id, 'PUT', {}, payload);
   }
 
   createSingle(payload: {}) {

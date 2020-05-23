@@ -1,10 +1,6 @@
-export interface ITransaction {
+interface ICategory {
     id?: string;
-    description: string,
-    sum: number,
-    type: "expense" | "income",
-    account_id: string,
-    category_id: string,
+    title: string;
 
     // Since the input is unpredictable, allow any other values
     // to "checked" by the code below without causing compilation errors

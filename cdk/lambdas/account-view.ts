@@ -37,15 +37,9 @@ const originalHandler = async (event: IEvent) => {
         const accountId = event.pathParameters.account_id;
 
         const row = getDynamoRow(accountId, userId);
-
-        console.log(userId);
-        const items = await new DynamoManager(process.env.TABLE_NAME as string)
-            .forUser(userId)
-            .list();
-
         return {
             statusCode: 200,
-            body: JSON.stringify(items),
+            body: JSON.stringify(row),
         }
     } catch (e) {
         return {

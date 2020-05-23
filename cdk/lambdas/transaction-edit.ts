@@ -1,7 +1,6 @@
 import * as AWS from 'aws-sdk';
 import {IEvent} from './interfaces/IEvent';
 import DynamoDB = require('aws-sdk/clients/dynamodb');
-import {v4 as uuidv4} from 'uuid';
 import {ITransaction} from './interfaces/ITransaction';
 import {DynamoManager} from './shared/DynamoManager';
 import {Handler} from './shared/Handler';
@@ -13,11 +12,12 @@ interface Input extends ITransaction {
     [key: string]: any,
 }
 
-const originalHandler = async (event: IEvent, context: any) => {
-    console.log('Lambda called', event);
+const originalHandler = async (event: IEvent) => {
 
     try {
-        const userId = event.requestContext.authorizer.sub
+        const userId = event.requestContext.authorizer.sub;
+        const id = event.pathParameters.id;
+
         const params: Input = JSON.parse(event.body || '{}');
 
         [
@@ -37,13 +37,22 @@ const originalHandler = async (event: IEvent, context: any) => {
             throw new Error('Invalid "category_id"');
         }
 
+        const item = await new DynamoManager(process.env.TABLE_NAME as string)
+            .forUser(userId).getOne(id);
+
+        if (!item) {
+            throw new Error('Item not found');
+        }
+
+        const newItem = {
+            ...item,
+            ...params,
+        }
+
         const tableName = process.env.TABLE_NAME as string;
         const dynamodb = new AWS.DynamoDB();
-        const uuid = uuidv4();
         const obj: ITransaction = {
-            ...params,
-            id: uuid,
-            author_id: userId
+            ...newItem,
         };
         const putItem = await dynamodb.putItem({
             TableName: tableName,
@@ -57,17 +66,11 @@ const originalHandler = async (event: IEvent, context: any) => {
             }
         }
 
-        const getItem = await dynamodb.getItem({
-            Key: {
-                id: {
-                    S: uuid
-                },
-            },
-            TableName: tableName
-        }).promise();
+        const refreshedItem = await new DynamoManager(process.env.TABLE_NAME as string)
+            .forUser(userId).getOne(id);
         return {
             statusCode: 200,
-            body: JSON.stringify(DynamoDB.Converter.unmarshall(getItem.Item!)),
+            body: JSON.stringify(refreshedItem),
         }
     } catch (e) {
         console.log(e);

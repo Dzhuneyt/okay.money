@@ -31,6 +31,9 @@ const columns = [
   {
     label: 'Category',
     code: 'category_name',
+    renderer: (element: TransactionModel) => {
+      return element.category.title;
+    }
   },
   {
     label: 'Account',
@@ -148,7 +151,6 @@ export class TransactionListComponent implements OnInit {
           items.forEach(item => {
             // @TODO fix created_at
             item['created_at'] = parseInt(10000000 + `000`, 10);
-            item['category_name'] = item['category']['name'];
           });
           return items;
         }),

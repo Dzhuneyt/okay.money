@@ -41,4 +41,31 @@ export class DynamoManager {
         );
     }
 
+    async getOne(id: string) {
+        if (!this.userId) {
+            throw new Error(`userId not provided for getOne`);
+        }
+        const item = await this.connection.getItem({
+            Key: {
+                "id": {
+                    S: id,
+                }
+            },
+            TableName: this.tableName,
+        }).promise();
+
+        if (item.$response.error) {
+            throw new Error(item.$response.error.message);
+        }
+
+        if (!item.Item) {
+            throw new Error(`Item not found: ${id}`);
+        }
+        const result = AWS.DynamoDB.Converter.unmarshall(item.Item);
+        if (result.author_id !== this.userId) {
+            throw new Error(`Item not found: ${id}`);
+        }
+        return result;
+    }
+
 }

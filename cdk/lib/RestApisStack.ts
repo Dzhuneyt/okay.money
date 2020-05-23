@@ -258,9 +258,9 @@ export class RestApisStack extends cdk.Stack {
                 TABLE_NAME: this.dynamoTables.transaction.tableName,
             },
         });
-        this.dynamoTables.transaction.grantReadWriteData(fnTransactionCreate);
 
         const transactions = this.api.root.addResource('transaction', {});
+        const transaction = transactions.addResource('{id}');
         transactions.addMethod('POST', new LambdaIntegration(fnTransactionCreate), {
             authorizer: this.authorizer,
         })
@@ -270,20 +270,44 @@ export class RestApisStack extends cdk.Stack {
             handler: 'index.handler',
             environment: {
                 TABLE_NAME: this.dynamoTables.transaction.tableName,
+                TABLE_NAME_CATEGORIES: this.dynamoTables.category.tableName,
+                TABLE_NAME_ACCOUNTS: this.dynamoTables.account.tableName,
             },
         });
-        fnTransactionList.addToRolePolicy(new PolicyStatement({
-            sid: "ReadFromTableAndIndexes",
-            actions: ["dynamodb:*"],
-            resources: [
-                this.dynamoTables.transaction.tableArn,
-                this.dynamoTables.transaction.tableArn + "*",
-            ]
-        }))
-        this.dynamoTables.transaction.grantReadData(fnTransactionList);
         transactions.addMethod('GET', new LambdaIntegration(fnTransactionList), {
             authorizer: this.authorizer,
-        })
+        });
+
+        // Transaction view
+        const fnView = new Lambda(this, 'fn-transaction-view', {
+            code: getLambdaCode("transaction-view"),
+            handler: 'index.handler',
+            environment: {
+                TABLE_NAME: this.dynamoTables.transaction.tableName,
+                TABLE_NAME_CATEGORIES: this.dynamoTables.category.tableName,
+                TABLE_NAME_ACCOUNTS: this.dynamoTables.account.tableName,
+            },
+        });
+        transaction
+            .addMethod('GET', new LambdaIntegration(fnView), {
+                authorizer: this.authorizer,
+            });
+
+        // Transaction edit
+        const fnEdit = new Lambda(this, 'fn-transaction-edit', {
+            code: getLambdaCode("transaction-edit"),
+            handler: 'index.handler',
+            environment: {
+                TABLE_NAME: this.dynamoTables.transaction.tableName,
+                TABLE_NAME_CATEGORIES: this.dynamoTables.category.tableName,
+                TABLE_NAME_ACCOUNTS: this.dynamoTables.account.tableName,
+            },
+        });
+        transaction
+            .addMethod('PUT', new LambdaIntegration(fnEdit), {
+                authorizer: this.authorizer,
+            });
+
     }
 
     private createDynamoDBtables() {
