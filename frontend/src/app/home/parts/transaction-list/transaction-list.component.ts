@@ -22,9 +22,9 @@ const columns = [
     code: 'sum',
     renderer: (element: TransactionModel) => {
       if (element.sum > 0) {
-        return '<span class="green-text">' + Math.abs(element.sum) + '</span>';
+        return '<span class="green-text">+' + Math.abs(element.sum) + '</span>';
       } else {
-        return '<span class="red-text">' + Math.abs(element.sum) + '</span>';
+        return '<span class="red-text">-' + Math.abs(element.sum) + '</span>';
       }
     }
   },
@@ -55,7 +55,7 @@ const columns = [
 })
 export class TransactionListComponent implements OnInit {
 
-  public pageSize = 10;
+  public pageSize = 10000;
 
   @ViewChild(TableComponent, {static: true}) table: TableComponent;
 
@@ -90,8 +90,7 @@ export class TransactionListComponent implements OnInit {
             data: {
               title: 'Are you sure you want to delete this transaction?',
               onConfirm: () => {
-                return this.backend.request('v1/transactions/' + transaction.id, 'DELETE').pipe(
-                  map(res => res === null),
+                return this.backend.request('transaction/' + transaction.id, 'DELETE').pipe(
                   catchError(err => {
                     console.error(err);
                     return of(false);

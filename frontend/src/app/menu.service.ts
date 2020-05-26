@@ -1,16 +1,16 @@
 import {Injectable} from '@angular/core';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class MenuService {
 
-    public isOpened = false;
+  public isOpened = true;
 
-    constructor() {
-    }
+  constructor() {
+  }
 
-    toggle() {
-        this.isOpened = !this.isOpened;
-    }
+  toggle() {
+    this.isOpened = !this.isOpened;
+  }
 }

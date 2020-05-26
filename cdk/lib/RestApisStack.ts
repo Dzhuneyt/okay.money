@@ -147,13 +147,14 @@ export class RestApisStack extends cdk.Stack {
 
     private createAccountAPIs() {
         const accounts = this.api.root.addResource('account', {});
-        // const account = accounts.addResource('{id}', {});
+        const account = accounts.addResource('{id}', {});
 
         const fnAccountList = new Lambda(this, 'fn-account-list', {
             code: getLambdaCode("account-list"),
             handler: 'index.handler',
             environment: {
                 TABLE_NAME: this.dynamoTables.account.tableName,
+                TABLE_NAME_TRANSACTIONS: this.dynamoTables.transaction.tableName,
             }
         });
         this.dynamoTables.account.grantReadData(fnAccountList);
@@ -171,10 +172,6 @@ export class RestApisStack extends cdk.Stack {
         this.dynamoTables.account.grantReadWriteData(fnAccountCreate);
         accounts.addMethod('POST', new LambdaIntegration(fnAccountCreate), {
             authorizer: this.authorizer,
-            // authorizationType: AuthorizationType.COGNITO,
-            // authorizer: {
-            //     authorizerId: this.cognitoAuthorizer.ref,
-            // },
         });
 
         const fnView = new Lambda(this, 'fn-account-view', {
@@ -184,25 +181,28 @@ export class RestApisStack extends cdk.Stack {
                 TABLE_NAME: this.dynamoTables.account.tableName,
             }
         });
-        this.dynamoTables.account.grantReadData(fnView);
-        // account
-        //     .addMethod('GET', new LambdaIntegration(fnView), {
-        //         authorizer: this.authorizer,
-        //     });
+        account
+            .addMethod('GET', new LambdaIntegration(fnView), {
+                authorizer: this.authorizer,
+            });
 
-        // @TODO account view and delete APIs
+        const fnEdit = new Lambda(this, 'fn-account-edit', {
+            code: getLambdaCode("account-edit"),
+            handler: 'index.handler',
+            environment: {
+                TABLE_NAME: this.dynamoTables.account.tableName,
+            }
+        });
+        account
+            .addMethod('PUT', new LambdaIntegration(fnEdit), {
+                authorizer: this.authorizer,
+            });
+
+        // @TODO account delete APIs
     }
 
     private createCategoryAPIs() {
-        const categories = this.api.root.addResource('category', {
-            // defaultMethodOptions: {
-            //     authorizer: {
-            //         authorizerId: this.cognitoAuthorizer.logicalId,
-            //         authorizationType: AuthorizationType.COGNITO,
-            //     }
-            // }
-        });
-        // categories.node.addDependency(this.cognitoAuthorizer);
+        const categories = this.api.root.addResource('category', {});
 
         // Category listing
         const fnCategoryList = new Lambda(this, 'fn-category-list', {
@@ -212,15 +212,6 @@ export class RestApisStack extends cdk.Stack {
                 TABLE_NAME: this.dynamoTables.category.tableName,
             },
         });
-        fnCategoryList.addToRolePolicy(new PolicyStatement({
-            sid: "ReadFromTableAndIndexes",
-            actions: ["dynamodb:*"],
-            resources: [
-                this.dynamoTables.category.tableArn,
-                this.dynamoTables.category.tableArn + "*",
-            ]
-        }));
-        this.dynamoTables.category.grantReadData(fnCategoryList);
         categories.addMethod('GET', new LambdaIntegration(fnCategoryList), {
             authorizer: this.authorizer,
         });
@@ -233,7 +224,6 @@ export class RestApisStack extends cdk.Stack {
                 TABLE_NAME: this.dynamoTables.category.tableName,
             },
         });
-        this.dynamoTables.category.grantReadWriteData(fnCategoryCreate);
         categories.addMethod('POST', new LambdaIntegration(fnCategoryCreate), {
             authorizer: this.authorizer,
         })
@@ -310,6 +300,19 @@ export class RestApisStack extends cdk.Stack {
                 authorizer: this.authorizer,
             });
 
+        // Transaction delete
+        const fnDelete = new Lambda(this, 'fn-transaction-delete', {
+            code: getLambdaCode("transaction-delete"),
+            handler: 'index.handler',
+            environment: {
+                TABLE_NAME: this.dynamoTables.transaction.tableName,
+            },
+        });
+        transaction
+            .addMethod('DELETE', new LambdaIntegration(fnDelete), {
+                authorizer: this.authorizer,
+            });
+
     }
 
     private createDynamoDBtables() {
@@ -378,7 +381,7 @@ export class RestApisStack extends cdk.Stack {
             authFlows: {
                 userPassword: true,
                 refreshToken: true,
-            }
+            },
         }).userPoolClientId;
         fnLogin.addEnvironment('COGNITO_USERPOOL_CLIENT_ID', userPoolClientId);
         fnLogin.addToRolePolicy(new PolicyStatement({

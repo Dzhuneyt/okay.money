@@ -20,8 +20,7 @@ const columns = [
     label: 'Current Balance',
     code: 'current_balance',
     renderer: (element: Account) => {
-      return "to be implemented";
-      // return element.current_balance;
+      return element.current_balance;
     }
   },
 ];
@@ -54,17 +53,17 @@ export class AccountListComponent implements OnInit {
           });
       }
     },
-    {
-      label: 'Delete',
-      icon: 'delete',
-      onClick: (transaction: TransactionModel) => {
-        alert('todo');
-      }
-    },
+    // {
+    //   label: 'Delete',
+    //   icon: 'delete',
+    //   onClick: (transaction: TransactionModel) => {
+    //     alert('todo');
+    //   }
+    // },
   ];
   public displayedColumns: TableColumn[] = columns;
   @ViewChild(TableComponent, {static: true}) table: TableComponent;
-  public pageSize = 10;
+  public pageSize = 1000;
 
   constructor(
     private backend: BackendService,
