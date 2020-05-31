@@ -1,4 +1,5 @@
 import {UserPool} from '@aws-cdk/aws-cognito';
+import {AttributeType, BillingMode, Table} from '@aws-cdk/aws-dynamodb';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Code} from '@aws-cdk/aws-lambda';
 import {Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
@@ -11,6 +12,7 @@ interface Props extends StackProps {
 
 export class CognitoStack extends Stack {
     public userPool: UserPool;
+    public userTable: Table;
 
     constructor(scope: Construct, id: string, props: Props) {
         super(scope, id, props);
@@ -24,6 +26,14 @@ export class CognitoStack extends Stack {
                 requireUppercase: false,
             },
         });
+        this.userTable = new Table(this, 'table-users', {
+            partitionKey: {
+                name: "id",
+                type: AttributeType.STRING,
+            },
+            billingMode: BillingMode.PAY_PER_REQUEST,
+            serverSideEncryption: true,
+        })
 
         const fnCreateUser = new Lambda(this, 'fn-create-user', {
             code: Code.fromAsset(path.resolve(__dirname, '../dist/lambdas/user-create')),
@@ -38,5 +48,7 @@ export class CognitoStack extends Stack {
                 "cognito-idp:AdminSetUserPassword",
             ]
         }));
+        fnCreateUser.addEnvironment("TABLE_NAME_USERS", this.userTable.tableName);
+        this.userTable.grantReadWriteData(fnCreateUser);
     }
 }

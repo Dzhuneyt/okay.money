@@ -7,6 +7,8 @@ import {BackendService} from 'src/app/services/backend.service';
 import {DialogService} from 'src/app/services/dialog.service';
 import {AccountEditComponent} from 'src/app/account-edit/account-edit.component';
 import {MatSnackBar} from '@angular/material';
+import {MenuService} from '../menu.service';
+import {AccountsService} from '../services/accounts.service';
 
 const columns = [
   {
@@ -31,6 +33,8 @@ const columns = [
   styleUrls: ['./account-list.component.scss']
 })
 export class AccountListComponent implements OnInit {
+
+  private page: number = 1;
 
   public tableActions: TableAction[] = [
     {
@@ -69,13 +73,41 @@ export class AccountListComponent implements OnInit {
     private backend: BackendService,
     private dialog: DialogService,
     private snackbar: MatSnackBar,
+    private menu: MenuService,
+    private account: AccountsService,
   ) {
   }
 
   ngOnInit() {
+
+    this.menu.items.next([
+      {
+        label: "Create account",
+        matIcon: "add",
+        onClick: () => {
+          this.dialog.open(AccountEditComponent, {
+              data: {},
+              width: '700px'
+            },
+            (res) => {
+              if (res) {
+                this.account.changes.next();
+              } else {
+                this.snackbar.open('Creating transaction failed');
+              }
+            });
+        }
+      }
+    ]);
+
+    this.account.changes.subscribe(() => {
+      this.table.goToPage(this.table.currentPage);
+    });
   }
 
   public getPage = (page, pageSize) => {
+    this.page = page;
+
     let totalCount;
     return this.backend
       .request(

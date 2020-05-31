@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {MenuService} from '../../menu.service';
+import {MenuItem, MenuService} from '../../menu.service';
 import {UserService} from 'src/app/services/user.service';
 import {tap} from 'rxjs/operators';
 import {Router} from '@angular/router';
@@ -16,6 +16,7 @@ import {TransactionService} from 'src/app/services/transaction.service';
 export class HeaderComponent implements OnInit {
 
   public isLoggedIn = false;
+  public menuItems: MenuItem[];
 
   constructor(
     private menuService: MenuService,
@@ -33,6 +34,8 @@ export class HeaderComponent implements OnInit {
         console.log(val);
       }),
     ).subscribe(data => (this.isLoggedIn = data.loggedIn));
+
+    this.menuService.items.subscribe(menuItems => this.menuItems = menuItems);
   }
 
   public toggleMenu() {
@@ -44,6 +47,9 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  /**
+   * @deprecated
+   */
   public createTransaction() {
     this.dialog.open(TransactionEditComponent, {
         data: {},

@@ -11,28 +11,27 @@
     <span routerLink="['/home']" routerLinkActive="true">Finance</span>
     <span class="example-spacer"></span>
 
-    <button
-      *ngIf="isLoggedIn"
-      [routerLink]="['/home']"
-      aria-label="Transactions and accounts list"
-      class="navbar-icon"
-      mat-button
-      routerLinkActive="true">
-      <mat-icon inline="true">account_balance</mat-icon>
-      Overview
-    </button>
+    <ng-container *ngFor="let menuItem of menuItems">
+      <button
+        *ngIf="menuItem.route && !menuItem.onClick"
+        mat-button
+        [routerLink]="[menuItem.route]"
+        class="navbar-icon"
+        routerLinkActive="true">
+        <mat-icon inline="true">{{menuItem.matIcon}}</mat-icon>
+        {{menuItem.label}}
+      </button>
+      <button
+        *ngIf="!menuItem.route && menuItem.onClick"
+        (click)="menuItem.onClick()"
+        mat-button
+        class="navbar-icon">
+        <mat-icon inline="true">{{menuItem.matIcon}}</mat-icon>
+        {{menuItem.label}}
+      </button>
+    </ng-container>
 
-    <button
-      *ngIf="isLoggedIn"
-      (click)="createTransaction()"
-      aria-label="Create Transaction"
-      class="navbar-icon"
-      mat-button>
-      <mat-icon inline="true">add</mat-icon>
-      Create transaction
-    </button>
     <!--    <mat-icon [routerLink]="['/profile']" class="navbar-icon" routerLinkActive="true">person</mat-icon>-->
-
 
     <button (click)="logout()"
             *ngIf="isLoggedIn"

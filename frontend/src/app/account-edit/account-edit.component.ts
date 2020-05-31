@@ -42,9 +42,9 @@ export class AccountEditComponent implements OnInit {
   }
 
   submit() {
-    const payload = {};
-
-    payload['title'] = this.form.controls['title'].value;
+    const payload = {
+      'title': this.form.controls['title'].value
+    };
 
     if (this.isNewRecord()) {
       this.account.createSingle(payload).subscribe(() => {

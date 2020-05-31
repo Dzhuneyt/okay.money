@@ -17,10 +17,10 @@ export class AccountSummaryListComponent implements OnInit {
       label: 'Name',
       code: 'title',
     },
-    // {
-    //   label: 'Current balance',
-    //   code: 'current_balance',
-    // }
+    {
+      label: 'Current balance',
+      code: 'current_balance',
+    }
   ];
 
   constructor(

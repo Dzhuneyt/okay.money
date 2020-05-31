@@ -1,4 +1,12 @@
 import {Injectable} from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
+
+export interface MenuItem {
+  label: string;
+  matIcon: string;
+  route?: string;
+  onClick?: () => void;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -6,6 +14,8 @@ import {Injectable} from '@angular/core';
 export class MenuService {
 
   public isOpened = true;
+
+  public items = new BehaviorSubject<MenuItem[]>([]);
 
   constructor() {
   }

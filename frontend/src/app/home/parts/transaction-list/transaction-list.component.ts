@@ -10,6 +10,7 @@ import {of} from 'rxjs';
 import {MatSnackBar} from '@angular/material';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';
+import {MenuService} from '../../../menu.service';
 
 const columns = [
   {
@@ -118,6 +119,7 @@ export class TransactionListComponent implements OnInit {
     private dialog: DialogService,
     private snackbar: MatSnackBar,
     private transaction: TransactionService,
+    private menu: MenuService,
   ) {
   }
 
@@ -126,6 +128,26 @@ export class TransactionListComponent implements OnInit {
     this.transaction.changes.subscribe(() => {
       this.table.goToPage(0);
     });
+
+    this.menu.items.next([
+      {
+        label: "Create transaction",
+        matIcon: "add",
+        onClick: () => {
+          this.dialog.open(TransactionEditComponent, {
+              data: {},
+              width: '700px'
+            },
+            (res) => {
+              if (res) {
+                this.transaction.changes.next();
+              } else {
+                this.snackbar.open('Creating transaction failed');
+              }
+            });
+        }
+      }
+    ]);
   }
 
   public getPage = (page, pageSize) => {
