@@ -36,7 +36,7 @@ export class CognitoStack extends Stack {
         })
 
         const fnCreateUser = new Lambda(this, 'fn-create-user', {
-            code: Code.fromAsset(path.resolve(__dirname, '../dist/lambdas/user-create')),
+            code: Code.fromAsset(path.resolve(__dirname, '../../dist/lambdas/user-create')),
             handler: 'index.handler',
             timeout: Duration.seconds(10),
         });

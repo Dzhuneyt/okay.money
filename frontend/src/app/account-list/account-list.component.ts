@@ -1,12 +1,13 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {of} from 'rxjs';
 import {TableAction, TableColumn, TableComponent} from 'src/app/table/table.component';
-import {TransactionModel} from 'src/app/models/transaction.model';
 import {Account} from 'src/app/models/account.model';
-import {map} from 'rxjs/operators';
+import {catchError, map} from 'rxjs/operators';
 import {BackendService} from 'src/app/services/backend.service';
 import {DialogService} from 'src/app/services/dialog.service';
 import {AccountEditComponent} from 'src/app/account-edit/account-edit.component';
 import {MatSnackBar} from '@angular/material';
+import {DeleteConfirmComponent} from '../delete-confirm/delete-confirm.component';
 import {MenuService} from '../menu.service';
 import {AccountsService} from '../services/accounts.service';
 
@@ -57,13 +58,34 @@ export class AccountListComponent implements OnInit {
           });
       }
     },
-    // {
-    //   label: 'Delete',
-    //   icon: 'delete',
-    //   onClick: (transaction: TransactionModel) => {
-    //     alert('todo');
-    //   }
-    // },
+    {
+      label: 'Delete',
+      icon: 'delete',
+      onClick: (account: Account) => {
+        this.dialog.open(DeleteConfirmComponent, {
+            data: {
+              title: 'Are you sure you want to delete this account? All transactions inside will be deleted permanently.',
+              onConfirm: () => {
+                return this.backend.request('account/' + account.id, 'DELETE').pipe(
+                  catchError(err => {
+                    console.error(err);
+                    return of(false);
+                  })
+                );
+              },
+            },
+          },
+          (res) => {
+            if (res) {
+              // Refresh the table
+              this.snackbar.open('Deleted');
+              this.table.goToPage(this.table.currentPage);
+            } else {
+              this.snackbar.open('Deleting failed');
+            }
+          });
+      }
+    },
   ];
   public displayedColumns: TableColumn[] = columns;
   @ViewChild(TableComponent, {static: true}) table: TableComponent;

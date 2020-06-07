@@ -72,6 +72,16 @@ export class Account extends Construct {
                 authorizer: this.authorizer,
             });
 
-        // @TODO account delete APIs
+        const fnDelete = new Lambda(this, 'fn-delete', {
+            code: getLambdaCode("account-delete"),
+            handler: 'index.handler',
+            environment: {
+                TABLE_NAME: props.dynamoTables.account.tableName,
+            }
+        });
+        account
+            .addMethod('DELETE', new LambdaIntegration(fnDelete), {
+                authorizer: this.authorizer,
+            });
     }
 }

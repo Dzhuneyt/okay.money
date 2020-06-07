@@ -30,7 +30,7 @@ interface Props extends StackProps {
 }
 
 function getLambdaCode(lambdaName: string) {
-    return Code.fromAsset(path.resolve(__dirname, '../dist/lambdas/', lambdaName))
+    return Code.fromAsset(path.resolve(__dirname, '../../dist/lambdas/', lambdaName))
 }
 
 export class RestApisStack extends cdk.Stack {

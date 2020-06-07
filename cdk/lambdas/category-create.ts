@@ -1,5 +1,4 @@
 import * as AWS from 'aws-sdk';
-import {IsNotEmpty, Length} from 'class-validator';
 import {IEvent} from './interfaces/IEvent';
 import DynamoDB = require('aws-sdk/clients/dynamodb');
 import {v4 as uuidv4} from 'uuid';
