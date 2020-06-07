@@ -4,7 +4,7 @@ import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Code} from '@aws-cdk/aws-lambda';
 import {Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
 import * as path from 'path';
-import {Lambda} from './constructs/Lambda';
+import {Lambda} from '../constructs/Lambda';
 
 interface Props extends StackProps {
 
