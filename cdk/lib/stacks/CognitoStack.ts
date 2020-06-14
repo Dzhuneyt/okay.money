@@ -2,6 +2,7 @@ import {UserPool} from '@aws-cdk/aws-cognito';
 import {AttributeType, BillingMode, Table} from '@aws-cdk/aws-dynamodb';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Code} from '@aws-cdk/aws-lambda';
+import {StringParameter} from '@aws-cdk/aws-ssm';
 import {Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
 import * as path from 'path';
 import {Lambda} from '../constructs/Lambda';
@@ -33,7 +34,15 @@ export class CognitoStack extends Stack {
             },
             billingMode: BillingMode.PAY_PER_REQUEST,
             serverSideEncryption: true,
-        })
+        });
+        new StringParameter(this, 'param-table-name-users', {
+            stringValue: this.userTable.tableName,
+            parameterName: '/personalfinance/table/users/name',
+        });
+        new StringParameter(this, 'param-table-arn-users', {
+            stringValue: this.userTable.tableArn,
+            parameterName: '/personalfinance/table/users/arn',
+        });
 
         const fnCreateUser = new Lambda(this, 'fn-create-user', {
             code: Code.fromAsset(path.resolve(__dirname, '../../dist/lambdas/user-create')),

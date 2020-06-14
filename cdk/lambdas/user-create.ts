@@ -2,13 +2,16 @@ import * as AWS from 'aws-sdk';
 import {AttributeType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import DynamoDB = require('aws-sdk/clients/dynamodb');
 
+const dynamodb = new DynamoDB();
+const cognito = new AWS.CognitoIdentityServiceProvider();
+
+// @TODO deprecated
 export const handler = async (event: {
     username: string,
     password: string,
 }) => {
-    const cognito = new AWS.CognitoIdentityServiceProvider();
-    const userPoolId = process.env.COGNITO_USERPOOL_ID as string;
 
+    const userPoolId = process.env.COGNITO_USERPOOL_ID as string;
     try {
         const cognitoUser = await cognito.adminCreateUser({
             UserPoolId: userPoolId,
@@ -31,7 +34,6 @@ export const handler = async (event: {
         })?.Value;
         console.log(sub);
 
-        const dynamodb = new DynamoDB();
         await dynamodb.putItem({
             TableName: process.env.TABLE_NAME_USERS as string,
             Item: DynamoDB.Converter.marshall({
@@ -42,6 +44,7 @@ export const handler = async (event: {
     } catch (e) {
         console.log('Failed to create a user');
         console.log(e);
+        throw e;
     }
 
     return {};

@@ -5,6 +5,7 @@ import {AppComponent} from './app.component';
 import {LoginComponent} from './login/login.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {RegisterComponent} from './register/register.component';
 import {BackendService} from './services/backend.service';
 import {HttpClientModule} from '@angular/common/http';
 import {HomeComponent} from './home/home.component';
@@ -41,6 +42,11 @@ const routes: Routes = [
     canActivate: [AnonymousUserGuard]
   },
   {
+    path: 'register',
+    component: RegisterComponent,
+    canActivate: [AnonymousUserGuard]
+  },
+  {
     path: 'home',
     component: HomeComponent,
     canActivate: [LoggedInGuard],
@@ -71,6 +77,7 @@ const routes: Routes = [
     AppComponent,
     HomeComponent,
     LoginComponent,
+    RegisterComponent,
     AccountSummaryListComponent,
     AddAccountComponent,
     TransactionListComponent,
