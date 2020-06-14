@@ -6,7 +6,7 @@ import {
     TokenAuthorizer
 } from '@aws-cdk/aws-apigateway';
 import {CfnUserPoolResourceServer, UserPool} from '@aws-cdk/aws-cognito';
-import {AttributeType, BillingMode, Table} from '@aws-cdk/aws-dynamodb';
+import {Table} from '@aws-cdk/aws-dynamodb';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Code} from '@aws-cdk/aws-lambda';
 import {LogGroup, RetentionDays} from '@aws-cdk/aws-logs';
@@ -18,6 +18,7 @@ import {Account} from '../constructs/rest/Account';
 import {Category} from '../constructs/rest/Category';
 import {GatewayResponseMapper} from '../constructs/rest/GatewayResponseMapper';
 import {Login} from '../constructs/rest/Login';
+import {Register} from '../constructs/rest/Register';
 import {Transaction} from '../constructs/rest/Transaction';
 
 interface Props extends StackProps {
@@ -54,6 +55,7 @@ export class RestApisStack extends cdk.Stack {
         this.overwriteResponseTemplates();
 
         this.createLoginAPI();
+        this.createRegisterAPI();
         this.createAccountAPIs();
         this.createCategoryAPIs();
         this.createUserManagementAPIs();
@@ -173,6 +175,13 @@ export class RestApisStack extends cdk.Stack {
     private overwriteResponseTemplates() {
         new GatewayResponseMapper(this, 'gateway-responses', {
             api: this.api,
+        });
+    }
+
+    private createRegisterAPI() {
+        new Register(this, 'register', {
+            api: this.api,
+            userPool: this.userPool,
         });
     }
 }
