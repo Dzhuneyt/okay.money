@@ -1,10 +1,10 @@
 import {RestApi} from '@aws-cdk/aws-apigateway';
 import {UserPool} from '@aws-cdk/aws-cognito';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
+import {NodejsFunction} from '@aws-cdk/aws-lambda-nodejs';
 import {Construct, Duration} from '@aws-cdk/core';
-import {Lambda} from '../Lambda';
 import {LambdaIntegration} from '../LambdaIntegration';
-import {getLambdaCode} from './getLambdaCode';
+import {getLambdaTypescriptCode} from './getLambdaCode';
 
 export class Login extends Construct {
     constructor(scope: Construct, id: string, props: {
@@ -13,9 +13,8 @@ export class Login extends Construct {
     }) {
         super(scope, id);
 
-        const fnLogin = new Lambda(this, 'fn-login', {
-            code: getLambdaCode("login"),
-            handler: 'index.handler',
+        const fnLogin = new NodejsFunction(this, 'login', {
+            ...getLambdaTypescriptCode('login.ts'),
             timeout: Duration.seconds(30),
         });
         fnLogin.addEnvironment('COGNITO_USERPOOL_ID', props.userPool.userPoolId);
