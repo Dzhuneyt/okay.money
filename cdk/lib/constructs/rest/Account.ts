@@ -1,11 +1,9 @@
 import {RestApi, TokenAuthorizer} from '@aws-cdk/aws-apigateway';
-import {UserPool} from '@aws-cdk/aws-cognito';
 import {Table} from '@aws-cdk/aws-dynamodb';
-import {PolicyStatement} from '@aws-cdk/aws-iam';
-import {Construct, Duration} from '@aws-cdk/core';
-import {Lambda} from '../Lambda';
+import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../LambdaIntegration';
-import {getLambdaCode} from './getLambdaCode';
+import {LambdaTypescript} from '../LambdaTypescript';
+import {getLambdaTypescriptProps} from './getLambdaCode';
 
 export class Account extends Construct {
     private readonly authorizer: TokenAuthorizer;
@@ -20,68 +18,70 @@ export class Account extends Construct {
         super(scope, id);
 
         this.authorizer = props.authorizer;
-        const accounts = props.api.root.addResource('account', {});
-        const account = accounts.addResource('{id}', {});
 
-        const fnAccountList = new Lambda(this, 'fn-account-list', {
-            code: getLambdaCode("account-list"),
-            handler: 'index.handler',
+        const apiResources = this.createApiResources(props.api);
+
+        const fnAccountList = new LambdaTypescript(this, 'fn-account-list', {
+            ...getLambdaTypescriptProps('account-list.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
                 TABLE_NAME_TRANSACTIONS: props.dynamoTables.transaction.tableName,
             }
         });
-        props.dynamoTables.account.grantReadData(fnAccountList);
-        accounts.addMethod('GET', new LambdaIntegration(fnAccountList, {}), {
+        apiResources.accounts.addMethod('GET', new LambdaIntegration(fnAccountList, {}), {
             authorizer: this.authorizer,
         });
 
-        const fnAccountCreate = new Lambda(this, 'fn-account-create', {
-            code: getLambdaCode("account-create"),
-            handler: 'index.handler',
+        const fnAccountCreate = new LambdaTypescript(this, 'fn-account-create', {
+            ...getLambdaTypescriptProps('account-create.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }
         });
-        props.dynamoTables.account.grantReadWriteData(fnAccountCreate);
-        accounts.addMethod('POST', new LambdaIntegration(fnAccountCreate), {
+        apiResources.accounts.addMethod('POST', new LambdaIntegration(fnAccountCreate), {
             authorizer: this.authorizer,
         });
 
-        const fnView = new Lambda(this, 'fn-account-view', {
-            code: getLambdaCode("account-view"),
-            handler: 'index.handler',
+        const fnView = new LambdaTypescript(this, 'fn-account-view', {
+            ...getLambdaTypescriptProps('account-view.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }
         });
-        account
+        apiResources.account
             .addMethod('GET', new LambdaIntegration(fnView), {
                 authorizer: this.authorizer,
             });
 
-        const fnEdit = new Lambda(this, 'fn-account-edit', {
-            code: getLambdaCode("account-edit"),
-            handler: 'index.handler',
+        const fnEdit = new LambdaTypescript(this, 'fn-account-edit', {
+            ...getLambdaTypescriptProps('account-edit.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }
         });
-        account
+        apiResources.account
             .addMethod('PUT', new LambdaIntegration(fnEdit), {
                 authorizer: this.authorizer,
             });
 
-        const fnDelete = new Lambda(this, 'fn-delete', {
-            code: getLambdaCode("account-delete"),
-            handler: 'index.handler',
+        const fnDelete = new LambdaTypescript(this, 'fn-delete', {
+            ...getLambdaTypescriptProps('account-delete.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }
         });
-        account
+        apiResources.account
             .addMethod('DELETE', new LambdaIntegration(fnDelete), {
                 authorizer: this.authorizer,
             });
+    }
+
+    private createApiResources(api: RestApi) {
+        const accounts = api.root.addResource('account');
+        const account = accounts.addResource('{id}');
+        return {
+            accounts,
+            account
+        };
     }
 }

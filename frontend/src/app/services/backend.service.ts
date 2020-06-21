@@ -4,7 +4,7 @@ import {Observable} from 'rxjs';
 import {LocalStorage} from '@ngx-pwa/local-storage';
 import {catchError, flatMap} from 'rxjs/operators';
 import {Router} from '@angular/router';
-import {environment} from "src/environments/environment";
+import {environment} from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +28,7 @@ export class BackendService {
         console.log(`Making API call to ${method} ${path}`);
         const headers = new HttpHeaders(authKey ? {
           'Authorization': authKey['AccessToken'],
-        } : {})
+        } : {});
         return this.http.request(method, absoluteUrl, {
           body: bodyParams,
           params: queryParams,
@@ -40,7 +40,7 @@ export class BackendService {
               // Unauthorized. Most likely Access token has expired
               this.localStorage.removeItem('access_token').subscribe(() => {
                 this.router.navigate(['/login']);
-              })
+              });
 
             }
             throw err;

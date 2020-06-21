@@ -44,6 +44,7 @@ export class HeaderComponent implements OnInit {
 
   public logout() {
     this.userService.setIsLoggedIn(false);
+    window.location.reload(); // @TODO figure out why the below doesn't work
     this.router.navigate(['/login']);
   }
 

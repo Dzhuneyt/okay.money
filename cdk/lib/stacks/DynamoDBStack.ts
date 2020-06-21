@@ -45,17 +45,29 @@ export class DynamoDBStack extends Stack {
     }
 
     private storeInParameterStore() {
-        new StringParameter(this, 'param-table-accounts', {
+        new StringParameter(this, 'accounts-arn', {
             stringValue: this.tableAccount.tableArn,
-            parameterName: '/personalfinance/table/accounts',
+            parameterName: '/personalfinance/table/accounts/arn',
         });
-        new StringParameter(this, 'param-table-categories', {
-            stringValue: this.tableAccount.tableArn,
-            parameterName: '/personalfinance/table/categories',
+        new StringParameter(this, 'accounts-name', {
+            stringValue: this.tableAccount.tableName,
+            parameterName: '/personalfinance/table/accounts/name',
         });
-        new StringParameter(this, 'param-table-transactions', {
-            stringValue: this.tableAccount.tableArn,
-            parameterName: '/personalfinance/table/transactions',
+        new StringParameter(this, 'categories-arn', {
+            stringValue: this.tableCategory.tableArn,
+            parameterName: '/personalfinance/table/categories/arn',
+        });
+        new StringParameter(this, 'categories-name', {
+            stringValue: this.tableCategory.tableName,
+            parameterName: '/personalfinance/table/categories/name',
+        });
+        new StringParameter(this, 'transactions-arn', {
+            stringValue: this.tableTransaction.tableArn,
+            parameterName: '/personalfinance/table/transactions/arn',
+        });
+        new StringParameter(this, 'transactions-name', {
+            stringValue: this.tableTransaction.tableName,
+            parameterName: '/personalfinance/table/transactions/name',
         });
     }
 }

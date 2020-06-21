@@ -7,7 +7,7 @@ export function getLambdaCode(lambdaName: string) {
     return Code.fromAsset(path.resolve(__dirname, '../../../dist/lambdas/', lambdaName))
 }
 
-export function getLambdaTypescriptCode(fileName: string): Partial<NodejsFunctionProps> {
+export function getLambdaTypescriptProps(fileName: string): Partial<NodejsFunctionProps> {
     const file = path.resolve(__dirname, './../../../lambdas/', fileName);
     try {
         if (fs.existsSync(file)) {

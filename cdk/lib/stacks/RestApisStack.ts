@@ -12,11 +12,13 @@ import {Code} from '@aws-cdk/aws-lambda';
 import {LogGroup, RetentionDays} from '@aws-cdk/aws-logs';
 import * as cdk from '@aws-cdk/core';
 import {CfnOutput, Duration, RemovalPolicy, StackProps} from '@aws-cdk/core';
+import * as fs from 'fs';
 import * as path from 'path';
-import {Lambda} from '../constructs/Lambda';
+import {LambdaTypescript} from '../constructs/LambdaTypescript';
 import {Account} from '../constructs/rest/Account';
 import {Category} from '../constructs/rest/Category';
 import {GatewayResponseMapper} from '../constructs/rest/GatewayResponseMapper';
+import {getLambdaTypescriptProps} from '../constructs/rest/getLambdaCode';
 import {Login} from '../constructs/rest/Login';
 import {Register} from '../constructs/rest/Register';
 import {Transaction} from '../constructs/rest/Transaction';
@@ -31,7 +33,16 @@ interface Props extends StackProps {
 }
 
 function getLambdaCode(lambdaName: string) {
-    return Code.fromAsset(path.resolve(__dirname, '../../dist/lambdas/', lambdaName))
+    const filePath = path.resolve(__dirname, '../../dist/lambdas/', lambdaName);
+    try {
+        if (fs.existsSync(filePath)) {
+            return Code.fromAsset(filePath)
+        }
+    } catch (err) {
+        console.error(err)
+    }
+    throw new Error(`File does not exist at ${filePath}`);
+
 }
 
 export class RestApisStack extends cdk.Stack {
@@ -40,7 +51,6 @@ export class RestApisStack extends cdk.Stack {
     private cognitoResourceServer: CfnUserPoolResourceServer;
     private authorizer: TokenAuthorizer;
     private props: Props;
-    private logGroup: LogGroup;
 
     constructor(scope: cdk.Construct, id: string, props: Props) {
         super(scope, id, props);
@@ -48,10 +58,9 @@ export class RestApisStack extends cdk.Stack {
         this.props = props;
         this.userPool = props.userPool;
 
-        this.createLogGroup();
         this.createCognitoResourceServerForRestAPIs();
         this.createAuthorizerLambda();
-        this.createBaseApi();
+        this.createApiGateway();
         this.overwriteResponseTemplates();
 
         this.createLoginAPI();
@@ -123,18 +132,9 @@ export class RestApisStack extends cdk.Stack {
         });
     }
 
-    private createLogGroup() {
-        this.logGroup = new LogGroup(this, 'api-logs', {
-            removalPolicy: RemovalPolicy.DESTROY,
-            // @TODO increase retention
-            retention: RetentionDays.ONE_DAY,
-        });
-    }
-
     private createAuthorizerLambda() {
-        const authFn = new Lambda(this, 'fn-authorizer', {
-            code: getLambdaCode("authorizer"),
-            handler: 'index.handler',
+        const authFn = new LambdaTypescript(this, 'fn-authorizer', {
+            ...getLambdaTypescriptProps('authorizer.ts'),
         });
         authFn.addToRolePolicy(new PolicyStatement({
             resources: [this.userPool.userPoolArn],
@@ -148,10 +148,15 @@ export class RestApisStack extends cdk.Stack {
         });
     }
 
-    private createBaseApi() {
+    private createApiGateway() {
+        const logGroup = new LogGroup(this, 'api-logs', {
+            removalPolicy: RemovalPolicy.DESTROY,
+            // @TODO increase retention
+            retention: RetentionDays.ONE_DAY,
+        });
         this.api = new RestApi(this, this.stackName, {
             deployOptions: {
-                accessLogDestination: new LogGroupLogDestination(this.logGroup),
+                accessLogDestination: new LogGroupLogDestination(logGroup),
                 accessLogFormat: AccessLogFormat.jsonWithStandardFields(),
                 tracingEnabled: true,
             },

@@ -8,7 +8,7 @@ interface Input {
     title: string,
 }
 
-const originalHandler = async (event: IEvent) => {
+export const handler = new Handler(async (event: IEvent) => {
     try {
         const userId = event.requestContext.authorizer.sub
         const params: Input = JSON.parse(event.body || '{}');
@@ -17,12 +17,6 @@ const originalHandler = async (event: IEvent) => {
             return {
                 statusCode: 400,
                 body: `Invalid "title" parameter`,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Headers": "*",
-                    "Access-Control-Allow-Methods": "*",
-                    'Access-Control-Allow-Credentials': true,
-                },
             }
         }
 
@@ -56,26 +50,12 @@ const originalHandler = async (event: IEvent) => {
         return {
             statusCode: 200,
             body: JSON.stringify(DynamoDB.Converter.unmarshall(item.Item!)),
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "*",
-                "Access-Control-Allow-Methods": "*",
-                'Access-Control-Allow-Credentials': true,
-            },
         }
     } catch (e) {
         return {
             statusCode: 500,
             body: JSON.stringify(e),
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "*",
-                "Access-Control-Allow-Methods": "*",
-                'Access-Control-Allow-Credentials': true,
-            },
         }
     }
-}
-
-export const handler = new Handler(originalHandler)
+})
     .create();

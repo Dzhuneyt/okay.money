@@ -64,7 +64,7 @@ export class UserService {
         break;
       case false:
         // Logout
-        this.localStorage.removeItem('auth_key').subscribe(() => {
+        this.localStorage.removeItem('access_token').subscribe(() => {
           this.loginStageChanges.next({
             loggedIn: false,
           });
