@@ -3,9 +3,9 @@ import {UserPool} from '@aws-cdk/aws-cognito';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Construct, Duration} from '@aws-cdk/core';
-import {Lambda} from '../Lambda';
 import {LambdaIntegration} from '../LambdaIntegration';
-import {getLambdaCode} from './getLambdaCode';
+import {LambdaTypescript} from '../LambdaTypescript';
+import {getLambdaTypescriptProps} from './util/getLambdaCode';
 
 export class Category extends Construct {
     private readonly authorizer: TokenAuthorizer;
@@ -21,29 +21,27 @@ export class Category extends Construct {
 
         this.authorizer = props.authorizer;
 
-        const categories = props.api.root.addResource('category', {});
+        const categoriesApiResource = props.api.root.addResource('category', {});
 
         // Category listing
-        const fnCategoryList = new Lambda(this, 'fn-category-list', {
-            code: getLambdaCode("category-list"),
-            handler: 'index.handler',
+        const fnCategoryList = new LambdaTypescript(this, 'fn-category-list', {
+            ...getLambdaTypescriptProps('category-list.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.category.tableName,
             },
         });
-        categories.addMethod('GET', new LambdaIntegration(fnCategoryList), {
+        categoriesApiResource.addMethod('GET', new LambdaIntegration(fnCategoryList), {
             authorizer: this.authorizer,
         });
 
         // Category creation
-        const fnCategoryCreate = new Lambda(this, 'fn-category-create', {
-            code: getLambdaCode("category-create"),
-            handler: 'index.handler',
+        const fnCategoryCreate = new LambdaTypescript(this, 'fn-category-create', {
+            ...getLambdaTypescriptProps('category-create.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.category.tableName,
             },
         });
-        categories.addMethod('POST', new LambdaIntegration(fnCategoryCreate), {
+        categoriesApiResource.addMethod('POST', new LambdaIntegration(fnCategoryCreate), {
             authorizer: this.authorizer,
         })
     }

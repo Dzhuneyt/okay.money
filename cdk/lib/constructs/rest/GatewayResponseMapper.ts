@@ -1,11 +1,5 @@
 import {GatewayResponse, ResponseType, RestApi, TokenAuthorizer} from '@aws-cdk/aws-apigateway';
-import {UserPool} from '@aws-cdk/aws-cognito';
-import {Table} from '@aws-cdk/aws-dynamodb';
-import {PolicyStatement} from '@aws-cdk/aws-iam';
-import {Construct, Duration} from '@aws-cdk/core';
-import {Lambda} from '../Lambda';
-import {LambdaIntegration} from '../LambdaIntegration';
-import {getLambdaCode} from './getLambdaCode';
+import {Construct} from '@aws-cdk/core';
 
 export class GatewayResponseMapper extends Construct {
     constructor(scope: Construct, id: string, props: {

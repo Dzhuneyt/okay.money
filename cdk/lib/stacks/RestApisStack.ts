@@ -18,7 +18,7 @@ import {LambdaTypescript} from '../constructs/LambdaTypescript';
 import {Account} from '../constructs/rest/Account';
 import {Category} from '../constructs/rest/Category';
 import {GatewayResponseMapper} from '../constructs/rest/GatewayResponseMapper';
-import {getLambdaTypescriptProps} from '../constructs/rest/getLambdaCode';
+import {getLambdaTypescriptProps} from '../constructs/rest/util/getLambdaCode';
 import {Login} from '../constructs/rest/Login';
 import {Register} from '../constructs/rest/Register';
 import {Transaction} from '../constructs/rest/Transaction';
@@ -47,8 +47,6 @@ function getLambdaCode(lambdaName: string) {
 
 export class RestApisStack extends cdk.Stack {
     private api: RestApi;
-    private readonly userPool: UserPool;
-    private cognitoResourceServer: CfnUserPoolResourceServer;
     private authorizer: TokenAuthorizer;
     private props: Props;
 
@@ -56,40 +54,15 @@ export class RestApisStack extends cdk.Stack {
         super(scope, id, props);
 
         this.props = props;
-        this.userPool = props.userPool;
 
-        this.createCognitoResourceServerForRestAPIs();
-        this.createAuthorizerLambda();
         this.createApiGateway();
-        this.overwriteResponseTemplates();
+        this.createApigatewayEndpoints();
 
-        this.createLoginAPI();
-        this.createRegisterAPI();
-        this.createAccountAPIs();
-        this.createCategoryAPIs();
         this.createUserManagementAPIs();
-        this.createTransactionAPIs();
 
         new CfnOutput(this, 'rest-api', {
             value: this.api.url,
         });
-    }
-
-    private createAccountAPIs() {
-        new Account(this, 'account', {
-            api: this.api,
-            authorizer: this.authorizer,
-            dynamoTables: this.props.dynamoTables,
-        });
-    }
-
-    private createCategoryAPIs() {
-        new Category(this, 'category', {
-            api: this.api,
-            authorizer: this.authorizer,
-            dynamoTables: this.props.dynamoTables,
-        })
-
     }
 
     private createUserManagementAPIs() {
@@ -102,42 +75,13 @@ export class RestApisStack extends cdk.Stack {
         // user.addMethod('DELETE');
     }
 
-    private createTransactionAPIs() {
-        new Transaction(this, 'transaction', {
-            api: this.api,
-            authorizer: this.authorizer,
-            dynamoTables: this.props.dynamoTables,
-        })
-
-    }
-
-    private createLoginAPI() {
-        new Login(this, 'login', {
-            api: this.api,
-            userPool: this.userPool,
-        });
-    }
-
-    private createCognitoResourceServerForRestAPIs() {
-        this.cognitoResourceServer = new CfnUserPoolResourceServer(this, 'cognit-resource-server', {
-            identifier: 'https://my-weather-api.example.com',
-            name: 'RestAPIsResourceServer',
-            userPoolId: this.userPool.userPoolId,
-            scopes: [
-                {
-                    scopeName: 'default',
-                    scopeDescription: "Default scope",
-                }
-            ]
-        });
-    }
 
     private createAuthorizerLambda() {
         const authFn = new LambdaTypescript(this, 'fn-authorizer', {
             ...getLambdaTypescriptProps('authorizer.ts'),
         });
         authFn.addToRolePolicy(new PolicyStatement({
-            resources: [this.userPool.userPoolArn],
+            resources: [this.props.userPool.userPoolArn],
             actions: [
                 "cognito-idp:GetUser",
             ]
@@ -149,6 +93,20 @@ export class RestApisStack extends cdk.Stack {
     }
 
     private createApiGateway() {
+        this.createAuthorizerLambda();
+
+        new CfnUserPoolResourceServer(this, 'cognit-resource-server', {
+            identifier: 'https://my-weather-api.example.com',
+            name: 'RestAPIsResourceServer',
+            userPoolId: this.props.userPool.userPoolId,
+            scopes: [
+                {
+                    scopeName: 'default',
+                    scopeDescription: "Default scope",
+                }
+            ]
+        });
+
         const logGroup = new LogGroup(this, 'api-logs', {
             removalPolicy: RemovalPolicy.DESTROY,
             // @TODO increase retention
@@ -175,18 +133,34 @@ export class RestApisStack extends cdk.Stack {
                 },
             },
         });
-    }
-
-    private overwriteResponseTemplates() {
         new GatewayResponseMapper(this, 'gateway-responses', {
             api: this.api,
         });
     }
 
-    private createRegisterAPI() {
+    private createApigatewayEndpoints() {
+        new Login(this, 'login', {
+            api: this.api,
+            userPool: this.props.userPool,
+        });
         new Register(this, 'register', {
             api: this.api,
-            userPool: this.userPool,
+            userPool: this.props.userPool,
+        });
+        new Account(this, 'account', {
+            api: this.api,
+            authorizer: this.authorizer,
+            dynamoTables: this.props.dynamoTables,
+        });
+        new Category(this, 'category', {
+            api: this.api,
+            authorizer: this.authorizer,
+            dynamoTables: this.props.dynamoTables,
+        });
+        new Transaction(this, 'transaction', {
+            api: this.api,
+            authorizer: this.authorizer,
+            dynamoTables: this.props.dynamoTables,
         });
     }
 }

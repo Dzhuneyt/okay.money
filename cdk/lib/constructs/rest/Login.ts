@@ -4,7 +4,7 @@ import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../LambdaIntegration';
 import {LambdaTypescript} from '../LambdaTypescript';
-import {getLambdaTypescriptProps} from './getLambdaCode';
+import {getLambdaTypescriptProps} from './util/getLambdaCode';
 
 export class Login extends Construct {
     constructor(scope: Construct, id: string, props: {
