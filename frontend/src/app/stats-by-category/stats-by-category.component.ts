@@ -136,48 +136,42 @@ export class StatsByCategoryComponent implements OnInit {
     if (endDate !== null) {
       params['end_date'] = this.formatDate(endDate);
     }
-    this.backend.request('v1/stats/by_category', 'GET', params).subscribe(apiResult => {
-      this.categories.getList().subscribe(items => {
+    this.backend.request('stats/by_category', 'GET', params).subscribe(apiResult => {
 
-        // Extract and fill category names for each stats object
-        this.categoryInfos = apiResult['categories'].map(cat => {
-          const foundCategory = items.find(item => {
-            return item['id'] === cat['id'];
-          });
-          cat['name'] = foundCategory['name'];
-          return cat;
-        });
-
-        this.legends.income = this.categoryInfos
-          .filter(elem => {
-            return elem.income_for_period > 0;
-          })
-          .map(elem => elem.name ? elem.name : elem.id);
-        this.legends.expsense = this.categoryInfos
-          .filter(elem => {
-            return elem.expense_for_period < 0;
-          })
-          .map(elem => elem.name ? elem.name : elem.id);
-
-        this.dataSets.expenses = [
-          {
-            label: 'Expenses',
-            data: this.categoryInfos
-              .filter(elem => elem.expense_for_period < 0)
-              .map(elem => elem.expense_for_period),
-          }
-        ];
-        this.dataSets.income = [
-          {
-            label: 'Income',
-            data: this.categoryInfos
-              .filter(elem => elem.income_for_period > 0)
-              .map(elem => elem.income_for_period),
-          }
-        ];
-
-        this.toggleCharts(true);
+      // Extract and fill category names for each stats object
+      this.categoryInfos = apiResult['categories'].map(cat => {
+        return cat;
       });
+
+      this.legends.income = this.categoryInfos
+        .filter(elem => {
+          return elem.income_for_period > 0;
+        })
+        .map(elem => elem.name ? elem.name : elem.id);
+      this.legends.expsense = this.categoryInfos
+        .filter(elem => {
+          return elem.expense_for_period < 0;
+        })
+        .map(elem => elem.name ? elem.name : elem.id);
+
+      this.dataSets.expenses = [
+        {
+          label: 'Expenses',
+          data: this.categoryInfos
+            .filter(elem => elem.expense_for_period < 0)
+            .map(elem => elem.expense_for_period),
+        }
+      ];
+      this.dataSets.income = [
+        {
+          label: 'Income',
+          data: this.categoryInfos
+            .filter(elem => elem.income_for_period > 0)
+            .map(elem => elem.income_for_period),
+        }
+      ];
+
+      this.toggleCharts(true);
     });
   }
 

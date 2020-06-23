@@ -8,12 +8,12 @@ export function getLambdaCode(lambdaName: string) {
 }
 
 export function getLambdaTypescriptProps(fileName: string): Partial<NodejsFunctionProps> {
-    const file = path.resolve(__dirname, './../../../lambdas/', fileName);
+    const file = path.resolve(__dirname, './../../../../lambdas/', fileName);
     try {
         if (fs.existsSync(file)) {
             // file exists
             return {
-                projectRoot: path.resolve(__dirname, './../../../'),
+                projectRoot: path.resolve(__dirname, './../../../../'),
                 entry: file,
                 handler: 'handler',
             }

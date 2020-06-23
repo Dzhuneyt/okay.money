@@ -18,6 +18,7 @@ import {LambdaTypescript} from '../constructs/LambdaTypescript';
 import {Account} from '../constructs/rest/Account';
 import {Category} from '../constructs/rest/Category';
 import {GatewayResponseMapper} from '../constructs/rest/GatewayResponseMapper';
+import {Stats} from '../constructs/rest/Stats';
 import {getLambdaTypescriptProps} from '../constructs/rest/util/getLambdaCode';
 import {Login} from '../constructs/rest/Login';
 import {Register} from '../constructs/rest/Register';
@@ -158,6 +159,11 @@ export class RestApisStack extends cdk.Stack {
             dynamoTables: this.props.dynamoTables,
         });
         new Transaction(this, 'transaction', {
+            api: this.api,
+            authorizer: this.authorizer,
+            dynamoTables: this.props.dynamoTables,
+        });
+        new Stats(this, 'stats', {
             api: this.api,
             authorizer: this.authorizer,
             dynamoTables: this.props.dynamoTables,
