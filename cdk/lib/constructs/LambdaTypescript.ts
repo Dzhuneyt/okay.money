@@ -17,6 +17,8 @@ export class LambdaTypescript extends Original {
             actions: ["dynamodb:*"],
             resources: ["*"],
         }));
+        this.node.addInfo(`Compiling ${props.entry}`);
+        console.log(props.entry);
     }
 
 }

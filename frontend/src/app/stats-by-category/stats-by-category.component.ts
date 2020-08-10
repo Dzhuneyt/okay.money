@@ -175,14 +175,15 @@ export class StatsByCategoryComponent implements OnInit {
     });
   }
 
-  private formatDate(date) {
-    const d = date;
-    return d.getFullYear() + '-' +
-      ('00' + (d.getMonth() + 1)).slice(-2) + '-' +
-      ('00' + d.getDate()).slice(-2) + ' ' +
-      ('00' + d.getHours()).slice(-2) + ':' +
-      ('00' + d.getMinutes()).slice(-2) + ':' +
-      ('00' + d.getSeconds()).slice(-2);
+  private formatDate(date: Date) {
+    return date.getTime();
+    // const d = date;
+    // return d.getFullYear() + '-' +
+    //   ('00' + (d.getMonth() + 1)).slice(-2) + '-' +
+    //   ('00' + d.getDate()).slice(-2) + ' ' +
+    //   ('00' + d.getHours()).slice(-2) + ':' +
+    //   ('00' + d.getMinutes()).slice(-2) + ':' +
+    //   ('00' + d.getSeconds()).slice(-2);
   }
 
   get hasData() {

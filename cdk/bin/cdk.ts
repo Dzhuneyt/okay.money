@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import {Environment, Stack} from '@aws-cdk/core';
+import {Environment} from '@aws-cdk/core';
 import * as cdk from '@aws-cdk/core';
 import {CognitoStack} from '../lib/stacks/CognitoStack';
 import {DynamoDBStack} from '../lib/stacks/DynamoDBStack';
@@ -8,7 +8,7 @@ import {RestApisStack} from '../lib/stacks/RestApisStack';
 
 const app = new cdk.App({});
 const env: Environment = {
-    account: "347315207830",
+    account: "347315207830", // SS Personal
 }
 try {
     const dynamoStack = new DynamoDBStack(app, 'personalfinance-dynamodb', {

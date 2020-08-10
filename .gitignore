@@ -32,3 +32,6 @@ package-lock.json
 terraform.tfstate.backup
 
 .env
+
+.cache
+.parcel-cache

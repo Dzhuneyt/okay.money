@@ -1,10 +1,9 @@
 import * as AWS from 'aws-sdk';
-import DynamoDB = require('aws-sdk/clients/dynamodb');
 
 export class DynamoManager {
     private tableName: string;
     private userId: string;
-    private connection: DynamoDB;
+    private connection: AWS.DynamoDB;
 
     constructor(tableName: string) {
         this.tableName = tableName;

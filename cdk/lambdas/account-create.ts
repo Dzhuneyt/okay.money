@@ -1,7 +1,7 @@
 import * as AWS from 'aws-sdk';
 import {IAccount} from './interfaces/IAccount';
 import {IEvent} from './interfaces/IEvent';
-import DynamoDB = require('aws-sdk/clients/dynamodb');
+import * as DynamoDB from 'aws-sdk/clients/dynamodb';
 import {v4 as uuidv4} from 'uuid';
 import {Handler} from './shared/Handler';
 
