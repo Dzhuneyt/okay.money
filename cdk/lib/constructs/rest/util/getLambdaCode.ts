@@ -13,7 +13,7 @@ export function getLambdaTypescriptProps(fileName: string): Partial<NodejsFuncti
         if (fs.existsSync(file)) {
             // file exists
             return {
-                projectRoot: path.resolve(__dirname, './../../../../'),
+                depsLockFilePath: path.resolve(__dirname, './../../../../'),
                 entry: file,
                 handler: 'handler',
             }

@@ -22,7 +22,7 @@ export class Login extends Construct {
         const userPoolClientId = props.userPool.addClient('login', {
             authFlows: {
                 userPassword: true,
-                refreshToken: true,
+                // refreshToken: true,
             },
         }).userPoolClientId;
         fnLogin.addEnvironment('COGNITO_USERPOOL_CLIENT_ID', userPoolClientId);

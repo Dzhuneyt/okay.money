@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import 'source-map-support/register';
-import {Environment} from '@aws-cdk/core';
 import * as cdk from '@aws-cdk/core';
+import {Environment} from '@aws-cdk/core';
+import 'source-map-support/register';
 import {CognitoStack} from '../lib/stacks/CognitoStack';
 import {DynamoDBStack} from '../lib/stacks/DynamoDBStack';
 import {RestApisStack} from '../lib/stacks/RestApisStack';

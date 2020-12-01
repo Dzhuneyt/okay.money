@@ -1,4 +1,4 @@
-import {GatewayResponse, ResponseType, RestApi, TokenAuthorizer} from '@aws-cdk/aws-apigateway';
+import {ResponseType, RestApi} from '@aws-cdk/aws-apigateway';
 import {Construct} from '@aws-cdk/core';
 
 export class GatewayResponseMapper extends Construct {
@@ -33,8 +33,7 @@ export class GatewayResponseMapper extends Construct {
             // and prevents the frontend from reacting properly. For example, on expired
             // authorization token, the frontend can not detect this error and redirect
             // to the /login page
-            const gatewayResponse = new GatewayResponse(this, 'gw-response-' + type.responseType, {
-                restApi: props.api,
+            props.api.addGatewayResponse('gw-response-' + type.responseType, {
                 type,
                 responseHeaders: {
                     "Access-Control-Allow-Origin": "'*'",
@@ -44,7 +43,6 @@ export class GatewayResponseMapper extends Construct {
                     "application/json": "{\n     \"message\": $context.error.messageString,\n     \"type\":  \"$context.error.responseType\",\n     \"resourcePath\":  \"$context.resourcePath\",\n }"
                 }
             });
-            gatewayResponse.node.addDependency(props.api);
         })
     }
 }

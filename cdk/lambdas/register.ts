@@ -1,5 +1,5 @@
-import {DynamoDB} from 'aws-sdk';
 import * as AWS from 'aws-sdk';
+import {DynamoDB} from 'aws-sdk';
 import {AttributeType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import {v4 as uuidv4} from 'uuid';
 import {IEvent} from './interfaces/IEvent';
@@ -147,7 +147,7 @@ export const handler = new Handler(async (event: IEvent) => {
         console.log(e);
         return {
             statusCode: 500,
-            body: "Internal error occurred. Please check system logs."
+            body: e.toString(),
         }
     }
 }).create();
