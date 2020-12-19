@@ -14,7 +14,7 @@ import {SnackbarService} from '../services/snackbar.service';
 @Component({
   selector: 'app-account-list',
   templateUrl: './account-list.component.html',
-  styleUrls: ['./account-list.component.scss']
+  styleUrls: ['./account-list.component.scss'],
 })
 export class AccountListComponent implements OnInit {
 
@@ -51,7 +51,6 @@ export class AccountListComponent implements OnInit {
   }
 
   ngOnInit() {
-
     this.menuService.items.next([
       {
         label: 'Create account',

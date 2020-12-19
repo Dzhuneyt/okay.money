@@ -8,15 +8,12 @@ import {
 import {CfnUserPoolResourceServer, UserPool} from '@aws-cdk/aws-cognito';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
-import {Code} from '@aws-cdk/aws-lambda';
 import {LogGroup, RetentionDays} from '@aws-cdk/aws-logs';
 import * as cdk from '@aws-cdk/core';
 import {CfnOutput, Duration, RemovalPolicy, StackProps} from '@aws-cdk/core';
-import * as fs from 'fs';
-import * as path from 'path';
 import {LambdaTypescript} from '../constructs/LambdaTypescript';
 import {Account} from '../constructs/rest/Account';
-import {Category} from '../constructs/rest/Category';
+import {Category} from '../constructs/rest/category/Category';
 import {GatewayResponseMapper} from '../constructs/rest/GatewayResponseMapper';
 import {Stats} from '../constructs/rest/Stats';
 import {getPropsByLambdaFilename} from '../constructs/rest/util/getLambdaCode';
@@ -33,19 +30,6 @@ interface Props extends StackProps {
     };
 }
 
-function getLambdaCode(lambdaName: string) {
-    const filePath = path.resolve(__dirname, '../../dist/lambdas/', lambdaName);
-    try {
-        if (fs.existsSync(filePath)) {
-            return Code.fromAsset(filePath)
-        }
-    } catch (err) {
-        console.error(err)
-    }
-    throw new Error(`File does not exist at ${filePath}`);
-
-}
-
 export class RestApisStack extends cdk.Stack {
     private api: RestApi;
     private authorizer: TokenAuthorizer;
@@ -59,23 +43,10 @@ export class RestApisStack extends cdk.Stack {
         this.createApiGateway();
         this.createApigatewayEndpoints();
 
-        this.createUserManagementAPIs();
-
         new CfnOutput(this, 'rest-api', {
             value: this.api.url,
         });
     }
-
-    private createUserManagementAPIs() {
-        // const users = this.api.root.addResource('user');
-        // users.addMethod('GET');
-        // users.addMethod('POST');
-        //
-        // const user = users.addResource('{id}');
-        // user.addMethod('GET');
-        // user.addMethod('DELETE');
-    }
-
 
     private createAuthorizerLambda() {
         const authFn = new LambdaTypescript(this, 'fn-authorizer', {
@@ -85,7 +56,7 @@ export class RestApisStack extends cdk.Stack {
             resources: [this.props.userPool.userPoolArn],
             actions: [
                 "cognito-idp:GetUser",
-            ]
+            ],
         }));
         this.authorizer = new TokenAuthorizer(this, 'api-authorizer', {
             handler: authFn,

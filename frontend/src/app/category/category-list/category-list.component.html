@@ -1,0 +1,16 @@
+<mat-card>
+  <mat-card-title>Categories</mat-card-title>
+  <mat-card-subtitle>Define a common set of income sources and expense targets. Example categories: Food, Clothes,
+    Transportation, etc.
+  </mat-card-subtitle>
+</mat-card>
+<br/>
+<mat-card>
+  <app-table
+    #table
+    [actions]="tableActions"
+    [displayedColumns]="displayedColumns"
+    [pageSize]="1000"
+    [pagination]="getPage"
+  ></app-table>
+</mat-card>

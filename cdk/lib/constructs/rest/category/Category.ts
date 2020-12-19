@@ -1,11 +1,9 @@
 import {RestApi, TokenAuthorizer} from '@aws-cdk/aws-apigateway';
-import {UserPool} from '@aws-cdk/aws-cognito';
 import {Table} from '@aws-cdk/aws-dynamodb';
-import {PolicyStatement} from '@aws-cdk/aws-iam';
-import {Construct, Duration} from '@aws-cdk/core';
-import {LambdaIntegration} from '../LambdaIntegration';
-import {LambdaTypescript} from '../LambdaTypescript';
-import {getPropsByLambdaFilename} from './util/getLambdaCode';
+import {Construct} from '@aws-cdk/core';
+import {LambdaIntegration} from '../../LambdaIntegration';
+import {LambdaTypescript} from '../../LambdaTypescript';
+import {getPropsByLambdaFilename} from '../util/getLambdaCode';
 
 export class Category extends Construct {
     private readonly authorizer: TokenAuthorizer;
