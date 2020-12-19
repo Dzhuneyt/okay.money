@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable, Observer} from 'rxjs';
-import {LocalStorage} from '@ngx-pwa/local-storage';
 import {UserService} from 'src/app/services/user.service';
 
 @Injectable({
@@ -9,7 +8,6 @@ import {UserService} from 'src/app/services/user.service';
 })
 export class LoggedInGuard implements CanActivate {
   constructor(
-    private localStorage: LocalStorage,
     private router: Router,
     private user: UserService,
   ) {
