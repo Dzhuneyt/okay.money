@@ -2,7 +2,7 @@
   <mat-toolbar-row>
     <button
       (click)="toggleMenu()"
-      *ngIf="isLoggedIn"
+      *ngIf="(this.userService.loginStateChanges | async).loggedIn"
       aria-label="Home page"
       class="hamburger"
       mat-icon-button>
@@ -31,9 +31,15 @@
       </button>
     </ng-container>
 
-    <mat-icon [routerLink]="['/profile']" class="navbar-icon" routerLinkActive="true">person</mat-icon>
+    <mat-icon
+      *ngIf="(this.userService.loginStateChanges | async).loggedIn"
+      [routerLink]="['/profile']"
+      class="navbar-icon"
+      routerLinkActive="true">
+      person
+    </mat-icon>
 
-    <button *ngIf="!isLoggedIn"
+    <button *ngIf="!(this.userService.loginStateChanges | async).loggedIn"
             [routerLink]="['/login']"
             aria-label="Login"
             class="navbar-icon"

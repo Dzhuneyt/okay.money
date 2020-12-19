@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {UserService} from "../services/user.service";
 import {Router} from "@angular/router";
+import {filter} from "rxjs/operators";
 
 @Component({
   selector: 'app-sidenav',
@@ -19,9 +20,16 @@ export class SidenavComponent implements OnInit {
   }
 
   logout() {
+
     this.userService.setIsLoggedIn(false);
-    window.location.reload(); // @TODO figure out why the below doesn't work
-    this.router.navigate(['/login']);
+    // window.location.reload(); // @TODO figure out why the below doesn't work
+
+    // Wait for logout event
+    this.userService.loginStateChanges
+      .pipe(filter(value => !value.loggedIn))
+      .subscribe(value => {
+        this.router.navigate(['/login']);
+      });
 
     const absoluteUrl = window.location.origin + this.router.createUrlTree(['/login']);
     console.log(absoluteUrl);

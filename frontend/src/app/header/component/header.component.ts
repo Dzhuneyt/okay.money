@@ -2,11 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {MenuItem, MenuService} from '../../menu.service';
 import {UserService} from 'src/app/services/user.service';
 import {tap} from 'rxjs/operators';
-import {Router} from '@angular/router';
-import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
-import {DialogService} from 'src/app/services/dialog.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import {TransactionService} from 'src/app/services/transaction.service';
 
 @Component({
   selector: 'app-header',
@@ -20,21 +15,11 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private menuService: MenuService,
-    private userService: UserService,
-    private router: Router,
-    private dialog: DialogService,
-    private snackbar: MatSnackBar,
-    private transaction: TransactionService,
+    public userService: UserService,
   ) {
   }
 
   ngOnInit() {
-    this.userService.loginStateChanges.pipe(
-      tap(state => {
-        console.log(state);
-      }),
-    ).subscribe(data => (this.isLoggedIn = data.loggedIn));
-
     this.menuService.items.subscribe(menuItems => this.menuItems = menuItems);
   }
 
