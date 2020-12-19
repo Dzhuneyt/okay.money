@@ -101,7 +101,7 @@ const routes: Routes = [
     FormsModule,
     FlexLayoutModule,
     HttpClientModule,
-    RouterModule.forRoot(routes),
+    RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
     BrowserAnimationsModule,
     MaterialComponentsModule,
     ChartsModule,
