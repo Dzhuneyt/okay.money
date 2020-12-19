@@ -23,6 +23,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+
     this.user.loginStateChanges.subscribe(value => {
       if (!value.loggedIn) {
         // On logout, close the sidebar

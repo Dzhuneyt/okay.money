@@ -1,6 +1,7 @@
 import {
     AccessLogFormat,
     AuthorizationType,
+    Cors,
     LogGroupLogDestination,
     RestApi,
     TokenAuthorizer
@@ -89,16 +90,18 @@ export class RestApisStack extends cdk.Stack {
                 accessLogDestination: new LogGroupLogDestination(logGroup),
                 accessLogFormat: AccessLogFormat.jsonWithStandardFields(),
                 tracingEnabled: true,
+                throttlingRateLimit: 50, // API calls per second
+                throttlingBurstLimit: 50, // parallel API calls allowed
             },
             defaultCorsPreflightOptions: {
-                allowHeaders: ["*"],
-                allowMethods: ["*"],
-                allowOrigins: ["*"],
+                allowHeaders: Cors.DEFAULT_HEADERS,
+                allowMethods: Cors.ALL_METHODS,
+                allowOrigins: Cors.ALL_ORIGINS,
                 allowCredentials: true,
                 disableCache: true,
             },
             defaultMethodOptions: {
-                // By default all requests do not require authentication
+                // By default all requests DO NOT require authentication
                 authorizer: {
                     authorizerId: "",
                     authorizationType: AuthorizationType.NONE,

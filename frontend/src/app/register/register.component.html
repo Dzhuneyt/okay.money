@@ -1,10 +1,7 @@
 <form [formGroup]="form" class="example-form">
   <mat-card class="example-card">
-    <mat-card-header>
-      <mat-card-title>Register</mat-card-title>
-    </mat-card-header>
+    <h2>Register</h2>
     <mat-card-content>
-
       <table cellspacing="0" class="example-full-width">
         <tr>
           <td>
@@ -43,11 +40,11 @@
     </mat-card-actions>
     <mat-card-actions style="text-align: center;">
       <p>
-        Or if you already have an account:
+        Already registered?
       </p>
       <button
         type="button"
-        [routerLink]="['/login']" color="info" mat-raised-button>Login instead
+        [routerLink]="['/login']" color="info" mat-raised-button>Login
       </button>
       <p>&nbsp;</p>
     </mat-card-actions>
