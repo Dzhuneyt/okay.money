@@ -91,4 +91,8 @@ export class CategoryListComponent implements OnInit {
         }
       });
   }
+
+  private openDeleteAccountDialog(category: Category) {
+    // @TODO implement
+  }
 }

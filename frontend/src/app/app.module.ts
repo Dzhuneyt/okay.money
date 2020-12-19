@@ -25,8 +25,8 @@ import {StatsByCategoryComponent} from 'src/app/stats-by-category/stats-by-categ
 import {UserService} from 'src/app/services/user.service';
 import {CommonModule} from '@angular/common';
 import {SidenavComponent} from 'src/app/sidenav/sidenav.component';
-import { MatListModule } from '@angular/material/list';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import {MatListModule} from '@angular/material/list';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';
@@ -35,7 +35,7 @@ import {AnonymousUserGuard} from 'src/app/guards/anonymous-user.guard';
 import {AccountListComponent} from 'src/app/account-list/account-list.component';
 import {AccountEditComponent} from 'src/app/account-edit/account-edit.component';
 import {ProfileComponent} from 'src/app/profile/profile.component';
-import { StorageModule } from '@ngx-pwa/local-storage';
+import {StorageModule} from '@ngx-pwa/local-storage';
 
 const routes: Routes = [
   {
@@ -102,7 +102,7 @@ const routes: Routes = [
     FormsModule,
     FlexLayoutModule,
     HttpClientModule,
-    RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
+    RouterModule.forRoot(routes, {relativeLinkResolution: 'legacy'}),
     BrowserAnimationsModule,
     MaterialComponentsModule,
     ChartsModule,
@@ -112,7 +112,7 @@ const routes: Routes = [
     MatListModule,
     ReactiveFormsModule,
     MatSlideToggleModule,
-    StorageModule.forRoot({ IDBNoWrap: false }),
+    StorageModule.forRoot({IDBNoWrap: false}),
   ],
   providers: [
     BackendService,
