@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "bootstrap": "npx lerna bootstrap",
     "dev": "npm run deps:frontend && npx concurrently --kill-others-on-fail -n lambdas,frontend 'cd ./cdk && npm run build:lambdas:watch' 'cd ./frontend && npm run dev'",
     "frontend:build": "cd frontend && docker build . --build-arg uid=$(id -u) --file Dockerfile-builder --tag frontend_builder && docker run -u node -w='/app' --volume=$(pwd):/app:delegated --rm frontend_builder",
     "tests": "npm run deps:all && npm run beMigrations && npx  concurrently 'npm run feUnitTests' 'npm run beUnitTests && npm run beFunctionalTests'",
@@ -32,5 +33,8 @@
   "homepage": "https://github.com/Dzhuneyt/Personal-Finance#readme",
   "dependencies": {
     "concurrently": "^4.1.1"
+  },
+  "devDependencies": {
+    "lerna": "^3.22.1"
   }
 }

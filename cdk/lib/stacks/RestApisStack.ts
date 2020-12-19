@@ -1,8 +1,6 @@
 import {
     AccessLogFormat,
-    AuthorizationType, GatewayResponse,
-    LogGroupLogDestination, ResponseType,
-    RestApi,
+    AuthorizationType, LogGroupLogDestination, RestApi,
     TokenAuthorizer
 } from '@aws-cdk/aws-apigateway';
 import {CfnUserPoolResourceServer, UserPool} from '@aws-cdk/aws-cognito';
@@ -19,7 +17,7 @@ import {Account} from '../constructs/rest/Account';
 import {Category} from '../constructs/rest/Category';
 import {GatewayResponseMapper} from '../constructs/rest/GatewayResponseMapper';
 import {Stats} from '../constructs/rest/Stats';
-import {getLambdaTypescriptProps} from '../constructs/rest/util/getLambdaCode';
+import {getPropsByLambdaFilename} from '../constructs/rest/util/getLambdaCode';
 import {Login} from '../constructs/rest/Login';
 import {Register} from '../constructs/rest/Register';
 import {Transaction} from '../constructs/rest/Transaction';
@@ -79,7 +77,7 @@ export class RestApisStack extends cdk.Stack {
 
     private createAuthorizerLambda() {
         const authFn = new LambdaTypescript(this, 'fn-authorizer', {
-            ...getLambdaTypescriptProps('authorizer.ts'),
+            ...getPropsByLambdaFilename('authorizer.ts'),
         });
         authFn.addToRolePolicy(new PolicyStatement({
             resources: [this.props.userPool.userPoolArn],

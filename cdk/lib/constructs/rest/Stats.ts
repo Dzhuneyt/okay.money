@@ -3,7 +3,7 @@ import {Table} from '@aws-cdk/aws-dynamodb';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../LambdaIntegration';
 import {LambdaTypescript} from '../LambdaTypescript';
-import {getLambdaTypescriptProps} from './util/getLambdaCode';
+import {getPropsByLambdaFilename} from './util/getLambdaCode';
 
 export class Stats extends Construct {
     constructor(scope: Construct, id: string, props: {
@@ -16,7 +16,7 @@ export class Stats extends Construct {
         super(scope, id);
 
         const fnByCategory = new LambdaTypescript(this, 'fn-by-category', {
-            ...getLambdaTypescriptProps('stats/byCategory.ts'),
+            ...getPropsByLambdaFilename('stats/byCategory.ts'),
         });
 
         props.api.root

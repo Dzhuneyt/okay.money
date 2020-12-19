@@ -4,7 +4,7 @@ import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../LambdaIntegration';
 import {LambdaTypescript} from '../LambdaTypescript';
-import {getLambdaTypescriptProps} from './util/getLambdaCode';
+import {getPropsByLambdaFilename} from './util/getLambdaCode';
 
 export class Register extends Construct {
     constructor(scope: Construct, id: string, props: {
@@ -14,7 +14,7 @@ export class Register extends Construct {
         super(scope, id);
 
         const fnRegister = new LambdaTypescript(this, 'fn-register', {
-            ...getLambdaTypescriptProps('register.ts'),
+            ...getPropsByLambdaFilename('register.ts'),
             initialPolicy: [
                 new PolicyStatement({
                     sid: "AllowCreatingCognitoUsers",

@@ -5,7 +5,7 @@ import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Construct, Duration} from '@aws-cdk/core';
 import {LambdaIntegration} from '../LambdaIntegration';
 import {LambdaTypescript} from '../LambdaTypescript';
-import {getLambdaTypescriptProps} from './util/getLambdaCode';
+import {getPropsByLambdaFilename} from './util/getLambdaCode';
 
 export class Category extends Construct {
     private readonly authorizer: TokenAuthorizer;
@@ -25,7 +25,7 @@ export class Category extends Construct {
 
         // Category listing
         const fnCategoryList = new LambdaTypescript(this, 'fn-category-list', {
-            ...getLambdaTypescriptProps('category-list.ts'),
+            ...getPropsByLambdaFilename('category-list.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.category.tableName,
             },
@@ -36,7 +36,7 @@ export class Category extends Construct {
 
         // Category creation
         const fnCategoryCreate = new LambdaTypescript(this, 'fn-category-create', {
-            ...getLambdaTypescriptProps('category-create.ts'),
+            ...getPropsByLambdaFilename('category-create.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.category.tableName,
             },

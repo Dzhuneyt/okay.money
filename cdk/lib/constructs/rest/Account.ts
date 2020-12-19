@@ -3,7 +3,7 @@ import {Table} from '@aws-cdk/aws-dynamodb';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../LambdaIntegration';
 import {LambdaTypescript} from '../LambdaTypescript';
-import {getLambdaTypescriptProps} from './util/getLambdaCode';
+import {getPropsByLambdaFilename} from './util/getLambdaCode';
 
 export class Account extends Construct {
     private readonly authorizer: TokenAuthorizer;
@@ -22,7 +22,7 @@ export class Account extends Construct {
         const apiResources = this.createApiResources(props.api);
 
         const fnAccountList = new LambdaTypescript(this, 'fn-account-list', {
-            ...getLambdaTypescriptProps('account-list.ts'),
+            ...getPropsByLambdaFilename('account-list.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
                 TABLE_NAME_TRANSACTIONS: props.dynamoTables.transaction.tableName,
@@ -33,7 +33,7 @@ export class Account extends Construct {
         });
 
         const fnAccountCreate = new LambdaTypescript(this, 'fn-account-create', {
-            ...getLambdaTypescriptProps('account-create.ts'),
+            ...getPropsByLambdaFilename('account-create.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }
@@ -43,7 +43,7 @@ export class Account extends Construct {
         });
 
         const fnView = new LambdaTypescript(this, 'fn-account-view', {
-            ...getLambdaTypescriptProps('account-view.ts'),
+            ...getPropsByLambdaFilename('account-view.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }
@@ -54,7 +54,7 @@ export class Account extends Construct {
             });
 
         const fnEdit = new LambdaTypescript(this, 'fn-account-edit', {
-            ...getLambdaTypescriptProps('account-edit.ts'),
+            ...getPropsByLambdaFilename('account-edit.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }
@@ -65,7 +65,7 @@ export class Account extends Construct {
             });
 
         const fnDelete = new LambdaTypescript(this, 'fn-delete', {
-            ...getLambdaTypescriptProps('account-delete.ts'),
+            ...getPropsByLambdaFilename('account-delete.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }

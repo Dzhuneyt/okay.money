@@ -4,7 +4,7 @@ import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../LambdaIntegration';
 import {LambdaTypescript} from '../LambdaTypescript';
-import {getLambdaTypescriptProps} from './util/getLambdaCode';
+import {getPropsByLambdaFilename} from './util/getLambdaCode';
 
 export class Login extends Construct {
     constructor(scope: Construct, id: string, props: {
@@ -14,7 +14,7 @@ export class Login extends Construct {
         super(scope, id);
 
         const fnLogin = new LambdaTypescript(this, 'login', {
-            ...getLambdaTypescriptProps('login.ts'),
+            ...getPropsByLambdaFilename('login.ts'),
         });
         fnLogin.addEnvironment('COGNITO_USERPOOL_ID', props.userPool.userPoolId);
 

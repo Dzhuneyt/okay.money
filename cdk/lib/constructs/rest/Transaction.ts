@@ -3,7 +3,7 @@ import {Table} from '@aws-cdk/aws-dynamodb';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../LambdaIntegration';
 import {LambdaTypescript} from '../LambdaTypescript';
-import {getLambdaTypescriptProps} from './util/getLambdaCode';
+import {getPropsByLambdaFilename} from './util/getLambdaCode';
 
 export class Transaction extends Construct {
     private readonly authorizer: TokenAuthorizer;
@@ -19,7 +19,7 @@ export class Transaction extends Construct {
 
         this.authorizer = props.authorizer;
         const fnTransactionCreate = new LambdaTypescript(this, 'fn-transaction-create', {
-            ...getLambdaTypescriptProps('transaction-create.ts'),
+            ...getPropsByLambdaFilename('transaction-create.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.transaction.tableName,
                 TABLE_NAME_ACCOUNTS: props.dynamoTables.account.tableName,
@@ -34,7 +34,7 @@ export class Transaction extends Construct {
         })
 
         const fnTransactionList = new LambdaTypescript(this, 'fn-transaction-list', {
-            ...getLambdaTypescriptProps('transaction-list.ts'),
+            ...getPropsByLambdaFilename('transaction-list.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.transaction.tableName,
                 TABLE_NAME_CATEGORIES: props.dynamoTables.category.tableName,
@@ -47,7 +47,7 @@ export class Transaction extends Construct {
 
         // Transaction view
         const fnView = new LambdaTypescript(this, 'fn-transaction-view', {
-            ...getLambdaTypescriptProps('transaction-view.ts'),
+            ...getPropsByLambdaFilename('transaction-view.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.transaction.tableName,
                 TABLE_NAME_CATEGORIES: props.dynamoTables.category.tableName,
@@ -61,7 +61,7 @@ export class Transaction extends Construct {
 
         // Transaction edit
         const fnEdit = new LambdaTypescript(this, 'fn-transaction-edit', {
-            ...getLambdaTypescriptProps('transaction-edit.ts'),
+            ...getPropsByLambdaFilename('transaction-edit.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.transaction.tableName,
                 TABLE_NAME_CATEGORIES: props.dynamoTables.category.tableName,
@@ -75,7 +75,7 @@ export class Transaction extends Construct {
 
         // Transaction delete
         const fnDelete = new LambdaTypescript(this, 'fn-transaction-delete', {
-            ...getLambdaTypescriptProps('transaction-delete.ts'),
+            ...getPropsByLambdaFilename('transaction-delete.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.transaction.tableName,
             },
