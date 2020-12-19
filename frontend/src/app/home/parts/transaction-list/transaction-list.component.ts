@@ -7,7 +7,7 @@ import {DialogService} from 'src/app/services/dialog.service';
 import {TransactionModel} from 'src/app/models/transaction.model';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
 import {of} from 'rxjs';
-import {MatSnackBar} from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';
 import {MenuService} from '../../../menu.service';

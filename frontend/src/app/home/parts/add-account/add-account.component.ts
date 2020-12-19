@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BackendService} from "../../../services/backend.service";
-import {MatDialogRef} from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
 
 @Component({
   selector: 'app-add-account',

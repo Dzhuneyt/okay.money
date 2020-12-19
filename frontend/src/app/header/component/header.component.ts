@@ -5,7 +5,7 @@ import {tap} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {DialogService} from 'src/app/services/dialog.service';
-import {MatSnackBar} from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {TransactionService} from 'src/app/services/transaction.service';
 
 @Component({

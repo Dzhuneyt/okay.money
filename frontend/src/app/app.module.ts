@@ -25,7 +25,8 @@ import {StatsByCategoryComponent} from 'src/app/stats-by-category/stats-by-categ
 import {UserService} from 'src/app/services/user.service';
 import {CommonModule} from '@angular/common';
 import {SidenavComponent} from 'src/app/sidenav/sidenav.component';
-import {MatListModule, MatSlideToggleModule} from '@angular/material';
+import { MatListModule } from '@angular/material/list';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';

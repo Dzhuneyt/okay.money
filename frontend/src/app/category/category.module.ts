@@ -5,7 +5,7 @@ import {CategoryListComponent} from './category-list/category-list.component';
 import {MaterialComponentsModule} from "../material-components.module";
 import {UiKitModule} from "../ui-kit/ui-kit.module";
 import {CategoryEditComponent} from './category-edit/category-edit.component';
-import {MatDialogModule} from "@angular/material";
+import { MatDialogModule } from "@angular/material/dialog";
 
 const routes: Routes = [
   {

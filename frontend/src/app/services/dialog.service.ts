@@ -1,5 +1,5 @@
 import {Injectable, TemplateRef} from '@angular/core';
-import {MatDialog, MatDialogConfig} from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import {ComponentType} from '@angular/cdk/portal';
 
 @Injectable({

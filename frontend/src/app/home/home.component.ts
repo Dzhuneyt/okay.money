@@ -1,6 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BackendService} from '../services/backend.service';
-import {MatDialog, MatSnackBar, MatTabGroup} from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTabGroup } from '@angular/material/tabs';
 import {AddAccountComponent} from './parts/add-account/add-account.component';
 import {DialogService} from '../services/dialog.service';
 import {AccountSummaryListComponent} from 'src/app/home/parts/accounts-list/account-summary-list.component';
