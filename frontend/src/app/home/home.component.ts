@@ -14,7 +14,7 @@ export class HomeComponent implements OnInit {
 
   @ViewChild(AccountSummaryListComponent, {static: true}) accountListComponent;
 
-  @ViewChild(MatTabGroup, {static: false}) public tabs: MatTabGroup;
+  @ViewChild(MatTabGroup) public tabs: MatTabGroup;
 
   constructor(
     private backend: BackendService,
