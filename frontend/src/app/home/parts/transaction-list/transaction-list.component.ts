@@ -1,5 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {TableAction, TableColumn, TableColumnType, TableComponent} from 'src/app/table/table.component';
+import {
+  TableAction,
+  TableColumn,
+  TableColumnType,
+  TableComponent,
+  TableGlobalAction
+} from 'src/app/table/table.component';
 import {catchError, map} from 'rxjs/operators';
 import {BackendService} from 'src/app/services/backend.service';
 import {CategoriesService} from 'src/app/services/categories.service';
@@ -7,7 +13,7 @@ import {DialogService} from 'src/app/services/dialog.service';
 import {TransactionModel} from 'src/app/models/transaction.model';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
 import {of} from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';
 import {MenuService} from '../../../menu.service';
@@ -113,6 +119,26 @@ export class TransactionListComponent implements OnInit {
     },
   ];
 
+  public footerActions: TableGlobalAction[] = [
+    {
+      label: 'Create transaction',
+      icon: 'add',
+      onClick: () => {
+        this.dialog.open(TransactionEditComponent, {
+            data: {},
+            width: '700px'
+          },
+          (res) => {
+            if (res) {
+              this.transaction.changes.next();
+            } else {
+              this.snackbar.open('Creating transaction failed');
+            }
+          });
+      },
+    }
+  ];
+
   constructor(
     private backend: BackendService,
     private categories: CategoriesService,
@@ -128,26 +154,6 @@ export class TransactionListComponent implements OnInit {
     this.transaction.changes.subscribe(() => {
       this.table.goToPage(0);
     });
-
-    this.menu.items.next([
-      {
-        label: "Create transaction",
-        matIcon: "add",
-        onClick: () => {
-          this.dialog.open(TransactionEditComponent, {
-              data: {},
-              width: '700px'
-            },
-            (res) => {
-              if (res) {
-                this.transaction.changes.next();
-              } else {
-                this.snackbar.open('Creating transaction failed');
-              }
-            });
-        }
-      }
-    ]);
   }
 
   public getPage = (page, pageSize) => {

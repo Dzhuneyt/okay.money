@@ -31,16 +31,7 @@
       </button>
     </ng-container>
 
-    <!--    <mat-icon [routerLink]="['/profile']" class="navbar-icon" routerLinkActive="true">person</mat-icon>-->
-
-    <button (click)="logout()"
-            *ngIf="isLoggedIn"
-            aria-label="Logout"
-            class="navbar-icon"
-            mat-button>
-      <mat-icon inline="true">exit_to_app</mat-icon>
-      Logout
-    </button>
+    <mat-icon [routerLink]="['/profile']" class="navbar-icon" routerLinkActive="true">person</mat-icon>
 
     <button *ngIf="!isLoggedIn"
             [routerLink]="['/login']"

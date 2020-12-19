@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {of} from 'rxjs';
-import {TableAction, TableColumn, TableComponent} from 'src/app/table/table.component';
+import {TableAction, TableColumn, TableComponent, TableGlobalAction} from 'src/app/table/table.component';
 import {Account} from 'src/app/models/account.model';
 import {catchError, map} from 'rxjs/operators';
 import {BackendService} from 'src/app/services/backend.service';
@@ -39,6 +39,13 @@ export class AccountListComponent implements OnInit {
     },
   ];
   public pageSize = 1000;
+  public footerActions: TableGlobalAction[] = [
+    {
+      label: 'Create account',
+      icon: 'add',
+      onClick: () => this.openCreateAccountDialog(),
+    },
+  ];
   private page = 1;
 
   constructor(
@@ -51,27 +58,6 @@ export class AccountListComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.menuService.items.next([
-      {
-        label: 'Create account',
-        matIcon: 'add',
-        onClick: () => {
-          this.dialogService.open(AccountEditComponent, {
-              data: {},
-              width: '700px'
-            },
-            (res) => {
-              if (res) {
-                this.accountsService.changes.next();
-                this.snackbarService.success('Account created');
-              } else {
-                this.snackbarService.error('Account creation failed');
-              }
-            });
-        }
-      }
-    ]);
-
     this.accountsService.changes.subscribe(() => {
       this.table.goToPage(this.table.currentPage);
     });
@@ -145,6 +131,21 @@ export class AccountListComponent implements OnInit {
           this.table.goToPage(this.table.currentPage);
         } else {
           this.snackbarService.error('Deleting failed');
+        }
+      });
+  }
+
+  private openCreateAccountDialog() {
+    this.dialogService.open(AccountEditComponent, {
+        data: {},
+        width: '700px'
+      },
+      (res) => {
+        if (res) {
+          this.accountsService.changes.next();
+          this.snackbarService.success('Account created');
+        } else {
+          this.snackbarService.error('Account creation failed');
         }
       });
   }

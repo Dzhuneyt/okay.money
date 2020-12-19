@@ -42,29 +42,4 @@ export class HeaderComponent implements OnInit {
     this.menuService.toggle();
   }
 
-  public logout() {
-    this.userService.setIsLoggedIn(false);
-    window.location.reload(); // @TODO figure out why the below doesn't work
-    this.router.navigate(['/login']);
-
-    const absoluteUrl = window.location.origin + this.router.createUrlTree(['/login']);
-    console.log(absoluteUrl);
-  }
-
-  /**
-   * @deprecated
-   */
-  public createTransaction() {
-    this.dialog.open(TransactionEditComponent, {
-        data: {},
-        width: '700px'
-      },
-      (res) => {
-        if (res) {
-          this.transaction.changes.next();
-        } else {
-          this.snackbar.open('Creating transaction failed');
-        }
-      });
-  }
 }

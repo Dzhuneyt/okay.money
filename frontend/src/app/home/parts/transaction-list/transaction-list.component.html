@@ -5,10 +5,11 @@
 <br/>
 <mat-card>
   <app-table
-      #table
-      [actions]="tableActions"
-      [displayedColumns]="displayedColumns"
-      [pageSize]="pageSize"
-      [pagination]="getPage"
+    #table
+    [actions]="tableActions"
+    [footerActions]="footerActions"
+    [displayedColumns]="displayedColumns"
+    [pageSize]="pageSize"
+    [pagination]="getPage"
   ></app-table>
 </mat-card>

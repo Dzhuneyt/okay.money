@@ -48,11 +48,30 @@
 </div>
 
 <!--Hide the pagination when there are no results on the first page -->
-<mat-paginator
+<div
   *ngIf="shouldShowPagination()"
-  [length]="totalCount"
-  [pageSize]="pageSize"
-  [pageSizeOptions]="[]"
-  [hidePageSize]="true"
-  (page)="goToPage($event.pageIndex)">
-</mat-paginator>
+  fxLayout="row" fxLayoutAlign="space-between center" style="margin-top: 2em;">
+  <div fxFlex="1 1 auto" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px grid">
+    <button
+      *ngFor="let action of footerActions"
+      mat-raised-button
+      (click)="action.onClick()"
+      fxFlex="0 1 auto"
+      style="margin-left: 10px; margin-right: 10px;">
+      <mat-icon>{{action.icon}}</mat-icon>
+      {{action.label}}
+    </button>
+  </div>
+  <div
+    fxFlex="0 1 auto">
+    <mat-paginator
+      [length]="totalCount"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[]"
+      [hidePageSize]="true"
+      (page)="goToPage($event.pageIndex)">
+    </mat-paginator>
+  </div>
+
+
+</div>

@@ -28,6 +28,9 @@ export interface TableAction {
   onClick: Function;
 }
 
+export interface TableGlobalAction extends TableAction {
+}
+
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
@@ -44,6 +47,7 @@ export class TableComponent implements OnInit {
   public currentPage = 0;
 
   public isLoading = true;
+  @Input() footerActions: TableGlobalAction[] = [];
 
   constructor() {
   }
