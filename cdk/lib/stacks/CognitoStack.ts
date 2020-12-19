@@ -1,11 +1,10 @@
 import {UserPool} from '@aws-cdk/aws-cognito';
 import {AttributeType, BillingMode, Table} from '@aws-cdk/aws-dynamodb';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
-import {Code} from '@aws-cdk/aws-lambda';
 import {StringParameter} from '@aws-cdk/aws-ssm';
 import {Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
-import * as path from 'path';
-import {Lambda} from '../constructs/Lambda';
+import {LambdaTypescript} from "../constructs/LambdaTypescript";
+import {getPropsByLambdaFilename} from "../constructs/rest/util/getLambdaCode";
 
 interface Props extends StackProps {
 
@@ -44,12 +43,17 @@ export class CognitoStack extends Stack {
             parameterName: '/personalfinance/table/users/arn',
         });
 
-        const fnCreateUser = new Lambda(this, 'fn-create-user', {
-            code: Code.fromAsset(path.resolve(__dirname, '../../dist/lambdas/user-create')),
-            handler: 'index.handler',
+        // Create a utility Lambda for being able to create new users
+        // by calling that Lambda from the AWS console using a payload like:
+        // {username: "test", password: "testtest"}
+        const fnCreateUser = new LambdaTypescript(this, 'fn-create-user', {
+            ...getPropsByLambdaFilename('user-create.ts'),
             timeout: Duration.seconds(10),
+            environment: {
+                COGNITO_USERPOOL_ID: this.userPool.userPoolId,
+                TABLE_NAME_USERS: this.userTable.tableName,
+            }
         });
-        fnCreateUser.addEnvironment('COGNITO_USERPOOL_ID', this.userPool.userPoolId);
         fnCreateUser.addToRolePolicy(new PolicyStatement({
             resources: [this.userPool.userPoolArn],
             actions: [
@@ -57,7 +61,6 @@ export class CognitoStack extends Stack {
                 "cognito-idp:AdminSetUserPassword",
             ]
         }));
-        fnCreateUser.addEnvironment("TABLE_NAME_USERS", this.userTable.tableName);
         this.userTable.grantReadWriteData(fnCreateUser);
     }
 }

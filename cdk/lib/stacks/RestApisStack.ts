@@ -1,6 +1,8 @@
 import {
     AccessLogFormat,
-    AuthorizationType, LogGroupLogDestination, RestApi,
+    AuthorizationType,
+    LogGroupLogDestination,
+    RestApi,
     TokenAuthorizer
 } from '@aws-cdk/aws-apigateway';
 import {CfnUserPoolResourceServer, UserPool} from '@aws-cdk/aws-cognito';
