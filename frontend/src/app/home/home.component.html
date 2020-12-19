@@ -8,14 +8,15 @@
   <mat-card class="example-card" fxFlex="50%" fxGrow="1" fxShrink="0">
     <mat-card-header>
       <mat-card-title>
-        Account balances
+        <h3>Accounts overview</h3>
+        <br/>
       </mat-card-title>
 
-      <span fxFlex fxLayoutAlign="end center">
-        <button (click)="openAddAccountModal()" mat-button>
-          <mat-icon>add_circle</mat-icon>
-        </button>
-      </span>
+      <!--      <span fxFlex fxLayoutAlign="end center">-->
+      <!--        <button (click)="openAddAccountModal()" mat-button>-->
+      <!--          <mat-icon>add_circle</mat-icon>-->
+      <!--        </button>-->
+      <!--      </span>-->
     </mat-card-header>
     <mat-card-content>
       <app-accounts-list #appAccountList></app-accounts-list>
@@ -24,7 +25,12 @@
 
   <mat-card class="example-card" fxFlex="50%" fxGrow="1" fxShrink="1">
     <mat-card-header>
-      <mat-card-title>Cash flow breakdown by category</mat-card-title>
+      <mat-card-title>
+        <h3>Recent spending
+          and
+          income</h3>
+        <br/>
+      </mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <app-stats-by-category></app-stats-by-category>

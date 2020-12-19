@@ -132,43 +132,43 @@ export class StatsByCategoryComponent implements OnInit {
     this.makeFakeChart();
 
 
-    this.backend.request('stats/by_category', 'GET', params).subscribe(apiResult => {
-
-      // Extract and fill category names for each stats object
-      this.categoryInfos = apiResult['categories'].map(cat => {
-        return cat;
-      });
-
-      this.legends.income = this.categoryInfos
-        .filter(elem => {
-          return elem.income_for_period > 0;
-        })
-        .map(elem => elem.name ? elem.name : elem.id);
-      this.legends.expense = this.categoryInfos
-        .filter(elem => {
-          return elem.expense_for_period < 0;
-        })
-        .map(elem => elem.name ? elem.name : elem.id);
-
-      this.dataSets.expenses = [
-        {
-          label: 'Expenses',
-          data: this.categoryInfos
-            .filter(elem => elem.expense_for_period < 0)
-            .map(elem => elem.expense_for_period),
-        }
-      ];
-      this.dataSets.income = [
-        {
-          label: 'Income',
-          data: this.categoryInfos
-            .filter(elem => elem.income_for_period > 0)
-            .map(elem => elem.income_for_period),
-        }
-      ];
-
-      this.toggleChartVisibility(true);
-    });
+    // this.backend.request('stats/by_category', 'GET', params).subscribe(apiResult => {
+    //
+    //   // Extract and fill category names for each stats object
+    //   this.categoryInfos = apiResult['categories'].map(cat => {
+    //     return cat;
+    //   });
+    //
+    //   this.legends.income = this.categoryInfos
+    //     .filter(elem => {
+    //       return elem.income_for_period > 0;
+    //     })
+    //     .map(elem => elem.name ? elem.name : elem.id);
+    //   this.legends.expense = this.categoryInfos
+    //     .filter(elem => {
+    //       return elem.expense_for_period < 0;
+    //     })
+    //     .map(elem => elem.name ? elem.name : elem.id);
+    //
+    //   this.dataSets.expenses = [
+    //     {
+    //       label: 'Expenses',
+    //       data: this.categoryInfos
+    //         .filter(elem => elem.expense_for_period < 0)
+    //         .map(elem => elem.expense_for_period),
+    //     }
+    //   ];
+    //   this.dataSets.income = [
+    //     {
+    //       label: 'Income',
+    //       data: this.categoryInfos
+    //         .filter(elem => elem.income_for_period > 0)
+    //         .map(elem => elem.income_for_period),
+    //     }
+    //   ];
+    //
+    //   this.toggleChartVisibility(true);
+    // });
   }
 
   private formatDate(date: Date) {
