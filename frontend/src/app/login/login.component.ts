@@ -1,17 +1,17 @@
-import {Component, OnInit} from '@angular/core';
-import {BackendService} from "../services/backend.service";
-import {LocalStorage} from "@ngx-pwa/local-storage";
-import {MatSnackBar} from "@angular/material";
-import {Observable, Observer} from "rxjs";
-import {Router} from "@angular/router";
-import {UserService} from "src/app/services/user.service";
+import {Component} from '@angular/core';
+import {BackendService} from '../services/backend.service';
+import {LocalStorage} from '@ngx-pwa/local-storage';
+import {MatSnackBar} from '@angular/material';
+import {Observable, Observer} from 'rxjs';
+import {Router} from '@angular/router';
+import {UserService} from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
 
   username: string;
   password: string;
@@ -22,12 +22,9 @@ export class LoginComponent implements OnInit {
     private backendService: BackendService,
     private userService: UserService,
     private localStorage: LocalStorage,
-    private snackar: MatSnackBar,
+    private snackBar: MatSnackBar,
     private router: Router,
   ) {
-  }
-
-  ngOnInit() {
   }
 
   login(): Observable<boolean> {
@@ -45,19 +42,17 @@ export class LoginComponent implements OnInit {
 
           if (result.hasOwnProperty('errors')) {
             console.error('Login failed with errors', result);
-            this.snackar.open('Login failed');
+            this.snackBar.open('Login failed');
 
             observer.next(false);
             observer.complete();
-
             return;
           }
-
 
           this.userService.setAccessToken(result).subscribe(() => {
             this.userService.setIsLoggedIn(true);
 
-            this.snackar.open('Login successful', null, {
+            this.snackBar.open('Login successful', null, {
               duration: 1000,
             });
 
@@ -68,7 +63,7 @@ export class LoginComponent implements OnInit {
           });
         }, (result) => {
           console.error('Login failed with errors', result);
-          this.snackar.open('Login failed', null, {
+          this.snackBar.open('Login failed', null, {
             duration: 1000,
           });
           this.showSpinner = false;

@@ -10,3 +10,14 @@
 .mat-header-row {
   min-height: 35px;
 }
+
+.loading {
+  width: 100%;
+
+  mat-spinner {
+    // Center spinner
+    margin: auto;
+  }
+}
+
+

@@ -9,7 +9,7 @@ interface Input {
     title: string,
 }
 
-const originalHandler = async (event: IEvent,) => {
+const originalHandler = async (event: IEvent) => {
     try {
         const userId = event.requestContext.authorizer.sub
         const params: Input = JSON.parse(event.body || '{}');

@@ -8,30 +8,30 @@ const originalHandler = async (event: IEvent) => {
     try {
         const userId = event.requestContext.authorizer.sub;
 
-        const transactions = await new DynamoManager(process.env.TABLE_NAME_TRANSACTIONS as string)
+        const allTransactions = await new DynamoManager(process.env.TABLE_NAME_TRANSACTIONS as string)
             .forUser(userId)
             .list() as ITransaction[];
-        const accounts = (await new DynamoManager(process.env.TABLE_NAME as string)
+
+        const accounts = await new DynamoManager(process.env.TABLE_NAME as string)
             .forUser(userId)
-            .list())
-            .map(account => {
-                let balance = 0.00;
-                transactions
-                    .filter(transaction => {
-                        return transaction.account_id === account.id;
-                    })
-                    .forEach(transaction => {
-                        balance += transaction.sum;
-                    });
+            .list();
 
-                account.current_balance = balance;
-                return account;
-            })
+        // Enrich the accounts array with the current balance,
+        // calculated by aggregating all transactions for this account
+        const response = accounts.map(account => {
+            let balance = 0.00;
+            allTransactions
+                .filter(transaction => transaction.account_id === account.id)
+                .forEach(transaction => {
+                    balance += transaction.sum;
+                });
 
-
+            account.current_balance = balance;
+            return account;
+        });
         return {
             statusCode: 200,
-            body: JSON.stringify(accounts),
+            body: JSON.stringify(response),
         }
     } catch (e) {
         return {

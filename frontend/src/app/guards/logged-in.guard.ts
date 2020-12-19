@@ -22,7 +22,7 @@ export class LoggedInGuard implements CanActivate {
       this.user.restoreUserState().subscribe(() => {
         // Don't allow anonymous users here
         // This route allows only logged in users
-        if (this.user.loginStageChanges.getValue().loggedIn) {
+        if (this.user.loginStateChanges.getValue().loggedIn) {
           observer.next(true);
         } else {
           observer.next(false);

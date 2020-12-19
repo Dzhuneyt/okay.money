@@ -41,7 +41,6 @@ export class BackendService {
               this.localStorage.removeItem('access_token').subscribe(() => {
                 this.router.navigate(['/login']);
               });
-
             }
             throw err;
           })

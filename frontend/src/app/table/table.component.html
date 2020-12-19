@@ -40,13 +40,16 @@
   <!--Don't touch these. They are just "definitions"-->
 </mat-table>
 
-<div *ngIf="!currentPageItems.length">
+<div *ngIf="isLoading" class="loading">
+  <mat-spinner></mat-spinner>
+</div>
+<div *ngIf="!currentPageItems.length && !isLoading">
   No results
 </div>
 
 <!--Hide the pagination when there are no results on the first page -->
 <mat-paginator
-  *ngIf="!(currentPage===0 && !currentPageItems.length)"
+  *ngIf="shouldShowPagination()"
   [length]="totalCount"
   [pageSize]="pageSize"
   [pageSizeOptions]="[]"

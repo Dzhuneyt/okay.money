@@ -4,7 +4,7 @@
       <canvas *ngIf="showChart.expense"
               [chartType]="'doughnut'"
               [datasets]="this.dataSets.expenses"
-              [labels]="legends.expsense"
+              [labels]="legends.expense"
               [options]="chartOptions"
               baseChart></canvas>
     </mat-tab>
@@ -21,7 +21,7 @@
   <br/>
   <mat-form-field fxLayout fxLayoutAlign="center center">
     <mat-select
-      (selectionChange)="statsPeriodChange($event.value)"
+      (selectionChange)="changePeriod($event.value)"
       [value]="'weekly'"
     >
       <mat-option value="weekly">Last 7 days</mat-option>

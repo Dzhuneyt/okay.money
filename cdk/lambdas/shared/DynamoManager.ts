@@ -16,7 +16,6 @@ export class DynamoManager {
     }
 
     async list() {
-
         if (!this.userId) {
             throw new Error(`userId not provided for listing`);
         }
@@ -35,9 +34,10 @@ export class DynamoManager {
             throw new Error(result.$response.error.message);
         }
 
-        return !result.Items ? [] : result.Items.map(value =>
-            AWS.DynamoDB.Converter.unmarshall(value)
-        );
+        if (!result.Items) {
+            return [];
+        }
+        return result.Items.map(value => AWS.DynamoDB.Converter.unmarshall(value));
     }
 
     async getOne(id: string) {

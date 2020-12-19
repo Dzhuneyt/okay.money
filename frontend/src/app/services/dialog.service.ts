@@ -20,6 +20,7 @@ export class DialogService {
     config?: MatDialogConfig<any>,
     onDialogClose?: (result: any) => any,
   ) {
+
     const dialogRef = this.dialog.open(componentOrTemplateRef, config);
 
     // Subscribe for dialog closing and propagate the value

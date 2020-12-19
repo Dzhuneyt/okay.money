@@ -29,9 +29,9 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.userService.loginStageChanges.pipe(
-      tap(val => {
-        console.log(val);
+    this.userService.loginStateChanges.pipe(
+      tap(state => {
+        console.log(state);
       }),
     ).subscribe(data => (this.isLoggedIn = data.loggedIn));
 
@@ -46,6 +46,9 @@ export class HeaderComponent implements OnInit {
     this.userService.setIsLoggedIn(false);
     window.location.reload(); // @TODO figure out why the below doesn't work
     this.router.navigate(['/login']);
+
+    const absoluteUrl = window.location.origin + this.router.createUrlTree(['/login']);
+    console.log(absoluteUrl);
   }
 
   /**

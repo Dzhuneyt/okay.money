@@ -50,8 +50,6 @@ export class StatsByCategoryComponent implements OnInit {
 
   // Static param
   public readonly chartOptions = chartOptions;
-  private categoryInfos: CategoryStats[] = [];
-
   /**
    * Boolean flags used in *ngIf to decide whether or not to show a given chart
    */
@@ -59,14 +57,14 @@ export class StatsByCategoryComponent implements OnInit {
     income: false,
     expense: false,
   };
-
   /**
    * Holds the "legends" for both charts
    */
   public legends = {
     income: [],
-    expsense: [],
+    expense: [],
   };
+  private categoryInfos: CategoryStats[] = [];
 
   constructor(
     private elementRef: ChangeDetectorRef,
@@ -75,18 +73,18 @@ export class StatsByCategoryComponent implements OnInit {
   ) {
   }
 
-  ngOnInit() {
-    this.statsPeriodChange('weekly');
+  get hasData() {
+    return (this.legends.income && this.legends.income.length > 0) || (this.legends.expense && this.legends.expense.length > 0);
   }
 
-  categoryStatsLabels() {
-    return this.categoryInfos.map(elem => elem.name ? elem.name : elem.id);
+  ngOnInit() {
+    this.changePeriod('weekly');
   }
 
   /**
    * Triggered when the user changes the "period" dropdown
    */
-  public statsPeriodChange(value: 'monthly' | 'weekly' | 'half_year') {
+  public changePeriod(value: 'monthly' | 'weekly' | 'half_year') {
     let startDate = null;
     let endDate = null;
 
@@ -110,23 +108,17 @@ export class StatsByCategoryComponent implements OnInit {
 
     console.log(startDate, endDate);
 
-    this.getStatsByCategory(startDate, endDate);
+    this.refresh(startDate, endDate);
   }
 
-  private toggleCharts(show: boolean = null) {
-    if (show === null) {
-      this.showChart.income = !this.showChart.income;
-      this.showChart.expense = !this.showChart.expense;
-      return;
-    } else {
-      this.showChart.income = show;
-      this.showChart.expense = show;
-    }
+  private toggleChartVisibility(show: boolean = false) {
+    this.showChart.income = show;
+    this.showChart.expense = show;
     this.elementRef.detectChanges();
   }
 
-  private getStatsByCategory(startDate: Date = null, endDate: Date = null) {
-    this.toggleCharts(false);
+  private refresh(startDate: Date = null, endDate: Date = null) {
+    this.toggleChartVisibility(false);
 
     const params = {};
 
@@ -136,6 +128,10 @@ export class StatsByCategoryComponent implements OnInit {
     if (endDate !== null) {
       params['end_date'] = this.formatDate(endDate);
     }
+
+    this.makeFakeChart();
+
+
     this.backend.request('stats/by_category', 'GET', params).subscribe(apiResult => {
 
       // Extract and fill category names for each stats object
@@ -148,7 +144,7 @@ export class StatsByCategoryComponent implements OnInit {
           return elem.income_for_period > 0;
         })
         .map(elem => elem.name ? elem.name : elem.id);
-      this.legends.expsense = this.categoryInfos
+      this.legends.expense = this.categoryInfos
         .filter(elem => {
           return elem.expense_for_period < 0;
         })
@@ -171,7 +167,7 @@ export class StatsByCategoryComponent implements OnInit {
         }
       ];
 
-      this.toggleCharts(true);
+      this.toggleChartVisibility(true);
     });
   }
 
@@ -186,7 +182,44 @@ export class StatsByCategoryComponent implements OnInit {
     //   ('00' + d.getSeconds()).slice(-2);
   }
 
-  get hasData() {
-    return (this.legends.income && this.legends.income.length > 0) || (this.legends.expsense && this.legends.expsense.length > 0);
+  private makeFakeChart() {
+    this.categoryInfos = [
+      {
+        id: 1,
+        name: 'Food',
+        expense_for_period: 100,
+        income_for_period: 13,
+      },
+      {
+        id: 2,
+        name: 'Clothes',
+        expense_for_period: 100,
+        income_for_period: 13,
+      },
+    ];
+
+    this.legends.income = [
+      'Food',
+      'Clothes',
+    ];
+
+    this.legends.expense = [
+      'Food',
+      'Clothes',
+    ];
+
+    this.dataSets.expenses = [
+      {
+        label: 'Expenses',
+        data: [10, 20],
+      }
+    ];
+    this.dataSets.income = [
+      {
+        label: 'Income',
+        data: [10, 20],
+      }
+    ];
+    this.toggleChartVisibility(true);
   }
 }

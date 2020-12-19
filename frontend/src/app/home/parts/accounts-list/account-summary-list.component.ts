@@ -48,10 +48,10 @@ export class AccountSummaryListComponent implements OnInit {
           return {
             items: result,
             totalCount: result.length,
-          }
+          };
         })
       );
-  };
+  }
 
   ngOnInit() {
 

@@ -21,7 +21,7 @@ export class AnonymousUserGuard implements CanActivate {
     state: RouterStateSnapshot): Observable<boolean> {
     return new Observable<boolean>((observer: Observer<boolean>) => {
       this.user.restoreUserState().subscribe(() => {
-        if (this.user.loginStageChanges.getValue().loggedIn) {
+        if (this.user.loginStateChanges.getValue().loggedIn) {
           // Don't allow logged in users to this route
           // This route is only for anonymous users
           observer.next(false);

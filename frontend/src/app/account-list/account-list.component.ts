@@ -6,27 +6,10 @@ import {catchError, map} from 'rxjs/operators';
 import {BackendService} from 'src/app/services/backend.service';
 import {DialogService} from 'src/app/services/dialog.service';
 import {AccountEditComponent} from 'src/app/account-edit/account-edit.component';
-import {MatSnackBar} from '@angular/material';
 import {DeleteConfirmComponent} from '../delete-confirm/delete-confirm.component';
 import {MenuService} from '../menu.service';
 import {AccountsService} from '../services/accounts.service';
-
-const columns = [
-  {
-    label: 'Account Name',
-    code: 'name',
-    renderer: (account: Account) => {
-      return account.title;
-    }
-  },
-  {
-    label: 'Current Balance',
-    code: 'current_balance',
-    renderer: (element: Account) => {
-      return element.current_balance;
-    }
-  },
-];
+import {SnackbarService} from '../services/snackbar.service';
 
 @Component({
   selector: 'app-account-list',
@@ -35,94 +18,62 @@ const columns = [
 })
 export class AccountListComponent implements OnInit {
 
-  private page: number = 1;
+  @ViewChild(TableComponent, {static: true}) table: TableComponent;
 
+  public displayedColumns: TableColumn[] = [
+    {
+      label: 'Account Name',
+      code: 'title',
+    },
+  ];
   public tableActions: TableAction[] = [
     {
       label: 'Edit',
       icon: 'edit',
-      onClick: (account: Account) => {
-        this.dialog.open(AccountEditComponent, {
-            data: {
-              id: account.id,
-            },
-            width: '700px'
-          },
-          (res) => {
-            if (res) {
-              this.table.goToPage(this.table.currentPage);
-              // Refresh the table
-            } else {
-              this.snackbar.open('Editing failed');
-            }
-          });
-      }
+      onClick: (account: Account) => this.openEditAccountDialog(account)
     },
     {
       label: 'Delete',
       icon: 'delete',
-      onClick: (account: Account) => {
-        this.dialog.open(DeleteConfirmComponent, {
-            data: {
-              title: 'Are you sure you want to delete this account? All transactions inside will be deleted permanently.',
-              onConfirm: () => {
-                return this.backend.request('account/' + account.id, 'DELETE').pipe(
-                  catchError(err => {
-                    console.error(err);
-                    return of(false);
-                  })
-                );
-              },
-            },
-          },
-          (res) => {
-            if (res) {
-              // Refresh the table
-              this.snackbar.open('Deleted');
-              this.table.goToPage(this.table.currentPage);
-            } else {
-              this.snackbar.open('Deleting failed');
-            }
-          });
-      }
+      onClick: (account: Account) => this.openDeleteAccountDialog(account),
     },
   ];
-  public displayedColumns: TableColumn[] = columns;
-  @ViewChild(TableComponent, {static: true}) table: TableComponent;
   public pageSize = 1000;
+  private page = 1;
 
   constructor(
-    private backend: BackendService,
-    private dialog: DialogService,
-    private snackbar: MatSnackBar,
-    private menu: MenuService,
-    private account: AccountsService,
+    private backendService: BackendService,
+    private dialogService: DialogService,
+    private snackbarService: SnackbarService,
+    private menuService: MenuService,
+    private accountsService: AccountsService,
   ) {
   }
 
   ngOnInit() {
 
-    this.menu.items.next([
+    this.menuService.items.next([
       {
-        label: "Create account",
-        matIcon: "add",
+        label: 'Create account',
+        matIcon: 'add',
         onClick: () => {
-          this.dialog.open(AccountEditComponent, {
+          this.dialogService.open(AccountEditComponent, {
               data: {},
               width: '700px'
             },
             (res) => {
               if (res) {
-                this.account.changes.next();
+                this.accountsService.changes.next();
+                this.snackbarService.success('Account created');
               } else {
-                this.snackbar.open('Creating transaction failed');
+                this.snackbarService.error('Account creation failed');
               }
             });
         }
       }
     ]);
 
-    this.account.changes.subscribe(() => {
+    this.accountsService.changes.subscribe(() => {
       this.table.goToPage(this.table.currentPage);
     });
   }
@@ -131,7 +82,7 @@ export class AccountListComponent implements OnInit {
     this.page = page;
 
     let totalCount;
-    return this.backend
+    return this.backendService
       .request(
         'account',
         'get',
@@ -154,7 +105,48 @@ export class AccountListComponent implements OnInit {
           };
         })
       );
-
   }
 
+  private openEditAccountDialog(account: Account) {
+    this.dialogService.open(AccountEditComponent, {
+        data: {
+          id: account.id,
+        },
+        width: '700px'
+      },
+      (res) => {
+        if (res) {
+          // Refresh the table
+          this.table.goToPage(this.table.currentPage);
+          this.snackbarService.success('Account modified');
+        } else {
+          this.snackbarService.error('Editing failed');
+        }
+      });
+  }
+
+  private openDeleteAccountDialog(account: Account) {
+    this.dialogService.open(DeleteConfirmComponent, {
+        data: {
+          title: 'Are you sure you want to delete this account? All transactions inside will be deleted permanently.',
+          onConfirm: () => {
+            return this.backendService.request('account/' + account.id, 'DELETE').pipe(
+              catchError(err => {
+                console.error(err);
+                return of(false);
+              })
+            );
+          },
+        },
+      },
+      (res) => {
+        if (res) {
+          // Refresh the table
+          this.snackbarService.success('Deleted');
+          this.table.goToPage(this.table.currentPage);
+        } else {
+          this.snackbarService.error('Deleting failed');
+        }
+      });
+  }
 }

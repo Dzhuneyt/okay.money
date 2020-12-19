@@ -13,7 +13,7 @@ export interface MenuItem {
 })
 export class MenuService {
 
-  public isOpened = true;
+  public isOpened = false;
 
   public items = new BehaviorSubject<MenuItem[]>([]);
 

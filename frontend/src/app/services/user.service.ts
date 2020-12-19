@@ -8,7 +8,7 @@ import {take} from 'rxjs/operators';
 })
 export class UserService {
 
-  public loginStageChanges = new BehaviorSubject<{
+  public loginStateChanges = new BehaviorSubject<{
     loggedIn: boolean,
     userId?: number,
   }>({
@@ -23,7 +23,7 @@ export class UserService {
   public restoreUserState() {
     return new Observable(observer => {
       // fill the initial value on app boot time
-      if (!this.loginStageChanges.getValue().loggedIn) {
+      if (!this.loginStateChanges.getValue().loggedIn) {
         this.localStorage.getItem('access_token')
           .pipe(take(1))
           .subscribe(res => {
@@ -54,18 +54,18 @@ export class UserService {
     });
   }
 
-  public setIsLoggedIn(newValue: boolean = null): void {
-    switch (newValue) {
+  public setIsLoggedIn(isLoggedIn: boolean = null): void {
+    switch (isLoggedIn) {
       case true:
         // Login
-        this.loginStageChanges.next({
+        this.loginStateChanges.next({
           loggedIn: true,
         });
         break;
       case false:
         // Logout
         this.localStorage.removeItem('access_token').subscribe(() => {
-          this.loginStageChanges.next({
+          this.loginStateChanges.next({
             loggedIn: false,
           });
         });
@@ -74,6 +74,6 @@ export class UserService {
   }
 
   public getLoginStageChanges() {
-    return this.loginStageChanges;
+    return this.loginStateChanges;
   }
 }
