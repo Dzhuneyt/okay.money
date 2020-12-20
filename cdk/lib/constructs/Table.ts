@@ -2,6 +2,7 @@ import {TableProps} from '@aws-cdk/aws-dynamodb/lib/table';
 import {Construct, RemovalPolicy} from '@aws-cdk/core';
 import {AttributeType, BillingMode, Table as BaseTable} from '@aws-cdk/aws-dynamodb';
 
+// @TODO for production, prefer to keep tables
 const removalPolicy = RemovalPolicy.DESTROY;
 
 export class Table extends BaseTable {

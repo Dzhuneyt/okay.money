@@ -1,169 +1,70 @@
-import * as AWS from 'aws-sdk';
-import {CognitoIdentityServiceProvider, DynamoDB} from 'aws-sdk';
-import {AttributeType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
-import {v4 as uuidv4} from 'uuid';
 import {IEvent} from './interfaces/IEvent';
 import {Handler} from './shared/Handler';
-import {TableNames} from './shared/TableNames';
+import {v4} from 'uuid';
+import {DynamoDB} from "aws-sdk";
+import {MailDataRequired} from "@sendgrid/helpers/classes/mail";
 
-async function createDefaultCategories(userId: string) {
-    const tableName = await TableNames.categories();
-    const dynamo = new AWS.DynamoDB();
-    for (const categoryName of [
-        'Other',
-        'Food',
-        'Clothes',
-        'Entertainment',
-    ]) {
-        const uuid = uuidv4();
-        const result = await dynamo.putItem({
-            TableName: tableName,
-            Item: DynamoDB.Converter.marshall({
-                id: uuid,
-                author_id: userId,
-                title: categoryName,
-            }),
-        }).promise();
-        if (result.$response.error) {
-            throw new Error(result.$response.error.message);
-        }
-    }
+const sendgrid = require('@sendgrid/mail');
+const SENDGRID_API_KEY = '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';
 
-    return true;
-}
-
-async function createDefaultAccount(userId: string) {
-    const tableName = await TableNames.accounts();
-    const dynamo = new AWS.DynamoDB();
-
-    for (const account of [
-        'Cash at hand',
-        'Bank account',
-    ]) {
-        const uuid = uuidv4();
-        const result = await dynamo.putItem({
-            TableName: tableName,
-            Item: DynamoDB.Converter.marshall({
-                id: uuid,
-                author_id: userId,
-                title: account,
-            }),
-        }).promise();
-        if (result.$response.error) {
-            throw new Error(result.$response.error.message);
-        }
-    }
-
-    return true;
-}
-
-async function userExistsInPool(username: string, userPoolId: string) {
-    try {
-        const oldUser = await new CognitoIdentityServiceProvider()
-            .adminGetUser({
-                UserPoolId: userPoolId,
-                Username: username,
-            }).promise();
-        return !!oldUser.Username;
-    } catch (e) {
-        if (e.toString().includes('UserNotFoundException')) {
-            return false;
-        }
-        throw e;
-    }
-}
+sendgrid.setApiKey(SENDGRID_API_KEY);
 
 export const handler = new Handler(async (event: IEvent) => {
-    const dynamodb = new DynamoDB();
-    const cognito = new AWS.CognitoIdentityServiceProvider();
-
-    if (!process.env.COGNITO_USERPOOL_ID) {
-        return {
-            statusCode: 500,
-            body: "Invalid configuration"
-        };
-    }
-
-    const userPoolId = process.env.COGNITO_USERPOOL_ID as string;
     try {
         const body: {
-            username?: string,
-            password?: string,
+            email: string,
         } = event.body ? JSON.parse(event.body) : {};
 
-        if (!body.username || !body.password) {
-            throw new Error(`Username or Password not provided`);
-        }
-
-        if (body.password.length < 6) {
-            throw new Error(`Password must be longer than 6 characters`);
-        }
-
-        const exists = await userExistsInPool(body.username, userPoolId);
-
-        if (exists) {
+        if (!body.email) {
             return {
                 statusCode: 400,
                 body: JSON.stringify({
-                    message: 'User already exists',
+                    message: 'Email is invalid',
                 })
-            }
+            };
         }
 
-        const cognitoUserCreated = await cognito.adminCreateUser({
-            UserPoolId: userPoolId,
-            Username: body.username,
-            TemporaryPassword: body.password,
-            MessageAction: 'SUPPRESS',
-        }).promise();
+        const uuid = v4();
 
-        const cognitoChangePassword = await cognito.adminSetUserPassword({
-            Permanent: true,
-            Username: body.username,
-            Password: body.password,
-            UserPoolId: userPoolId,
-        }).promise();
-
-        if (!cognitoUserCreated.User?.Username || cognitoChangePassword.$response.error) {
-            console.error(cognitoUserCreated.$response);
-            console.error(cognitoChangePassword.$response);
-            throw new Error(`Can not create Cognito user`);
-        }
-
-        console.log('User created in Cognito', body);
-
-        const sub = cognitoUserCreated.User
-            ?.Attributes
-            ?.find((value: AttributeType) => {
-                return value.Name === 'sub';
-            })?.Value;
-
-        if (!sub) {
-            throw new Error(`Failed to create Cognito user`);
-        }
-        console.log('sub', sub);
-
-        await dynamodb.putItem({
-            TableName: await TableNames.users(),
+        await new DynamoDB().putItem({
+            TableName: process.env.TABLE_NAME_TOKENS as string,
             Item: DynamoDB.Converter.marshall({
-                ...cognitoUserCreated.User,
-                id: sub,
+                id: uuid,
+                email: body.email,
+                // Expires in 7 days
+                expires: new Date().getTime() + 3600 * 24 * 7,
             }),
         }).promise();
 
-        // Create default things for this newly created user
-        await createDefaultCategories(sub);
-        await createDefaultAccount(sub);
+        const link = `http://localhost:3000/register?token=${uuid}`;
+
+        const msg: MailDataRequired = {
+            // Prevent emails from ending up in spam, by disabling link cloaking
+            // and embedding a pixel image inside email HTML
+            trackingSettings: {
+                clickTracking: {enable: false},
+                ganalytics: {enable: false},
+                openTracking: {enable: false},
+                subscriptionTracking: {enable: false},
+            },
+            to: body.email, // Change to your recipient
+            from: 'no-reply-registration@em5577.dzhuneyt.com', // Change to your verified sender
+            subject: 'Registration confirmation',
+            text: `Please visit this link to confirm your email: \n${link}\n\nNote that the link expires in 7 days.`,
+            html: `Please <a href="${link}">click here</a> to confirm your email. The link will expire in 7 days.`,
+        }
+        const emailResult = await sendgrid
+            .send(msg);
+
+        console.log(emailResult);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
-                id: sub,
+                success: true,
             })
         }
     } catch (e) {
-        console.log('Failed to create a user');
-        console.log(e);
         return {
             statusCode: 500,
             body: e.toString(),

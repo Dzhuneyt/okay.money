@@ -31,6 +31,7 @@
     "@aws-cdk/aws-logs": "^1.79.0",
     "@aws-cdk/aws-ssm": "^1.79.0",
     "@aws-cdk/core": "^1.79.0",
+    "@sendgrid/mail": "^7.4.0",
     "@types/uuid": "^7.0.4",
     "aws-sdk": "^2.814.0",
     "class-validator": "^0.12.2",

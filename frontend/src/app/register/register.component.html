@@ -1,4 +1,55 @@
-<form [formGroup]="form" class="example-form">
+<form
+  *ngIf="token$ | async"
+  [formGroup]="formWithToken" class="example-form"
+>
+  <mat-card class="example-card">
+    <h2>Finish registration</h2>
+    <mat-card-content>
+      <div fxLayout="column">
+        <mat-form-field fxFlex>
+          <label>
+            <input
+              [formControlName]="'password'"
+              matInput
+              name="password"
+              placeholder="Password"
+              required>
+          </label>
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <label>
+            <input
+              [formControlName]="'passwordRepeat'"
+              matInput
+              name="password_repeat"
+              placeholder="Repeat the password"
+              required>
+          </label>
+        </mat-form-field>
+      </div>
+      <mat-spinner [style.display]="showSpinner ? 'block' : 'none'"></mat-spinner>
+    </mat-card-content>
+    <mat-card-actions style="text-align: center;">
+      <button
+        type="button"
+        (click)="confirmRegistration().subscribe()" color="primary" mat-raised-button>Register
+      </button>
+    </mat-card-actions>
+    <mat-card-actions style="text-align: center;">
+      <p>
+        Already registered?
+      </p>
+      <button
+        type="button"
+        [routerLink]="['/login']" color="info" mat-raised-button>Login
+      </button>
+      <p>&nbsp;</p>
+    </mat-card-actions>
+  </mat-card>
+</form>
+<form
+  *ngIf="!(token$ | async)"
+  [formGroup]="form" class="example-form">
   <mat-card class="example-card">
     <h2>Register</h2>
     <mat-card-content>
@@ -7,23 +58,11 @@
           <td>
             <mat-form-field class="example-full-width">
               <input
-                [formControlName]="'username'"
-                matInput name="username"
-                placeholder="Username"
+                [formControlName]="'email'"
+                matInput
+                name="email"
+                placeholder="Email"
                 required
-              >
-            </mat-form-field>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <mat-form-field class="example-full-width">
-              <input [formControlName]="'password'"
-                     matInput
-                     name="password"
-                     placeholder="Password"
-                     required
-                     type="password"
               >
             </mat-form-field>
           </td>
