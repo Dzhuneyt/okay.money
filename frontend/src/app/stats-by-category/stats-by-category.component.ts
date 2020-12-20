@@ -129,9 +129,49 @@ export class StatsByCategoryComponent implements OnInit {
       params['end_date'] = this.formatDate(endDate);
     }
 
-    this.makeFakeChart();
+    // this.makeFakeChart();
 
+    this.backend.request('stats/by_category', 'GET')
+      .subscribe((apiResult: {
+        id: string,
+        name: string,
+        income_for_period: number,
+        expense_for_period: number,
+      }[]) => {
+        console.log(apiResult);
 
+        this.legends.income = apiResult
+          .filter(elem => {
+            return elem.income_for_period > 0;
+          })
+          .map(elem => elem.name ? elem.name : elem.id);
+
+        this.legends.expense = apiResult
+          .filter(elem => {
+            return elem.expense_for_period < 0;
+          })
+          .map(elem => elem.name ? elem.name : elem.id);
+
+        this.dataSets.income = [
+          {
+            label: 'Income',
+            data: apiResult
+              .filter(elem => elem.income_for_period > 0)
+              .map(elem => elem.income_for_period),
+          }
+        ];
+
+        this.dataSets.expenses = [
+          {
+            label: 'Expenses',
+            data: apiResult
+              .filter(elem => elem.expense_for_period < 0)
+              .map(elem => Math.abs(elem.expense_for_period)),
+          }
+        ];
+
+        this.toggleChartVisibility(true);
+      });
     // this.backend.request('stats/by_category', 'GET', params).subscribe(apiResult => {
     //
     //   // Extract and fill category names for each stats object

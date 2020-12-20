@@ -13,7 +13,7 @@ import {LogGroup, RetentionDays} from '@aws-cdk/aws-logs';
 import * as cdk from '@aws-cdk/core';
 import {CfnOutput, Duration, RemovalPolicy, StackProps} from '@aws-cdk/core';
 import {LambdaTypescript} from '../constructs/LambdaTypescript';
-import {Account} from '../constructs/rest/Account';
+import {Account} from '../constructs/rest/account/Account';
 import {Category} from '../constructs/rest/category/Category';
 import {GatewayResponseMapper} from '../constructs/rest/GatewayResponseMapper';
 import {Stats} from '../constructs/rest/Stats';

@@ -1,11 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {
-  TableAction,
-  TableColumn,
-  TableColumnType,
-  TableComponent,
-  TableGlobalAction
-} from 'src/app/table/table.component';
+import {TableAction, TableColumn, TableComponent, TableGlobalAction} from 'src/app/table/table.component';
 import {catchError, map} from 'rxjs/operators';
 import {BackendService} from 'src/app/services/backend.service';
 import {CategoriesService} from 'src/app/services/categories.service';
@@ -13,47 +7,10 @@ import {DialogService} from 'src/app/services/dialog.service';
 import {TransactionModel} from 'src/app/models/transaction.model';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
 import {of} from 'rxjs';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';
-import {MenuService} from '../../../menu.service';
-
-const columns = [
-  {
-    label: 'Date',
-    code: 'created_at',
-    type: TableColumnType.dateTime,
-  },
-  {
-    label: 'Amount',
-    code: 'sum',
-    renderer: (element: TransactionModel) => {
-      if (element.sum > 0) {
-        return '<span class="green-text">+' + Math.abs(element.sum) + '</span>';
-      } else {
-        return '<span class="red-text">-' + Math.abs(element.sum) + '</span>';
-      }
-    }
-  },
-  {
-    label: 'Category',
-    code: 'category_name',
-    renderer: (element: TransactionModel) => {
-      return element.category.title;
-    }
-  },
-  {
-    label: 'Account',
-    code: 'account_name',
-    renderer: (element: TransactionModel) => {
-      return element.account.title;
-    }
-  },
-  {
-    label: 'Description',
-    code: 'description',
-  },
-];
+import {SnackbarService} from '../../../services/snackbar.service';
+import {TransactionListColumns} from './transaction-list.columns';
 
 @Component({
   selector: 'app-transaction-list',
@@ -62,11 +19,11 @@ const columns = [
 })
 export class TransactionListComponent implements OnInit {
 
-  public pageSize = 10000;
+  public pageSize = 10000; // @TODO fix pagination
 
   @ViewChild(TableComponent, {static: true}) table: TableComponent;
 
-  public displayedColumns: TableColumn[] = columns;
+  public displayedColumns: TableColumn[] = TransactionListColumns;
 
   public tableActions: TableAction[] = [
     {
@@ -83,8 +40,8 @@ export class TransactionListComponent implements OnInit {
             if (res) {
               this.table.goToPage(this.table.currentPage);
               // Refresh the table
-            } else {
-              this.snackbar.open('Editing failed');
+            } else if (res === false) {
+              this.snackbarService.error('Editing failed');
             }
           });
       }
@@ -109,10 +66,10 @@ export class TransactionListComponent implements OnInit {
           (res) => {
             if (res) {
               // Refresh the table
-              this.snackbar.open('Deleted');
+              this.snackbarService.success('Deleted');
               this.table.goToPage(this.table.currentPage);
-            } else {
-              this.snackbar.open('Deleting failed');
+            } else if (res === false) {
+              this.snackbarService.error('Delete failed');
             }
           });
       }
@@ -131,8 +88,8 @@ export class TransactionListComponent implements OnInit {
           (res) => {
             if (res) {
               this.transaction.changes.next();
-            } else {
-              this.snackbar.open('Creating transaction failed');
+            } else if (res === false) {
+              this.snackbarService.error('Creating failed');
             }
           });
       },
@@ -143,9 +100,8 @@ export class TransactionListComponent implements OnInit {
     private backend: BackendService,
     private categories: CategoriesService,
     private dialog: DialogService,
-    private snackbar: MatSnackBar,
     private transaction: TransactionService,
-    private menu: MenuService,
+    private snackbarService: SnackbarService,
   ) {
   }
 

@@ -1,9 +1,9 @@
 import {RestApi, TokenAuthorizer} from '@aws-cdk/aws-apigateway';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {Construct} from '@aws-cdk/core';
-import {LambdaIntegration} from '../LambdaIntegration';
-import {LambdaTypescript} from '../LambdaTypescript';
-import {getPropsByLambdaFilename} from './util/getLambdaCode';
+import {LambdaIntegration} from '../../LambdaIntegration';
+import {LambdaTypescript} from '../../LambdaTypescript';
+import {getPropsByLambdaFilename} from '../util/getLambdaCode';
 
 export class Account extends Construct {
     private readonly authorizer: TokenAuthorizer;

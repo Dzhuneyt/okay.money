@@ -9,39 +9,67 @@ interface Input {
     end_date: number;
 }
 
-async function organizeTransactionsUnderCategories(transactions: ITransaction[], userId: string) {
+class StatsByCategory {
+    private categories: any[];
+
+    constructor(private userId: string) {
+    }
+
+    async getCategories() {
+        if (this.categories === undefined) {
+            this.categories = await new DynamoManager(await TableNames.categories())
+                .forUser(this.userId)
+                .list();
+        }
+        return this.categories;
+    }
+}
+
+const organizeTransactionsUnderCategories = async (transactions: ITransaction[], userId: string) => {
     const allCategories = await new DynamoManager(await TableNames.categories())
         .forUser(userId)
-        .list()
+        .list();
 
     const filteredCategories = allCategories
-        .filter(cat => {
-            // Filter categories only to those that have at least one transaction
-            return transactions.find(trans => trans.category_id === cat.id);
-        });
+        // Filter categories only to those that have at least one transaction
+        .filter(cat => !!transactions.find(transaction => transaction.category_id == cat.id));
 
     return filteredCategories.map(cat => {
+        let income_for_period = 0;
+        transactions.filter(tr => {
+            return tr.category_id == cat.id && tr.sum > 0;
+        }).map(tr => {
+            income_for_period += tr.sum;
+        });
+
+        let expense_for_period = 0;
+        transactions.filter(tr => {
+            return tr.category_id == cat.id && tr.sum < 0;
+        }).map(tr => {
+            expense_for_period += tr.sum;
+        });
+
         return {
             id: cat.id,
             name: cat.title,
-            income_for_period: 13,
-            expense_for_period: -25,
-            difference_for_period: 13 + -25,
+            income_for_period,
+            expense_for_period,
+            difference_for_period: income_for_period + expense_for_period,
         };
     });
-}
+};
 
 export const handler = new Handler(async (event: IEvent) => {
 
     try {
-        const params: Input = JSON.parse(event.body || '{}');
         const userId = event.requestContext.authorizer.sub;
 
-        const allTransactions = await new DynamoManager(await TableNames.accounts())
+        const allTransactions = await new DynamoManager(await TableNames.transactions())
             .forUser(userId)
             .list() as ITransaction[];
+        console.log('transactions count', allTransactions.length);
 
-        const response = organizeTransactionsUnderCategories(allTransactions, userId);
+        const response = await organizeTransactionsUnderCategories(allTransactions, userId);
 
         return {
             statusCode: 200,

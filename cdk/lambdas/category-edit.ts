@@ -9,7 +9,6 @@ interface CategoryEditInput {
 }
 
 const originalHandler = async (event: IEvent) => {
-
     try {
         const userId = event.requestContext.authorizer.sub;
         const id = event.pathParameters.id;
