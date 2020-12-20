@@ -1,6 +1,6 @@
-import {AttributeType, BillingMode} from '@aws-cdk/aws-dynamodb';
+import {AttributeType} from '@aws-cdk/aws-dynamodb';
 import {StringParameter} from '@aws-cdk/aws-ssm';
-import {Construct, NestedStack, NestedStackProps, RemovalPolicy, Stack, StackProps} from '@aws-cdk/core';
+import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {Table} from '../constructs/Table';
 
 export class DynamoDBStack extends Stack {

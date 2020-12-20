@@ -43,7 +43,7 @@ export class Account extends Construct {
         });
 
         const fnView = new LambdaTypescript(this, 'fn-account-view', {
-            ...getPropsByLambdaFilename('account-view.ts'),
+            ...getPropsByLambdaFilename('genericViewHandle.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }
@@ -65,7 +65,7 @@ export class Account extends Construct {
             });
 
         const fnDelete = new LambdaTypescript(this, 'fn-delete', {
-            ...getPropsByLambdaFilename('account-delete.ts'),
+            ...getPropsByLambdaFilename('genericDeleteHandler.ts'),
             environment: {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }

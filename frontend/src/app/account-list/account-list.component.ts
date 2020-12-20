@@ -141,11 +141,16 @@ export class AccountListComponent implements OnInit {
         width: '700px'
       },
       (res) => {
-        if (res) {
-          this.accountsService.changes.next();
-          this.snackbarService.success('Account created');
-        } else {
-          this.snackbarService.error('Account creation failed');
+        switch (res) {
+          case true:
+            this.accountsService.changes.next();
+            this.snackbarService.success('Account created');
+            break;
+          case false:
+            this.snackbarService.error('Account creation failed');
+            break;
+          default:
+          // Dialog was closed through the cancel button
         }
       });
   }

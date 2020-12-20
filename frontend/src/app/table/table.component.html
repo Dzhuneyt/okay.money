@@ -49,21 +49,37 @@
 
 <!--Hide the pagination when there are no results on the first page -->
 <div
-  *ngIf="shouldShowPagination()"
-  fxLayout="row" fxLayoutAlign="space-between center" style="margin-top: 2em;">
-  <div fxFlex="1 1 auto" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px grid">
-    <button
+  fxLayout="row"
+  fxLayoutAlign="space-between center"
+  fxLayoutGap="1em"
+  class="table-footer"
+>
+  <div
+    fxFlex="1 1 auto"
+    fxLayout="row wrap"
+    fxLayoutAlign="start center"
+    fxLayoutGap="1em"
+    class="footer-actions"
+  >
+    <div
       *ngFor="let action of footerActions"
-      mat-raised-button
-      (click)="action.onClick()"
-      fxFlex="0 1 auto"
-      style="margin-left: 10px; margin-right: 10px;">
-      <mat-icon>{{action.icon}}</mat-icon>
-      {{action.label}}
-    </button>
+      class="button-wrapper"
+    >
+      <button
+        mat-raised-button
+        (click)="action.onClick()"
+        fxFlex
+      >
+        <mat-icon>{{action.icon}}</mat-icon>
+        {{action.label}}
+      </button>
+    </div>
+
   </div>
   <div
-    fxFlex="0 1 auto">
+    *ngIf="shouldShowPagination()"
+    fxFlex="0 0 auto"
+  >
     <mat-paginator
       [length]="totalCount"
       [pageSize]="pageSize"
@@ -72,6 +88,6 @@
       (page)="goToPage($event.pageIndex)">
     </mat-paginator>
   </div>
-
-
 </div>
+<!-- Break row, so next containers are not affected by fxFlex -->
+<div fxLayout="row wrap"></div>

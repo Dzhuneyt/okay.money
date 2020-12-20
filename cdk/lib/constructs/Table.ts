@@ -1,4 +1,4 @@
-import {Attribute, TableProps} from '@aws-cdk/aws-dynamodb/lib/table';
+import {TableProps} from '@aws-cdk/aws-dynamodb/lib/table';
 import {Construct, RemovalPolicy} from '@aws-cdk/core';
 import {AttributeType, BillingMode, Table as BaseTable} from '@aws-cdk/aws-dynamodb';
 

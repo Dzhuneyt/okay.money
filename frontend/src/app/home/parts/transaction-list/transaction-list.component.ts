@@ -121,7 +121,7 @@ export class TransactionListComponent implements OnInit {
 
   public footerActions: TableGlobalAction[] = [
     {
-      label: 'Create transaction',
+      label: 'Create a transaction',
       icon: 'add',
       onClick: () => {
         this.dialog.open(TransactionEditComponent, {

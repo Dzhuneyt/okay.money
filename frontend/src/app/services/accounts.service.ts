@@ -1,7 +1,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {BackendService} from './backend.service';
-import {map} from 'rxjs/operators';
 import {Account} from 'src/app/models/account.model';
 
 

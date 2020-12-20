@@ -1,17 +1,16 @@
 import {IEvent} from './interfaces/IEvent';
 import {DynamoManager} from './shared/DynamoManager';
 import {Handler} from './shared/Handler';
-import DynamoDB = require('aws-sdk/clients/dynamodb');
 
 const originalHandler = async (event: IEvent) => {
     console.log(event);
     try {
         const userId = event.requestContext.authorizer.sub;
-        const accountId = event.pathParameters.id;
-        console.log(accountId);
+        const id = event.pathParameters.id;
+        console.log(id);
 
         const item = await new DynamoManager(process.env.TABLE_NAME as string)
-            .forUser(userId).getOne(accountId);
+            .forUser(userId).getOne(id);
         console.log(item);
         return {
             statusCode: 200,

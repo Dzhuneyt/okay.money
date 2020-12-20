@@ -4,11 +4,13 @@ import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../../LambdaIntegration';
 import {LambdaTypescript} from '../../LambdaTypescript';
 import {getPropsByLambdaFilename} from '../util/getLambdaCode';
+import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 export class Category extends Construct {
     private readonly authorizer: TokenAuthorizer;
+    private role: Role;
 
-    constructor(scope: Construct, id: string, props: {
+    constructor(scope: Construct, id: string, private props: {
         api: RestApi,
         dynamoTables: {
             [key: string]: Table,
@@ -19,7 +21,25 @@ export class Category extends Construct {
 
         this.authorizer = props.authorizer;
 
-        const categoriesApiResource = props.api.root.addResource('category', {});
+        // Create a reusable Role to be assumed by all Lambdas in this construct
+        this.role = new Role(this, 'Role', {
+            assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+        });
+        this.role.addManagedPolicy(
+            ManagedPolicy.fromManagedPolicyArn(this,
+                'AWSLambdaBasicExecutionRole',
+                'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+            ),
+        );
+        this.role.addManagedPolicy(
+            ManagedPolicy.fromManagedPolicyArn(this,
+                'AWSXRayDaemonWriteAccess',
+                'arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess'
+            ),
+        );
+        props.dynamoTables.category.grantReadWriteData(this.role);
+
+        const apiResource = props.api.root.addResource('category');
 
         // Category listing
         const fnCategoryList = new LambdaTypescript(this, 'fn-category-list', {
@@ -27,8 +47,9 @@ export class Category extends Construct {
             environment: {
                 TABLE_NAME: props.dynamoTables.category.tableName,
             },
+            role: this.role,
         });
-        categoriesApiResource.addMethod('GET', new LambdaIntegration(fnCategoryList), {
+        apiResource.addMethod('GET', new LambdaIntegration(fnCategoryList), {
             authorizer: this.authorizer,
         });
 
@@ -38,8 +59,37 @@ export class Category extends Construct {
             environment: {
                 TABLE_NAME: props.dynamoTables.category.tableName,
             },
+            role: this.role,
         });
-        categoriesApiResource.addMethod('POST', new LambdaIntegration(fnCategoryCreate), {
+        apiResource.addMethod('POST', new LambdaIntegration(fnCategoryCreate), {
+            authorizer: this.authorizer,
+        });
+
+        const singleApiResource = apiResource.addResource('{id}');
+
+        // Category delete
+        const fnCategoryDelete = new LambdaTypescript(this, 'fn-category-delete', {
+            ...getPropsByLambdaFilename('genericDeleteHandler.ts'),
+            environment: {
+                TABLE_NAME: props.dynamoTables.category.tableName,
+            },
+            role: this.role,
+        });
+
+        singleApiResource
+            .addMethod("DELETE", new LambdaIntegration(fnCategoryDelete), {
+                authorizer: this.authorizer,
+            });
+
+        singleApiResource.addMethod('GET', new LambdaIntegration(
+            new LambdaTypescript(this, 'fn-category-view', {
+                ...getPropsByLambdaFilename('genericViewHandle.ts'),
+                environment: {
+                    TABLE_NAME: props.dynamoTables.category.tableName,
+                },
+                role: this.role,
+            })
+        ), {
             authorizer: this.authorizer,
         })
     }

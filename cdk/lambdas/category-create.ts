@@ -1,14 +1,14 @@
 import * as AWS from 'aws-sdk';
 import {IEvent} from './interfaces/IEvent';
-import DynamoDB = require('aws-sdk/clients/dynamodb');
 import {v4 as uuidv4} from 'uuid';
 import {Handler} from './shared/Handler';
+import DynamoDB = require('aws-sdk/clients/dynamodb');
 
 interface Input {
     title: string,
 }
 
-export const handler = new Handler(async (event: IEvent) => {
+const originalHandler = async (event: IEvent) => {
     try {
         const userId = event.requestContext.authorizer.sub
         const params: Input = JSON.parse(event.body || '{}');
@@ -57,5 +57,6 @@ export const handler = new Handler(async (event: IEvent) => {
             body: JSON.stringify(e),
         }
     }
-})
-    .create();
+};
+
+export const handler = new Handler(originalHandler).create();

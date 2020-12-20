@@ -1,11 +1,14 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {TableAction, TableColumn, TableComponent} from "../../table/table.component";
-import {map} from "rxjs/operators";
-import {Category} from "../../models/Category";
-import {BackendService} from "../../services/backend.service";
-import {DialogService} from "../../services/dialog.service";
-import {SnackbarService} from "../../services/snackbar.service";
-import {CategoryEditComponent} from "../category-edit/category-edit.component";
+import {TableAction, TableColumn, TableComponent, TableGlobalAction} from '../../table/table.component';
+import {catchError, map} from 'rxjs/operators';
+import {Category} from '../../models/Category';
+import {BackendService} from '../../services/backend.service';
+import {DialogService} from '../../services/dialog.service';
+import {SnackbarService} from '../../services/snackbar.service';
+import {CategoryEditComponent} from '../category-edit/category-edit.component';
+import {DeleteConfirmComponent} from '../../delete-confirm/delete-confirm.component';
+import {of} from 'rxjs';
+import {CategoryService} from '../category.service';
 
 @Component({
   selector: 'app-category-list',
@@ -36,10 +39,35 @@ export class CategoryListComponent implements OnInit {
     },
   ];
 
+  public tableFooterActions: TableGlobalAction[] = [
+    {
+      label: 'Create a category',
+      icon: 'add',
+      onClick: () => {
+        this.dialogService.open(CategoryEditComponent, {
+            data: {},
+            width: '700px'
+          },
+          (res) => {
+            switch (res) {
+              case true:
+                // Notify other parts of the app so UI can be refreshed
+                this.categoryService.changes.next();
+                break;
+              case false:
+                this.snackbarService.error('Creating transaction failed');
+                break;
+            }
+          });
+      },
+    }
+  ];
+
   constructor(
     private backendService: BackendService,
     private dialogService: DialogService,
     private snackbarService: SnackbarService,
+    private categoryService: CategoryService,
   ) {
   }
 
@@ -93,6 +121,28 @@ export class CategoryListComponent implements OnInit {
   }
 
   private openDeleteAccountDialog(category: Category) {
-    // @TODO implement
+    this.dialogService.open(DeleteConfirmComponent, {
+        data: {
+          title: 'Are you sure you want to delete this category? All transactions marked with it will be deleted!',
+          onConfirm: () => {
+            this.categoryService.deleteCategory(category.id);
+            return this.backendService.request('category/' + category.id, 'DELETE').pipe(
+              catchError(err => {
+                console.error(err);
+                return of(false);
+              })
+            );
+          },
+        },
+      },
+      (res) => {
+        if (res) {
+          this.snackbarService.success('Deleted');
+          // Refresh the table
+          this.table.goToPage(this.table.currentPage);
+        } else {
+          this.snackbarService.error('Deleting failed');
+        }
+      });
   }
 }
