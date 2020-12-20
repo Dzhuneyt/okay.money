@@ -33,7 +33,6 @@ export class CategoryService {
   }
 
   updateSingle(id, payload: { title: any }) {
-    return of();
-    // @TODO
+    return this.backend.request(`category/${id}`, 'POST', {}, payload);
   }
 }

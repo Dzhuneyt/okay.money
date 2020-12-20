@@ -76,10 +76,9 @@ export class Category extends Construct {
             role: this.role,
         });
 
-        singleApiResource
-            .addMethod("DELETE", new LambdaIntegration(fnCategoryDelete), {
-                authorizer: this.authorizer,
-            });
+        singleApiResource.addMethod("DELETE", new LambdaIntegration(fnCategoryDelete), {
+            authorizer: this.authorizer,
+        });
 
         singleApiResource.addMethod('GET', new LambdaIntegration(
             new LambdaTypescript(this, 'fn-category-view', {
@@ -91,6 +90,19 @@ export class Category extends Construct {
             })
         ), {
             authorizer: this.authorizer,
-        })
+        });
+
+        // Update single category
+        singleApiResource.addMethod('POST', new LambdaIntegration(
+            new LambdaTypescript(this, 'fn-category-edit', {
+                ...getPropsByLambdaFilename('category-edit.ts'),
+                environment: {
+                    TABLE_NAME: props.dynamoTables.category.tableName,
+                },
+                role: this.role,
+            })
+        ), {
+            authorizer: this.authorizer,
+        });
     }
 }
