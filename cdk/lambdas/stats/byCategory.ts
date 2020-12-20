@@ -67,7 +67,6 @@ export const handler = new Handler(async (event: IEvent) => {
         const allTransactions = await new DynamoManager(await TableNames.transactions())
             .forUser(userId)
             .list() as ITransaction[];
-        console.log('transactions count', allTransactions.length);
 
         const response = await organizeTransactionsUnderCategories(allTransactions, userId);
 

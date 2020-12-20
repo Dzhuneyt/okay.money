@@ -39,6 +39,8 @@ const chartOptions: ChartOptions = {
 })
 export class StatsByCategoryComponent implements OnInit {
 
+  public isLoading = true;
+
   /**
    * Holds an array of datasets for both charts
    * See https://valor-software.com/ng2-charts/ and https://www.chartjs.org/docs/latest/
@@ -111,6 +113,14 @@ export class StatsByCategoryComponent implements OnInit {
     this.refresh(startDate, endDate);
   }
 
+  hasIncomeData() {
+    return this.legends.income.length;
+  }
+
+  hasExpensesData() {
+    return this.legends.expense.length;
+  }
+
   private toggleChartVisibility(show: boolean = false) {
     this.showChart.income = show;
     this.showChart.expense = show;
@@ -118,6 +128,7 @@ export class StatsByCategoryComponent implements OnInit {
   }
 
   private refresh(startDate: Date = null, endDate: Date = null) {
+    this.isLoading = true;
     this.toggleChartVisibility(false);
 
     const params = {};
@@ -169,6 +180,8 @@ export class StatsByCategoryComponent implements OnInit {
               .map(elem => Math.abs(elem.expense_for_period)),
           }
         ];
+
+        this.isLoading = false;
 
         this.toggleChartVisibility(true);
       });
