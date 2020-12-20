@@ -6,10 +6,6 @@
   },
   "scripts": {
     "deploy": "cdk deploy '*' --require-approval=never --outputs-file ./outputs.json",
-    "build:lambdas": "npx webpack",
-    "build:lambdas:watch": "npx webpack --watch --watch-poll 800",
-    "build": "tsc",
-    "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk"
   },
