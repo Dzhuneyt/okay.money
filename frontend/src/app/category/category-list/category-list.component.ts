@@ -53,6 +53,7 @@ export class CategoryListComponent implements OnInit {
               case true:
                 // Notify other parts of the app so UI can be refreshed
                 this.categoryService.changes.next();
+                this.table.goToPage(this.table.currentPage);
                 break;
               case false:
                 this.snackbarService.error('Creating transaction failed');

@@ -29,8 +29,7 @@ export class CategoryService {
   }
 
   createSingle(payload: { title: any }) {
-    return of();
-    // @TODO
+    return this.backend.request('category', 'POST', {}, payload);
   }
 
   updateSingle(id, payload: { title: any }) {
