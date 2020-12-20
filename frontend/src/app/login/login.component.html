@@ -27,18 +27,15 @@
     <mat-card-actions style="text-align: center;">
       <button
         type="button"
+        [disabled]="!username || !password"
         (click)="login().subscribe()" color="primary" mat-raised-button>Login
       </button>
     </mat-card-actions>
-    <mat-card-actions style="text-align: center;">
-      <p>
-        Not a member yet?
-      </p>
-      <button
-        type="button"
-        [routerLink]="['/register']" color="info" mat-raised-button>Register
-      </button>
-      <p>&nbsp;</p>
-    </mat-card-actions>
+    <br/>
   </mat-card>
+
+  <p class="side-note">
+    Not a member yet? <a [attr.href]="router.createUrlTree(['/register'])" [routerLink]="['/register']">Register</a>
+  </p>
+
 </form>

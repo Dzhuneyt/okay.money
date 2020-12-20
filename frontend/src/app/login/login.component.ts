@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {BackendService} from '../services/backend.service';
 import {LocalStorage} from '@ngx-pwa/local-storage';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {Observable, Observer} from 'rxjs';
 import {Router} from '@angular/router';
 import {UserService} from 'src/app/services/user.service';

@@ -1,6 +1,18 @@
-.example-card {
-  width: 300px;
+.example-form {
+  min-width: 200px;
+  max-width: 600px;
+  width: 25%;
   margin: 200px auto;
+}
+
+.side-note {
+  width: 100%;
+  text-align: center;
+  margin-top: 2em;
+
+  a, a:hover {
+    color: #333;
+  }
 }
 
 .example-full-width {
