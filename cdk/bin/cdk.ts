@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from '@aws-cdk/core';
-import {Environment} from '@aws-cdk/core';
+import {Environment, Tags} from '@aws-cdk/core';
 import 'source-map-support/register';
 import {CognitoStack} from '../lib/stacks/CognitoStack';
 import {DynamoDBStack} from '../lib/stacks/DynamoDBStack';
@@ -17,7 +17,7 @@ try {
     const cognitoStack = new CognitoStack(app, 'personalfinance-cognito', {
         env
     });
-    new RestApisStack(app, 'personalfinance-rest-apis', {
+    const restApis = new RestApisStack(app, 'personalfinance-rest-apis', {
         env,
         userPool: cognitoStack.userPool,
         dynamoTables: {
@@ -26,6 +26,8 @@ try {
             transaction: dynamoStack.tableTransaction,
         }
     });
+
+    Tags.of(app).add('app', 'personal-finance');
 } catch (e) {
     console.error(e);
     throw new Error('Failed to deploy CDK stacks');

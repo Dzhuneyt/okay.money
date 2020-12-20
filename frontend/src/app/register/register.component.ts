@@ -1,11 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
 import {LocalStorage} from '@ngx-pwa/local-storage';
-import {Observable, Observer} from 'rxjs';
+import {EMPTY, Observable, Observer} from 'rxjs';
 import {BackendService} from '../services/backend.service';
 import {UserService} from '../services/user.service';
+import {catchError} from 'rxjs/operators';
+import {SnackbarService} from '../services/snackbar.service';
 
 @Component({
   selector: 'app-register',
@@ -26,6 +28,7 @@ export class RegisterComponent implements OnInit {
     private userService: UserService,
     private localStorage: LocalStorage,
     private snackar: MatSnackBar,
+    private snackbarService: SnackbarService,
     private router: Router,
   ) {
   }
@@ -41,14 +44,26 @@ export class RegisterComponent implements OnInit {
           username: this.form.controls['username'].value,
           password: this.form.controls['password'].value,
         })
+        .pipe(
+          catchError(err => {
+            this.snackbarService.error(
+              err.error.message
+                ? err.error.message
+                : JSON.stringify(err.error)
+            );
+            this.showSpinner = false;
+            observer.next(false);
+            observer.complete();
+            console.log(err.error);
+            return EMPTY;
+          }),
+        )
         .subscribe(result => {
           console.log(result);
           console.log('Register success');
           this.showSpinner = false;
 
-          this.snackar.open('Registered successfully', null, {
-            duration: 1000,
-          });
+          this.snackbarService.success('Registered successfully');
 
           this.router.navigate(['/home']);
 

@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import {DynamoDB} from 'aws-sdk';
+import {CognitoIdentityServiceProvider, DynamoDB} from 'aws-sdk';
 import {AttributeType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import {v4 as uuidv4} from 'uuid';
 import {IEvent} from './interfaces/IEvent';
@@ -57,6 +57,22 @@ async function createDefaultAccount(userId: string) {
     return true;
 }
 
+async function userExistsInPool(username: string, userPoolId: string) {
+    try {
+        const oldUser = await new CognitoIdentityServiceProvider()
+            .adminGetUser({
+                UserPoolId: userPoolId,
+                Username: username,
+            }).promise();
+        return !!oldUser.Username;
+    } catch (e) {
+        if (e.toString().includes('UserNotFoundException')) {
+            return false;
+        }
+        throw e;
+    }
+}
+
 export const handler = new Handler(async (event: IEvent) => {
     const dynamodb = new DynamoDB();
     const cognito = new AWS.CognitoIdentityServiceProvider();
@@ -83,16 +99,17 @@ export const handler = new Handler(async (event: IEvent) => {
             throw new Error(`Password must be longer than 6 characters`);
         }
 
-        const exists = (await cognito.listUsers({
-            Filter: `username=\'${body.username}\'`,
-            UserPoolId: userPoolId,
-        }).promise()).Users?.length;
+        const exists = await userExistsInPool(body.username, userPoolId);
+
         if (exists) {
             return {
                 statusCode: 400,
-                body: "Username is already taken",
+                body: JSON.stringify({
+                    message: 'User already exists',
+                })
             }
         }
+
         const cognitoUserCreated = await cognito.adminCreateUser({
             UserPoolId: userPoolId,
             Username: body.username,
@@ -115,14 +132,16 @@ export const handler = new Handler(async (event: IEvent) => {
 
         console.log('User created in Cognito', body);
 
-        const sub = cognitoUserCreated.User?.Attributes?.find((value: AttributeType) => {
-            return value.Name === 'sub';
-        })?.Value;
+        const sub = cognitoUserCreated.User
+            ?.Attributes
+            ?.find((value: AttributeType) => {
+                return value.Name === 'sub';
+            })?.Value;
 
         if (!sub) {
             throw new Error(`Failed to create Cognito user`);
         }
-        console.log(sub);
+        console.log('sub', sub);
 
         await dynamodb.putItem({
             TableName: await TableNames.users(),
