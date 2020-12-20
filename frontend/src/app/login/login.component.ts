@@ -5,6 +5,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {Observable, Observer} from 'rxjs';
 import {Router} from '@angular/router';
 import {UserService} from 'src/app/services/user.service';
+import {SnackbarService} from '../services/snackbar.service';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +24,7 @@ export class LoginComponent {
     private userService: UserService,
     private localStorage: LocalStorage,
     private snackBar: MatSnackBar,
+    private snackbarService: SnackbarService,
     private router: Router,
   ) {
   }
@@ -42,7 +44,7 @@ export class LoginComponent {
 
           if (result.hasOwnProperty('errors')) {
             console.error('Login failed with errors', result);
-            this.snackBar.open('Login failed');
+            this.snackbarService.error('Login failed');
 
             observer.next(false);
             observer.complete();
@@ -52,9 +54,7 @@ export class LoginComponent {
           this.userService.setAccessToken(result).subscribe(() => {
             this.userService.setIsLoggedIn(true);
 
-            this.snackBar.open('Login successful', null, {
-              duration: 1000,
-            });
+            this.snackbarService.success('Login successful');
 
             this.router.navigate(['/home']);
 
@@ -63,9 +63,7 @@ export class LoginComponent {
           });
         }, (result) => {
           console.error('Login failed with errors', result);
-          this.snackBar.open('Login failed', null, {
-            duration: 1000,
-          });
+          this.snackbarService.error('Login failed');
           this.showSpinner = false;
 
           observer.next(false);

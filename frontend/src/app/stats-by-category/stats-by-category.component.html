@@ -5,6 +5,9 @@
         <mat-spinner></mat-spinner>
       </div>
       <div *ngIf="!isLoading">
+        <div *ngIf="!hasExpensesData()" class='no-activity-label'>
+          <h2>No activity for this period</h2>
+        </div>
         <canvas *ngIf="hasExpensesData()"
                 [chartType]="'doughnut'"
                 [datasets]="this.dataSets.expenses"
@@ -20,7 +23,7 @@
       </div>
 
       <div *ngIf="!isLoading">
-        <div *ngIf="!hasIncomeData()" style="text-align:center;">
+        <div *ngIf="!hasIncomeData()" class='no-activity-label'>
           <h2>No activity for this period</h2>
         </div>
         <canvas *ngIf="hasIncomeData()"
