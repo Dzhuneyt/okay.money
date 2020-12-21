@@ -8,15 +8,17 @@
       mat-icon-button>
       <mat-icon>menu</mat-icon>
     </button>
-    <span routerLink="['/home']" routerLinkActive="true">Finance</span>
-    <span class="example-spacer"></span>
+    <a class="logo" href="#" routerLink="['/home']" routerLinkActive="true">Finance</a>
+    <span fxFlex="1 1 auto"></span>
 
+    <!-- List of dynamic buttons, fetched from the MenuService service -->
+    <!-- Any component can inject the service and replace those -->
     <ng-container *ngFor="let menuItem of menuItems">
       <button
         *ngIf="menuItem.route && !menuItem.onClick"
-        mat-button
         [routerLink]="[menuItem.route]"
         class="navbar-icon"
+        mat-button
         routerLinkActive="true">
         <mat-icon inline="true">{{menuItem.matIcon}}</mat-icon>
         {{menuItem.label}}
@@ -31,14 +33,18 @@
       </button>
     </ng-container>
 
-    <mat-icon
+    <!-- Profile button -->
+    <button
       *ngIf="(this.userService.loginStateChanges | async).loggedIn"
       [routerLink]="['/profile']"
+      aria-label="Profile"
       class="navbar-icon"
-      routerLinkActive="true">
-      person
-    </mat-icon>
+      mat-button>
+      <mat-icon inline="true">person</mat-icon>
+      Profile
+    </button>
 
+    <!-- Login button -->
     <button *ngIf="!(this.userService.loginStateChanges | async).loggedIn"
             [routerLink]="['/login']"
             aria-label="Login"

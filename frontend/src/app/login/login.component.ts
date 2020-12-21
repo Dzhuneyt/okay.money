@@ -1,10 +1,10 @@
 import {Component} from '@angular/core';
-import {BackendService} from '../services/backend.service';
-import {LocalStorage} from '@ngx-pwa/local-storage';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {Observable, Observer} from 'rxjs';
 import {Router} from '@angular/router';
+import {LocalStorage} from '@ngx-pwa/local-storage';
+import {Observable, Observer} from 'rxjs';
 import {UserService} from 'src/app/services/user.service';
+import {BackendService} from '../services/backend.service';
 import {SnackbarService} from '../services/snackbar.service';
 
 @Component({
@@ -25,7 +25,7 @@ export class LoginComponent {
     private localStorage: LocalStorage,
     private snackBar: MatSnackBar,
     private snackbarService: SnackbarService,
-    private router: Router,
+    public router: Router,
   ) {
   }
 

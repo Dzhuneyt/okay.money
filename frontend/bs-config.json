@@ -1,0 +1,16 @@
+{
+  "port": 4000,
+  "files": "./dist/**/*",
+  "server": {
+    "baseDir": "./dist/frontend"
+  },
+  "watchEvents": [
+    "add",
+    "change",
+    "unlink",
+    "addDir",
+    "unlinkDir"
+  ],
+  "notify": false,
+  "reloadDebounce": 200
+}

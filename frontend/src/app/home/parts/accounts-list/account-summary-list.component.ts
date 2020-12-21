@@ -18,7 +18,7 @@ export class AccountSummaryListComponent implements OnInit {
       code: 'title',
     },
     {
-      label: 'Current balance',
+      label: 'Balance',
       code: 'current_balance',
     }
   ];
