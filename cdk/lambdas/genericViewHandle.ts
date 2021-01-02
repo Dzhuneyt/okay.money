@@ -5,7 +5,7 @@ import {Handler} from './shared/Handler';
 const originalHandler = async (event: IEvent) => {
     console.log(event);
     try {
-        const userId = event.requestContext.authorizer.sub;
+        const userId = event.requestContext.authorizer.claims.sub;
         const id = event.pathParameters.id;
         console.log(id);
 

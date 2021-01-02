@@ -16,13 +16,14 @@ if (!process.env.ENV_NAME) {
 }
 
 try {
-    const dynamoStack = new DynamoDBStack(app, 'personalfinance-dynamodb', {
+    const appName = 'personalfinance';
+    const dynamoStack = new DynamoDBStack(app, `${appName}-dynamodb`, {
         env,
     })
-    const cognitoStack = new CognitoStack(app, 'personalfinance-cognito', {
+    const cognitoStack = new CognitoStack(app, `${appName}-cognito`, {
         env
     });
-    const restApis = new RestApisStack(app, 'personalfinance-rest-apis', {
+    new RestApisStack(app, `${appName}-rest-apis`, {
         env,
         userPool: cognitoStack.userPool,
         dynamoTables: {

@@ -1,9 +1,9 @@
-import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {LocalStorage} from '@ngx-pwa/local-storage';
-import {catchError, flatMap} from 'rxjs/operators';
+import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
+import {LocalStorage} from '@ngx-pwa/local-storage';
+import {Observable} from 'rxjs';
+import {catchError, flatMap} from 'rxjs/operators';
 import {environment} from 'src/environments/environment';
 
 @Injectable({
@@ -25,9 +25,10 @@ export class BackendService {
 
     return this.localStorage.getItem('access_token')
       .pipe(flatMap(authKey => {
+        console.log(authKey);
         console.log(`Making API call to ${method} ${path}`);
         const headers = new HttpHeaders(authKey ? {
-          'Authorization': authKey['AccessToken'],
+          'Authorization': authKey['IdToken'],
         } : {});
         return this.http.request(method, absoluteUrl, {
           body: bodyParams,

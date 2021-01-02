@@ -1,12 +1,13 @@
-import {APIGatewayProxyEvent} from 'aws-lambda';
-
 export interface IEvent {
     requestContext: {
         authorizer: {
-            // Cognito user ID
-            sub: string,
-            // Cognito username
-            username: string,
+            // This is populated if the API GW endpoint uses the new "native" Cognito authorizer (not the lambda based one)
+            claims: {
+                // Cognito user ID
+                sub: string,
+                // Cognito username
+                'cognito:username': string,
+            }
         }
     },
 

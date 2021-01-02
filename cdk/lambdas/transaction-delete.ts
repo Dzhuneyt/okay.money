@@ -15,7 +15,7 @@ interface Input extends ITransaction {
 const originalHandler = async (event: IEvent) => {
 
     try {
-        const userId = event.requestContext.authorizer.sub;
+        const userId = event.requestContext.authorizer.claims.sub;
         const tableName = process.env.TABLE_NAME as string;
 
         const id = event.pathParameters.id;

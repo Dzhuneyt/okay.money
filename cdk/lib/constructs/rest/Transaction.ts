@@ -1,4 +1,4 @@
-import {RestApi, TokenAuthorizer} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, IAuthorizer, RestApi} from '@aws-cdk/aws-apigateway';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../LambdaIntegration';
@@ -6,14 +6,14 @@ import {LambdaTypescript} from '../LambdaTypescript';
 import {getPropsByLambdaFilename} from './util/getLambdaCode';
 
 export class Transaction extends Construct {
-    private readonly authorizer: TokenAuthorizer;
+    private readonly authorizer: IAuthorizer;
 
     constructor(scope: Construct, id: string, props: {
         api: RestApi,
         dynamoTables: {
             [key: string]: Table,
         },
-        authorizer: TokenAuthorizer,
+        authorizer: IAuthorizer,
     }) {
         super(scope, id);
 
@@ -30,6 +30,7 @@ export class Transaction extends Construct {
         const transactions = props.api.root.addResource('transaction', {});
         const transaction = transactions.addResource('{id}');
         transactions.addMethod('POST', new LambdaIntegration(fnTransactionCreate), {
+            authorizationType: AuthorizationType.COGNITO,
             authorizer: this.authorizer,
         })
 
@@ -42,6 +43,7 @@ export class Transaction extends Construct {
             },
         });
         transactions.addMethod('GET', new LambdaIntegration(fnTransactionList), {
+            authorizationType: AuthorizationType.COGNITO,
             authorizer: this.authorizer,
         });
 
@@ -56,6 +58,7 @@ export class Transaction extends Construct {
         });
         transaction
             .addMethod('GET', new LambdaIntegration(fnView), {
+                authorizationType: AuthorizationType.COGNITO,
                 authorizer: this.authorizer,
             });
 
@@ -70,6 +73,7 @@ export class Transaction extends Construct {
         });
         transaction
             .addMethod('PUT', new LambdaIntegration(fnEdit), {
+                authorizationType: AuthorizationType.COGNITO,
                 authorizer: this.authorizer,
             });
 
@@ -82,6 +86,7 @@ export class Transaction extends Construct {
         });
         transaction
             .addMethod('DELETE', new LambdaIntegration(fnDelete), {
+                authorizationType: AuthorizationType.COGNITO,
                 authorizer: this.authorizer,
             });
     }

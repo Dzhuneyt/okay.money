@@ -10,7 +10,7 @@ interface Input {
 
 const originalHandler = async (event: IEvent) => {
     try {
-        const userId = event.requestContext.authorizer.sub
+        const userId = event.requestContext.authorizer.claims.sub
         const params: Input = JSON.parse(event.body || '{}');
 
         if (!params['title']) {

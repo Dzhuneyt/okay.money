@@ -62,7 +62,7 @@ const organizeTransactionsUnderCategories = async (transactions: ITransaction[],
 export const handler = new Handler(async (event: IEvent) => {
 
     try {
-        const userId = event.requestContext.authorizer.sub;
+        const userId = event.requestContext.authorizer.claims.sub;
 
         const allTransactions = await new DynamoManager(await TableNames.transactions())
             .forUser(userId)

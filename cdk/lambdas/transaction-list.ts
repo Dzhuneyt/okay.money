@@ -13,7 +13,7 @@ const findById = (collection: { id?: string }[], id: string) => {
 
 export const originalHandler = async (event: any) => {
     try {
-        const userId = event.requestContext.authorizer.sub;
+        const userId = event.requestContext.authorizer.claims.sub;
 
         const categories = await new DynamoManager(process.env.TABLE_NAME_CATEGORIES as string)
             .forUser(userId)

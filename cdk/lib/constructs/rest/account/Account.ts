@@ -1,4 +1,4 @@
-import {RestApi, TokenAuthorizer} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, IAuthorizer, RestApi} from '@aws-cdk/aws-apigateway';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../../LambdaIntegration';
@@ -6,14 +6,14 @@ import {LambdaTypescript} from '../../LambdaTypescript';
 import {getPropsByLambdaFilename} from '../util/getLambdaCode';
 
 export class Account extends Construct {
-    private readonly authorizer: TokenAuthorizer;
+    private readonly authorizer: IAuthorizer;
 
     constructor(scope: Construct, id: string, props: {
         api: RestApi,
         dynamoTables: {
             [key: string]: Table,
         },
-        authorizer: TokenAuthorizer,
+        authorizer: IAuthorizer,
     }) {
         super(scope, id);
 
@@ -30,6 +30,7 @@ export class Account extends Construct {
         });
         apiResources.accounts.addMethod('GET', new LambdaIntegration(fnAccountList, {}), {
             authorizer: this.authorizer,
+            authorizationType: AuthorizationType.COGNITO,
         });
 
         const fnAccountCreate = new LambdaTypescript(this, 'fn-account-create', {
@@ -40,6 +41,7 @@ export class Account extends Construct {
         });
         apiResources.accounts.addMethod('POST', new LambdaIntegration(fnAccountCreate), {
             authorizer: this.authorizer,
+            authorizationType: AuthorizationType.COGNITO,
         });
 
         const fnView = new LambdaTypescript(this, 'fn-account-view', {
@@ -50,6 +52,7 @@ export class Account extends Construct {
         });
         apiResources.account
             .addMethod('GET', new LambdaIntegration(fnView), {
+                authorizationType: AuthorizationType.COGNITO,
                 authorizer: this.authorizer,
             });
 
@@ -59,10 +62,10 @@ export class Account extends Construct {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }
         });
-        apiResources.account
-            .addMethod('PUT', new LambdaIntegration(fnEdit), {
-                authorizer: this.authorizer,
-            });
+        apiResources.account.addMethod('PUT', new LambdaIntegration(fnEdit), {
+            authorizer: this.authorizer,
+            authorizationType: AuthorizationType.COGNITO,
+        });
 
         const fnDelete = new LambdaTypescript(this, 'fn-delete', {
             ...getPropsByLambdaFilename('genericDeleteHandler.ts'),
@@ -70,14 +73,14 @@ export class Account extends Construct {
                 TABLE_NAME: props.dynamoTables.account.tableName,
             }
         });
-        apiResources.account
-            .addMethod('DELETE', new LambdaIntegration(fnDelete), {
-                authorizer: this.authorizer,
-            });
+        apiResources.account.addMethod('DELETE', new LambdaIntegration(fnDelete), {
+            authorizer: this.authorizer,
+            authorizationType: AuthorizationType.COGNITO,
+        });
     }
 
     private createApiResources(api: RestApi) {
-        const accounts = api.root.addResource('account');
+        const accounts = api.root.addResource('account', {});
         const account = accounts.addResource('{id}');
         return {
             accounts,

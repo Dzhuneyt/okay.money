@@ -53,6 +53,7 @@ export class ApiGateway extends Construct {
                     authorizerId: "",
                     authorizationType: AuthorizationType.NONE,
                 },
+                authorizationType: AuthorizationType.NONE,
             },
         });
 

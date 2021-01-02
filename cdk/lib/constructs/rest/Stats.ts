@@ -1,4 +1,4 @@
-import {RestApi, TokenAuthorizer} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, IAuthorizer, RestApi} from '@aws-cdk/aws-apigateway';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../LambdaIntegration';
@@ -11,7 +11,7 @@ export class Stats extends Construct {
         dynamoTables: {
             [key: string]: Table,
         },
-        authorizer: TokenAuthorizer,
+        authorizer: IAuthorizer,
     }) {
         super(scope, id);
 
@@ -20,9 +20,10 @@ export class Stats extends Construct {
         });
 
         props.api.root
-            .addResource('stats')
+            .addResource('stats', {})
             .addResource('by_category')
             .addMethod('GET', new LambdaIntegration(fnByCategory), {
+                authorizationType: AuthorizationType.COGNITO,
                 authorizer: props.authorizer,
             });
     }

@@ -10,7 +10,7 @@ interface CategoryEditInput {
 
 const originalHandler = async (event: IEvent) => {
     try {
-        const userId = event.requestContext.authorizer.sub;
+        const userId = event.requestContext.authorizer.claims.sub;
         const id = event.pathParameters.id;
 
         const categoryEditInput = JSON.parse(event.body || '{}') as CategoryEditInput;

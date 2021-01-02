@@ -4,7 +4,7 @@ import {Handler} from './shared/Handler';
 
 const originalHandler = async (event: IEvent) => {
     try {
-        const userId = event.requestContext.authorizer.sub;
+        const userId = event.requestContext.authorizer.claims.sub;
         const items = await new DynamoManager(process.env.TABLE_NAME as string)
             .forUser(userId)
             .list();

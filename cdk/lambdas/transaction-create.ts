@@ -17,7 +17,7 @@ const originalHandler = async (event: IEvent, context: any) => {
     console.log('Lambda called', event);
 
     try {
-        const userId = event.requestContext.authorizer.sub
+        const userId = event.requestContext.authorizer.claims.sub
         const params: Input = JSON.parse(event.body || '{}');
 
         [

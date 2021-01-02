@@ -1,11 +1,11 @@
-import {RestApi} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, RestApi} from '@aws-cdk/aws-apigateway';
 import {UserPool} from '@aws-cdk/aws-cognito';
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../LambdaIntegration';
 import {LambdaTypescript} from '../LambdaTypescript';
-import {getPropsByLambdaFilename} from './util/getLambdaCode';
 import {Table} from "../Table";
+import {getPropsByLambdaFilename} from './util/getLambdaCode';
 
 export class Register extends Construct {
     constructor(scope: Construct, id: string, props: {
@@ -53,7 +53,9 @@ export class Register extends Construct {
         fnRegister.addEnvironment('COGNITO_USERPOOL_ID', props.userPool.userPoolId);
 
         apiResourceRegister
-            .addMethod('POST', new LambdaIntegration(fnRegister), {});
+            .addMethod('POST', new LambdaIntegration(fnRegister), {
+                authorizationType: AuthorizationType.NONE,
+            });
 
         const fnRegisterConfirm = new LambdaTypescript(this, 'fn-register-confirm', {
             ...getPropsByLambdaFilename('registerConfirm.ts'),
@@ -63,6 +65,8 @@ export class Register extends Construct {
         fnRegisterConfirm.addEnvironment('COGNITO_USERPOOL_ID', props.userPool.userPoolId);
         apiResourceRegister
             .addResource('confirm')
-            .addMethod('POST', new LambdaIntegration(fnRegisterConfirm), {});
+            .addMethod('POST', new LambdaIntegration(fnRegisterConfirm), {
+                authorizationType: AuthorizationType.NONE,
+            });
     }
 }

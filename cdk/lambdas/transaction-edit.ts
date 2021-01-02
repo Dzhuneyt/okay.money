@@ -15,7 +15,7 @@ interface Input extends ITransaction {
 const originalHandler = async (event: IEvent) => {
 
     try {
-        const userId = event.requestContext.authorizer.sub;
+        const userId = event.requestContext.authorizer.claims.sub;
         const id = event.pathParameters.id;
 
         const params: Input = JSON.parse(event.body || '{}');

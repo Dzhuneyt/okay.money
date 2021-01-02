@@ -1,4 +1,4 @@
-import {RestApi} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, RestApi} from '@aws-cdk/aws-apigateway';
 import {UserPool} from '@aws-cdk/aws-cognito';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Construct} from '@aws-cdk/core';
@@ -35,7 +35,9 @@ export class Login extends Construct {
 
         props.api.root
             .addResource('login')
-            .addMethod('POST', new LambdaIntegration(fnLogin), {});
+            .addMethod('POST', new LambdaIntegration(fnLogin), {
+                authorizationType: AuthorizationType.NONE,
+            });
 
     }
 }

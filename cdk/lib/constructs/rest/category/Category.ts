@@ -1,21 +1,21 @@
-import {RestApi, TokenAuthorizer} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, IAuthorizer, RestApi} from '@aws-cdk/aws-apigateway';
 import {Table} from '@aws-cdk/aws-dynamodb';
+import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../../LambdaIntegration';
 import {LambdaTypescript} from '../../LambdaTypescript';
 import {getPropsByLambdaFilename} from '../util/getLambdaCode';
-import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 export class Category extends Construct {
-    private readonly authorizer: TokenAuthorizer;
-    private role: Role;
+    private readonly authorizer: IAuthorizer;
+    private readonly role: Role;
 
     constructor(scope: Construct, id: string, private props: {
         api: RestApi,
         dynamoTables: {
             [key: string]: Table,
         },
-        authorizer: TokenAuthorizer,
+        authorizer: IAuthorizer,
     }) {
         super(scope, id);
 
@@ -39,7 +39,7 @@ export class Category extends Construct {
         );
         props.dynamoTables.category.grantReadWriteData(this.role);
 
-        const apiResource = props.api.root.addResource('category');
+        const apiResource = props.api.root.addResource('category', {});
 
         // Category listing
         const fnCategoryList = new LambdaTypescript(this, 'fn-category-list', {
@@ -50,6 +50,7 @@ export class Category extends Construct {
             role: this.role,
         });
         apiResource.addMethod('GET', new LambdaIntegration(fnCategoryList), {
+            authorizationType: AuthorizationType.COGNITO,
             authorizer: this.authorizer,
         });
 
@@ -62,6 +63,7 @@ export class Category extends Construct {
             role: this.role,
         });
         apiResource.addMethod('POST', new LambdaIntegration(fnCategoryCreate), {
+            authorizationType: AuthorizationType.COGNITO,
             authorizer: this.authorizer,
         });
 
@@ -77,6 +79,7 @@ export class Category extends Construct {
         });
 
         singleApiResource.addMethod("DELETE", new LambdaIntegration(fnCategoryDelete), {
+            authorizationType: AuthorizationType.COGNITO,
             authorizer: this.authorizer,
         });
 
@@ -89,6 +92,7 @@ export class Category extends Construct {
                 role: this.role,
             })
         ), {
+            authorizationType: AuthorizationType.COGNITO,
             authorizer: this.authorizer,
         });
 
@@ -102,6 +106,7 @@ export class Category extends Construct {
                 role: this.role,
             })
         ), {
+            authorizationType: AuthorizationType.COGNITO,
             authorizer: this.authorizer,
         });
     }
