@@ -1,8 +1,8 @@
 import * as AWS from 'aws-sdk';
-import {IAccount} from './interfaces/IAccount';
-import {IEvent} from './interfaces/IEvent';
 import * as DynamoDB from 'aws-sdk/clients/dynamodb';
 import {v4 as uuidv4} from 'uuid';
+import {IAccount} from './interfaces/IAccount';
+import {IEvent} from './interfaces/IEvent';
 import {Handler} from './shared/Handler';
 
 interface Input {

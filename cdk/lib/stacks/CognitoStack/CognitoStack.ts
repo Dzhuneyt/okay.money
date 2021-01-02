@@ -3,8 +3,8 @@ import {AttributeType, BillingMode, Table} from '@aws-cdk/aws-dynamodb';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {StringParameter} from '@aws-cdk/aws-ssm';
 import {Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
-import {LambdaTypescript} from "../constructs/LambdaTypescript";
-import {getPropsByLambdaFilename} from "../constructs/rest/util/getLambdaCode";
+import {LambdaTypescript} from "../../constructs/LambdaTypescript";
+import {getPropsByLambdaFilename} from "../../constructs/rest/util/getLambdaCode";
 
 interface Props extends StackProps {
 

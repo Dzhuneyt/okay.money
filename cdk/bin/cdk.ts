@@ -2,14 +2,19 @@
 import * as cdk from '@aws-cdk/core';
 import {Environment, Tags} from '@aws-cdk/core';
 import 'source-map-support/register';
-import {CognitoStack} from '../lib/stacks/CognitoStack';
-import {DynamoDBStack} from '../lib/stacks/DynamoDBStack';
-import {RestApisStack} from '../lib/stacks/RestApisStack';
+import {CognitoStack} from '../lib/stacks/CognitoStack/CognitoStack';
+import {DynamoDBStack} from '../lib/stacks/DynamoDBStack/DynamoDBStack';
+import {RestApisStack} from '../lib/stacks/RestApisStack/RestApisStack';
 
 const app = new cdk.App({});
 const env: Environment = {
     account: "347315207830", // SS Personal
 }
+
+if (!process.env.ENV_NAME) {
+    throw new Error(`process.env.ENV_NAME is not defined`);
+}
+
 try {
     const dynamoStack = new DynamoDBStack(app, 'personalfinance-dynamodb', {
         env,
