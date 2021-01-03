@@ -3,13 +3,13 @@ import {UserPool} from '@aws-cdk/aws-cognito';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import * as cdk from '@aws-cdk/core';
 import {CfnOutput, StackProps} from '@aws-cdk/core';
-import {Account} from '../../constructs/rest/account/Account';
-import {Category} from '../../constructs/rest/category/Category';
-import {Login} from '../../constructs/rest/Login';
-import {Register} from '../../constructs/rest/Register';
-import {Stats} from '../../constructs/rest/Stats';
-import {Transaction} from '../../constructs/rest/Transaction';
+import {AccountEndpoints} from './constructs/AccountEndpoints/AccountEndpoints';
 import {ApiGateway} from './constructs/ApiGateway';
+import {AuthEndpoints} from './constructs/AuthEndpoints/AuthEndpoints';
+import {CategoryEndpoints} from './constructs/CategoryEndpoints/CategoryEndpoints';
+import {StatsEndpoints} from './constructs/StatsEndpoints/StatsEndpoints';
+import {TransactionEndpoints} from './constructs/TransactionEndpoints/TransactionEndpoints';
+import {UserEndpoints} from './constructs/UserEndpoints/UserEndpoints';
 
 interface Props extends StackProps {
     userPool: UserPool;
@@ -47,33 +47,35 @@ export class RestApisStack extends cdk.Stack {
     }
 
     private createApigatewayEndpoints() {
-        new Login(this, 'login', {
-            api: this.api,
+        new AuthEndpoints(this, 'AuthEndpoints', {
+            apiGateway: this.api,
             userPool: this.props.userPool,
         });
-        new Register(this, 'register', {
+        new AccountEndpoints(this, 'account', {
             api: this.api,
+            authorizer: this.cognitoAuthorizer,
+            dynamoTables: this.props.dynamoTables,
+        });
+        new CategoryEndpoints(this, 'category', {
+            api: this.api,
+            authorizer: this.cognitoAuthorizer,
+            dynamoTables: this.props.dynamoTables,
+        });
+        new TransactionEndpoints(this, 'transaction', {
+            api: this.api,
+            authorizer: this.cognitoAuthorizer,
+            dynamoTables: this.props.dynamoTables,
+        });
+        new StatsEndpoints(this, 'stats', {
+            api: this.api,
+            authorizer: this.cognitoAuthorizer,
+            dynamoTables: this.props.dynamoTables,
+        });
+
+        new UserEndpoints(this, 'ProfileEndpoints', {
+            apiGateway: this.api,
             userPool: this.props.userPool,
-        });
-        new Account(this, 'account', {
-            api: this.api,
             authorizer: this.cognitoAuthorizer,
-            dynamoTables: this.props.dynamoTables,
-        });
-        new Category(this, 'category', {
-            api: this.api,
-            authorizer: this.cognitoAuthorizer,
-            dynamoTables: this.props.dynamoTables,
-        });
-        new Transaction(this, 'transaction', {
-            api: this.api,
-            authorizer: this.cognitoAuthorizer,
-            dynamoTables: this.props.dynamoTables,
-        });
-        new Stats(this, 'stats', {
-            api: this.api,
-            authorizer: this.cognitoAuthorizer,
-            dynamoTables: this.props.dynamoTables,
         });
     }
 

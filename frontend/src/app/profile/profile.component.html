@@ -7,7 +7,7 @@
 <br/>
 <mat-card>
   <form [formGroup]="form">
-    <div class="example-container">
+    <div class="example-container" fxLayout="column">
       <mat-form-field>
         <input matInput placeholder="Email" formControlName="email" required>
       </mat-form-field>
@@ -23,10 +23,19 @@
         <input matInput placeholder="Current password" [type]="'password'" formControlName="old_password">
       </mat-form-field>
       <mat-form-field>
-        <input matInput placeholder="New password" [type]="'password'" formControlName="new_password">
+        <mat-label>New password</mat-label>
+        <input matInput [type]="'password'" formControlName="new_password">
+      </mat-form-field>
+      <mat-form-field *ngIf="form.controls['new_password'].valid && form.controls['new_password'].value">
+        <mat-label>Repeat the new password</mat-label>
+        <input matInput placeholder="" [type]="'password'" formControlName="new_password_repeat">
+        <mat-error *ngIf="form.controls['new_password_repeat'].hasError('repeatPasswordMismatch')">
+          The two passwords do not match
+        </mat-error>
       </mat-form-field>
     </div>
-    <button mat-raised-button (click)="save()">Save</button>
+    <br/>
+    <button mat-raised-button (click)="save()" [disabled]="form.invalid">Save</button>
   </form>
 </mat-card>
 

@@ -1,4 +1,4 @@
-import {UserPool} from '@aws-cdk/aws-cognito';
+import {UserPool, UserPoolClient} from '@aws-cdk/aws-cognito';
 import {AttributeType, BillingMode, Table} from '@aws-cdk/aws-dynamodb';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {StringParameter} from '@aws-cdk/aws-ssm';
@@ -12,6 +12,7 @@ interface Props extends StackProps {
 
 export class CognitoStack extends Stack {
     public userPool: UserPool;
+    public userPoolClient: UserPoolClient;
     public userTable: Table;
 
     constructor(scope: Construct, id: string, props: Props) {
@@ -26,6 +27,22 @@ export class CognitoStack extends Stack {
                 requireUppercase: false,
             },
         });
+        new StringParameter(this, 'param-cognito-userpool-id', {
+            stringValue: this.userPool.userPoolId,
+            parameterName: `/personalfinance/${process.env.ENV_NAME}/userpool/id`,
+        });
+        // Allow the Lambda to do username/password login to Cognito and get Access Token
+        this.userPoolClient = this.userPool.addClient('cognito-login', {
+            authFlows: {
+                userPassword: true,
+                // refreshToken: true,
+            },
+        });
+        new StringParameter(this, 'param-cognito-userpool-client-id', {
+            stringValue: this.userPoolClient.userPoolClientId,
+            parameterName: `/personalfinance/${process.env.ENV_NAME}/userpool/client/id`,
+        });
+
         this.userTable = new Table(this, 'table-users', {
             partitionKey: {
                 name: "id",
@@ -36,11 +53,11 @@ export class CognitoStack extends Stack {
         });
         new StringParameter(this, 'param-table-name-users', {
             stringValue: this.userTable.tableName,
-            parameterName: '/personalfinance/table/users/name',
+            parameterName: `/personalfinance/${process.env.ENV_NAME}/table/users/name`,
         });
         new StringParameter(this, 'param-table-arn-users', {
             stringValue: this.userTable.tableArn,
-            parameterName: '/personalfinance/table/users/arn',
+            parameterName: `/personalfinance/${process.env.ENV_NAME}/table/users/arn`,
         });
 
         // Create a utility Lambda for being able to create new users
@@ -48,6 +65,7 @@ export class CognitoStack extends Stack {
         // {username: "test", password: "testtest"}
         const fnCreateUser = new LambdaTypescript(this, 'fn-create-user', {
             ...getPropsByLambdaFilename('user-create.ts'),
+            description: "Debugging lambda that allows you to skip the registration process and create a user immediately",
             timeout: Duration.seconds(10),
             environment: {
                 COGNITO_USERPOOL_ID: this.userPool.userPoolId,

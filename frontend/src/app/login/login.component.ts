@@ -54,7 +54,7 @@ export class LoginComponent {
           this.userService.setAccessToken(result).subscribe(() => {
             this.userService.setIsLoggedIn(true);
 
-            this.snackbarService.success('Login successful');
+            this.snackbarService.success('Welcome!');
 
             this.router.navigate(['/home']);
 

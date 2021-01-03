@@ -2,11 +2,11 @@ import {AuthorizationType, IAuthorizer, RestApi} from '@aws-cdk/aws-apigateway';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {Construct} from '@aws-cdk/core';
-import {LambdaIntegration} from '../../LambdaIntegration';
-import {LambdaTypescript} from '../../LambdaTypescript';
-import {getPropsByLambdaFilename} from '../util/getLambdaCode';
+import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
+import {LambdaTypescript} from '../../../../constructs/LambdaTypescript';
+import {getPropsByLambdaFilename} from '../../../../constructs/rest/util/getLambdaCode';
 
-export class Category extends Construct {
+export class CategoryEndpoints extends Construct {
     private readonly authorizer: IAuthorizer;
     private readonly role: Role;
 

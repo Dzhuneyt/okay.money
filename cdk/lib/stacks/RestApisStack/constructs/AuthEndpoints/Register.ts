@@ -1,16 +1,16 @@
-import {AuthorizationType, RestApi} from '@aws-cdk/aws-apigateway';
-import {UserPool} from '@aws-cdk/aws-cognito';
+import {AuthorizationType, IRestApi} from '@aws-cdk/aws-apigateway';
+import {IUserPool} from '@aws-cdk/aws-cognito';
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {Construct} from '@aws-cdk/core';
-import {LambdaIntegration} from '../LambdaIntegration';
-import {LambdaTypescript} from '../LambdaTypescript';
-import {Table} from "../Table";
-import {getPropsByLambdaFilename} from './util/getLambdaCode';
+import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
+import {LambdaTypescript} from '../../../../constructs/LambdaTypescript';
+import {getPropsByLambdaFilename} from '../../../../constructs/rest/util/getLambdaCode';
+import {Table} from "../../../../constructs/Table";
 
 export class Register extends Construct {
     constructor(scope: Construct, id: string, props: {
-        userPool: UserPool,
-        api: RestApi,
+        userPool: IUserPool,
+        api: IRestApi,
     }) {
         super(scope, id);
 

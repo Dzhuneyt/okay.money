@@ -1,15 +1,15 @@
-import {AuthorizationType, RestApi} from '@aws-cdk/aws-apigateway';
-import {UserPool} from '@aws-cdk/aws-cognito';
+import {AuthorizationType, IRestApi} from '@aws-cdk/aws-apigateway';
+import {IUserPool} from '@aws-cdk/aws-cognito';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Construct} from '@aws-cdk/core';
-import {LambdaIntegration} from '../LambdaIntegration';
-import {LambdaTypescript} from '../LambdaTypescript';
-import {getPropsByLambdaFilename} from './util/getLambdaCode';
+import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
+import {LambdaTypescript} from '../../../../constructs/LambdaTypescript';
+import {getPropsByLambdaFilename} from '../../../../constructs/rest/util/getLambdaCode';
 
 export class Login extends Construct {
     constructor(scope: Construct, id: string, props: {
-        userPool: UserPool,
-        api: RestApi,
+        userPool: IUserPool,
+        api: IRestApi,
     }) {
         super(scope, id);
 

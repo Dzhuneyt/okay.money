@@ -1,11 +1,11 @@
 import {AuthorizationType, IAuthorizer, RestApi} from '@aws-cdk/aws-apigateway';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {Construct} from '@aws-cdk/core';
-import {LambdaIntegration} from '../LambdaIntegration';
-import {LambdaTypescript} from '../LambdaTypescript';
-import {getPropsByLambdaFilename} from './util/getLambdaCode';
+import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
+import {LambdaTypescript} from '../../../../constructs/LambdaTypescript';
+import {getPropsByLambdaFilename} from '../../../../constructs/rest/util/getLambdaCode';
 
-export class Transaction extends Construct {
+export class TransactionEndpoints extends Construct {
     private readonly authorizer: IAuthorizer;
 
     constructor(scope: Construct, id: string, props: {
