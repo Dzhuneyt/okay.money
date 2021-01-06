@@ -67,7 +67,7 @@ export class CIStack extends Stack {
             sourceAction: new codepipeline_actions.GitHubSourceAction({
                 actionName: 'GitHub',
                 output: sourceArtifact,
-                oauthToken: SecretValue.secretsManager('GITHUB_TOKEN_NAME'),
+                oauthToken: SecretValue.secretsManager('GITHUB_TOKEN_PERSONAL'),
                 // Replace these with your actual GitHub project name
                 owner: 'Dzhuneyt',
                 repo: 'Personal-Finance',
@@ -80,6 +80,12 @@ export class CIStack extends Stack {
                 // Use this if you need a build step (if you're not using ts-node
                 // or if you have TypeScript Lambdas that need to be compiled).
                 buildCommand: 'npm run build',
+                subdirectory: 'cdk',
+                environmentVariables: {
+                    ENV_NAME: {
+                        value: process.env.BRANCH_NAME as string,
+                    },
+                },
             }),
         });
 

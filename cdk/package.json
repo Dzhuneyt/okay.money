@@ -8,7 +8,8 @@
     "deploy": "cdk deploy '*' -v --require-approval=never --outputs-file ./outputs.json",
     "deploy:ci": "cdk deploy '*' --app 'npx ts-node --prefer-ts-exts bin/ci.ts' -v --require-approval=never --outputs-file ./ci-outputs.json",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "build": "cdk synth"
   },
   "devDependencies": {
     "@aws-cdk/assert": "^1.83.0",
