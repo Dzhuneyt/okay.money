@@ -85,7 +85,7 @@ export class CIStack extends Stack {
 
         // Do this as many times as necessary with any account and region
         // Account and region may different from the pipeline's.
-        pipeline.addApplicationStage(new MyApplication(this, 'Prod', {
+        pipeline.addApplicationStage(new MyApplication(this, `Stage-${process.env.BRANCH_NAME}`, {
             env: {
                 account: Stack.of(this).account,
                 region: Stack.of(this).region,
