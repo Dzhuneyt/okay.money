@@ -1,49 +1,10 @@
-import {Construct, RemovalPolicy, SecretValue, Stack, StackProps, Stage, StageProps, Tags} from "@aws-cdk/core";
+import {Construct, RemovalPolicy, SecretValue, Stack, StackProps} from "@aws-cdk/core";
 import {Bucket, BucketEncryption, IBucket} from "@aws-cdk/aws-s3";
 import * as codepipeline from "@aws-cdk/aws-codepipeline";
 import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";
-import {DynamoDBStack} from "../DynamoDBStack/DynamoDBStack";
-import {CognitoStack} from "../CognitoStack/CognitoStack";
-import {RestApisStack} from "../RestApisStack/RestApisStack";
 import {BuildSpec, Cache, ComputeType, LinuxBuildImage, LocalCacheMode, PipelineProject} from "@aws-cdk/aws-codebuild";
 import {LogGroup, RetentionDays} from "@aws-cdk/aws-logs";
-import {ManagedPolicy, PolicyStatement} from "@aws-cdk/aws-iam";
-
-interface Props extends StageProps {
-    branch: string,
-}
-
-class MyApplication extends Stage {
-
-    constructor(scope: Construct, id: string, props: Props) {
-        super(scope, id, props);
-
-        const appName = `finance-${props.branch}`;
-
-        const dynamoStack = new DynamoDBStack(this, `${appName}-dynamodb`, {
-            env: props.env,
-        })
-        const cognitoStack = new CognitoStack(this, `${appName}-cognito`, {
-            env: props.env,
-        });
-        const restApisStack = new RestApisStack(this, `${appName}-rest-apis`, {
-            env: props.env,
-            userPool: cognitoStack.userPool,
-            dynamoTables: {
-                account: dynamoStack.tableAccount,
-                category: dynamoStack.tableCategory,
-                transaction: dynamoStack.tableTransaction,
-            }
-        });
-
-        // Provide a high level stack that depends on all others, providing
-        // an easy mechanism to deploy "everything" by just deploying this stack
-        const mainStack = new Stack(this, `${appName}-main`, {env: props.env,});
-        mainStack.addDependency(restApisStack);
-
-        Tags.of(this).add('app', 'personal-finance');
-    }
-}
+import {ManagedPolicy} from "@aws-cdk/aws-iam";
 
 export class CIStack extends Stack {
     private readonly cacheBucket: IBucket;
