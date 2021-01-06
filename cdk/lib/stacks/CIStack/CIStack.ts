@@ -1,12 +1,12 @@
 import {Construct, RemovalPolicy, SecretValue, Stack, StackProps, Stage, StageProps, Tags} from "@aws-cdk/core";
-import {Bucket, IBucket} from "@aws-cdk/aws-s3";
-import {CdkPipeline, SimpleSynthAction} from "@aws-cdk/pipelines";
+import {Bucket, BucketEncryption, IBucket} from "@aws-cdk/aws-s3";
 import * as codepipeline from "@aws-cdk/aws-codepipeline";
 import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";
 import {DynamoDBStack} from "../DynamoDBStack/DynamoDBStack";
 import {CognitoStack} from "../CognitoStack/CognitoStack";
 import {RestApisStack} from "../RestApisStack/RestApisStack";
-import {BuildSpec, IProject, PipelineProject} from "@aws-cdk/aws-codebuild";
+import {BuildSpec, Cache, ComputeType, LinuxBuildImage, LocalCacheMode, PipelineProject} from "@aws-cdk/aws-codebuild";
+import {LogGroup, RetentionDays} from "@aws-cdk/aws-logs";
 
 interface Props extends StageProps {
     branch: string,
@@ -45,7 +45,7 @@ class MyApplication extends Stage {
 }
 
 export class CIStack extends Stack {
-    private cacheBucket: IBucket;
+    private readonly cacheBucket: IBucket;
 
     constructor(scope: Construct, id: string, props: StackProps) {
         super(scope, id, props);
@@ -55,11 +55,16 @@ export class CIStack extends Stack {
         this.cacheBucket = new Bucket(this, 'CacheBucket', {
             removalPolicy: RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
+            encryption: BucketEncryption.S3_MANAGED,
         });
 
         const sourceArtifact = new codepipeline.Artifact();
 
-        const ppln = new codepipeline.Pipeline(this, 'Pipeline');
+        const ppln = new codepipeline.Pipeline(this, 'Pipeline', {
+            crossAccountKeys: false,
+            artifactBucket: this.cacheBucket,
+            pipelineName: `finance-${branchName}-ci`,
+        });
         ppln.addStage({
             stageName: "Source",
             actions: [
@@ -78,11 +83,19 @@ export class CIStack extends Stack {
         const project = new PipelineProject(this, 'CDK-Deploy', {
             buildSpec: BuildSpec.fromSourceFilename('buildspec.yml'),
             logging: {
-                s3: {
-                    bucket: this.cacheBucket,
-                    prefix: `ci-cache-${branchName}`,
+                cloudWatch: {
                     enabled: true,
-                }
+                    logGroup: new LogGroup(this, 'cdk-deploy-logs', {
+                        removalPolicy: RemovalPolicy.DESTROY,
+                        retention: RetentionDays.FIVE_MONTHS,
+                    })
+                },
+            },
+            cache: Cache.local(LocalCacheMode.CUSTOM, LocalCacheMode.DOCKER_LAYER, LocalCacheMode.SOURCE),
+            environment: {
+                buildImage: LinuxBuildImage.AMAZON_LINUX_2_3,
+                computeType: ComputeType.LARGE,
+                privileged: true,
             }
         });
 
