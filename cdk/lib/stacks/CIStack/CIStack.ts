@@ -60,12 +60,12 @@ export class CIStack extends Stack {
 
         const sourceArtifact = new codepipeline.Artifact();
 
-        const ppln = new codepipeline.Pipeline(this, 'Pipeline', {
+        const pipeline = new codepipeline.Pipeline(this, 'Pipeline', {
             crossAccountKeys: false,
             artifactBucket: this.cacheBucket,
             pipelineName: `finance-${branchName}-ci`,
         });
-        ppln.addStage({
+        pipeline.addStage({
             stageName: "Source",
             actions: [
                 new codepipeline_actions.GitHubSourceAction({
@@ -96,10 +96,15 @@ export class CIStack extends Stack {
                 buildImage: LinuxBuildImage.AMAZON_LINUX_2_3,
                 computeType: ComputeType.LARGE,
                 privileged: true,
+            },
+            environmentVariables: {
+                ENV_NAME: {
+                    value: branchName,
+                }
             }
         });
 
-        ppln.addStage({
+        pipeline.addStage({
             stageName: "Deploy",
             actions: [
                 new codepipeline_actions.CodeBuildAction({
