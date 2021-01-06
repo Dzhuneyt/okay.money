@@ -71,7 +71,7 @@ export class CIStack extends Stack {
                 // Replace these with your actual GitHub project name
                 owner: 'Dzhuneyt',
                 repo: 'Personal-Finance',
-                branch: 'master',
+                branch: process.env.BRANCH_NAME,
             }),
 
             synthAction: SimpleSynthAction.standardNpmSynth({
