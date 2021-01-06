@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from '@aws-cdk/core';
-import {Environment, Tags} from '@aws-cdk/core';
+import {Environment, Stack, Tags} from '@aws-cdk/core';
 import 'source-map-support/register';
 import {CognitoStack} from '../lib/stacks/CognitoStack/CognitoStack';
 import {DynamoDBStack} from '../lib/stacks/DynamoDBStack/DynamoDBStack';
@@ -16,14 +16,15 @@ if (!process.env.ENV_NAME) {
 }
 
 try {
-    const appName = 'personalfinance';
+    const appName = `finance-${process.env.ENV_NAME}`;
+
     const dynamoStack = new DynamoDBStack(app, `${appName}-dynamodb`, {
         env,
     })
     const cognitoStack = new CognitoStack(app, `${appName}-cognito`, {
         env
     });
-    new RestApisStack(app, `${appName}-rest-apis`, {
+    const restApisStack = new RestApisStack(app, `${appName}-rest-apis`, {
         env,
         userPool: cognitoStack.userPool,
         dynamoTables: {
@@ -32,6 +33,11 @@ try {
             transaction: dynamoStack.tableTransaction,
         }
     });
+
+    // Provide a high level stack that depends on all others, providing
+    // an easy mechanism to deploy "everything" by just deploying this stack
+    const mainStack = new Stack(app, `${appName}-main`, {env});
+    mainStack.addDependency(restApisStack);
 
     Tags.of(app).add('app', 'personal-finance');
 } catch (e) {
