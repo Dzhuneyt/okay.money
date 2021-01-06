@@ -26,8 +26,12 @@ export function samePasswordValidator(): ValidatorFn {
 })
 export class ProfileComponent implements OnInit {
 
+  public isLoading = true;
+
   public form = new FormGroup({
-    email: new FormControl(null, [Validators.email]),
+    email: new FormControl({
+      value: null, disabled: true,
+    }, [Validators.email]),
     firstname: new FormControl(null, []),
     lastname: new FormControl(null, []),
     old_password: new FormControl(null, []),
@@ -50,6 +54,7 @@ export class ProfileComponent implements OnInit {
   }
 
   save() {
+    this.isLoading = true;
     const payload = {
       old_password: this.form.get('old_password').value,
       new_password: this.form.get('new_password').value,
@@ -57,6 +62,7 @@ export class ProfileComponent implements OnInit {
       lastname: this.form.get('lastname').value,
     };
     this.backend.request('user/profile', 'PUT', {}, payload).subscribe(res => {
+      this.isLoading = false;
       this.snackbarService.success('Profile updated');
       this.resetForm();
     }, error => {
@@ -66,21 +72,12 @@ export class ProfileComponent implements OnInit {
   }
 
   private resetForm() {
-    this.form = new FormGroup({
-      email: new FormControl(null, [Validators.email]),
-      firstname: new FormControl(null, []),
-      lastname: new FormControl(null, []),
-      old_password: new FormControl(null, []),
-      new_password: new FormControl(null, []),
-      new_password_repeat: new FormControl(null, []),
-    }, {
-      validators: [samePasswordValidator()],
-      updateOn: 'change',
-    });
+    this.isLoading = true;
     this.backend.request('user/profile', 'GET').subscribe(res => {
       this.form.controls['email'].setValue(res.email);
       this.form.controls['firstname'].setValue(res.firstname);
       this.form.controls['lastname'].setValue(res.lastname);
+      this.isLoading = false;
     });
   }
 
