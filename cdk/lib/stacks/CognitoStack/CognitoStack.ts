@@ -29,7 +29,7 @@ export class CognitoStack extends Stack {
         });
         new StringParameter(this, 'param-cognito-userpool-id', {
             stringValue: this.userPool.userPoolId,
-            parameterName: `/personalfinance/${process.env.ENV_NAME}/userpool/id`,
+            parameterName: `/personalfinance/${process.env.ENV_NAME}/pool/id`,
         });
         // Allow the Lambda to do username/password login to Cognito and get Access Token
         this.userPoolClient = this.userPool.addClient('cognito-login', {
@@ -40,7 +40,7 @@ export class CognitoStack extends Stack {
         });
         new StringParameter(this, 'param-cognito-userpool-client-id', {
             stringValue: this.userPoolClient.userPoolClientId,
-            parameterName: `/personalfinance/${process.env.ENV_NAME}/userpool/client/id`,
+            parameterName: `/personalfinance/${process.env.ENV_NAME}/pool/client/id`,
         });
 
         this.userTable = new Table(this, 'table-users', {

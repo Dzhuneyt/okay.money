@@ -5,7 +5,7 @@ import {getDynamoUser, getUserByCognitoSub} from './getProfile';
 
 async function changeCognitoUserPassword(Username: string, Password: string) {
     const UserPoolId = (await new SSM().getParameter({
-        Name: `/personalfinance/${process.env.ENV_NAME}/userpool/id`,
+        Name: `/personalfinance/${process.env.ENV_NAME}/pool/id`,
         WithDecryption: true,
     }).promise()).Parameter?.Value as string;
     const passwordUpdated = await new CognitoIdentityServiceProvider().adminSetUserPassword({
@@ -20,7 +20,7 @@ async function changeCognitoUserPassword(Username: string, Password: string) {
 
 async function checkOldPasswordIsValid(Username: string, Password: string) {
     const userPoolClientId = (await new SSM().getParameter({
-        Name: `/personalfinance/${process.env.ENV_NAME}/userpool/client/id`,
+        Name: `/personalfinance/${process.env.ENV_NAME}/pool/client/id`,
         WithDecryption: true,
     }).promise()).Parameter?.Value as string;
 
