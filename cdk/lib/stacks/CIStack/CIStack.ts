@@ -7,6 +7,7 @@ import {CognitoStack} from "../CognitoStack/CognitoStack";
 import {RestApisStack} from "../RestApisStack/RestApisStack";
 import {BuildSpec, Cache, ComputeType, LinuxBuildImage, LocalCacheMode, PipelineProject} from "@aws-cdk/aws-codebuild";
 import {LogGroup, RetentionDays} from "@aws-cdk/aws-logs";
+import {ManagedPolicy, PolicyStatement} from "@aws-cdk/aws-iam";
 
 interface Props extends StageProps {
     branch: string,
@@ -103,6 +104,7 @@ export class CIStack extends Stack {
                 }
             }
         });
+        project.role?.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'));
 
         pipeline.addStage({
             stageName: "Deploy",
