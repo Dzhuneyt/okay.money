@@ -6,6 +6,7 @@ import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";
 import {DynamoDBStack} from "../DynamoDBStack/DynamoDBStack";
 import {CognitoStack} from "../CognitoStack/CognitoStack";
 import {RestApisStack} from "../RestApisStack/RestApisStack";
+import {BuildSpec, IProject, PipelineProject} from "@aws-cdk/aws-codebuild";
 
 interface Props extends StageProps {
     branch: string,
@@ -49,54 +50,51 @@ export class CIStack extends Stack {
     constructor(scope: Construct, id: string, props: StackProps) {
         super(scope, id, props);
 
+        const branchName = process.env.BRANCH_NAME as string;
+
         this.cacheBucket = new Bucket(this, 'CacheBucket', {
             removalPolicy: RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
         });
 
         const sourceArtifact = new codepipeline.Artifact();
-        const cloudAssemblyArtifact = new codepipeline.Artifact();
 
-        const pipeline = new CdkPipeline(this, 'Pipeline', {
-            pipelineName: 'MyAppPipeline',
-            cloudAssemblyArtifact,
-
-            // Don't create KMS key for S3 bucket to eliminate $1/mo cost
-            crossAccountKeys: false,
-
-            sourceAction: new codepipeline_actions.GitHubSourceAction({
-                actionName: 'GitHub',
-                output: sourceArtifact,
-                oauthToken: SecretValue.secretsManager('GITHUB_TOKEN_PERSONAL'),
-                // Replace these with your actual GitHub project name
-                owner: 'Dzhuneyt',
-                repo: 'Personal-Finance',
-                branch: process.env.BRANCH_NAME,
-            }),
-
-            synthAction: SimpleSynthAction.standardNpmSynth({
-                sourceArtifact,
-                cloudAssemblyArtifact,
-                // Use this if you need a build step (if you're not using ts-node
-                // or if you have TypeScript Lambdas that need to be compiled).
-                buildCommand: 'npm run build',
-                subdirectory: 'cdk',
-                environmentVariables: {
-                    ENV_NAME: {
-                        value: process.env.BRANCH_NAME as string,
-                    },
-                },
-            }),
+        const ppln = new codepipeline.Pipeline(this, 'Pipeline');
+        ppln.addStage({
+            stageName: "Source",
+            actions: [
+                new codepipeline_actions.GitHubSourceAction({
+                    actionName: 'GitHub',
+                    output: sourceArtifact,
+                    oauthToken: SecretValue.secretsManager('GITHUB_TOKEN_PERSONAL'),
+                    // Replace these with your actual GitHub project name
+                    owner: 'Dzhuneyt',
+                    repo: 'Personal-Finance',
+                    branch: branchName,
+                })
+            ],
         });
 
-        // Do this as many times as necessary with any account and region
-        // Account and region may different from the pipeline's.
-        pipeline.addApplicationStage(new MyApplication(this, `Stage-${process.env.BRANCH_NAME}`, {
-            env: {
-                account: Stack.of(this).account,
-                region: Stack.of(this).region,
-            },
-            branch: process.env.BRANCH_NAME as string,
-        }));
+        const project = new PipelineProject(this, 'CDK-Deploy', {
+            buildSpec: BuildSpec.fromSourceFilename('buildspec.yml'),
+            logging: {
+                s3: {
+                    bucket: this.cacheBucket,
+                    prefix: `ci-cache-${branchName}`,
+                    enabled: true,
+                }
+            }
+        });
+
+        ppln.addStage({
+            stageName: "Deploy",
+            actions: [
+                new codepipeline_actions.CodeBuildAction({
+                    actionName: "CDK-Deploy",
+                    input: sourceArtifact,
+                    project
+                })
+            ],
+        })
     }
 }

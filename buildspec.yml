@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Starting Docker
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2&
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+      - echo Docker started
+    runtime-versions:
+      docker: 18
+  pre_build:
+    commands:
+      - aws --version
+      - npm i --no-audit
+      - (cd cdk && npm i --no-audit)
+  build:
+    commands:
+      - cd cdk && npm run deploy
+
+cache:
+  paths:
+    - ./cdk/node_modules
+    - ./node_modules
