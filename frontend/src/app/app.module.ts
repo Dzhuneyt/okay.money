@@ -36,6 +36,7 @@ import {AccountListComponent} from 'src/app/account-list/account-list.component'
 import {AccountEditComponent} from 'src/app/account-edit/account-edit.component';
 import {ProfileComponent} from 'src/app/profile/profile.component';
 import {StorageModule} from '@ngx-pwa/local-storage';
+import {WelcomeComponent} from './welcome/welcome.component';
 
 const routes: Routes = [
   {
@@ -51,7 +52,6 @@ const routes: Routes = [
   {
     path: 'home',
     component: HomeComponent,
-    canActivate: [LoggedInGuard],
   },
   {
     path: 'transactions',
@@ -95,6 +95,7 @@ const routes: Routes = [
     AccountListComponent,
     AccountEditComponent,
     ProfileComponent,
+    WelcomeComponent,
   ],
   imports: [
     BrowserModule,

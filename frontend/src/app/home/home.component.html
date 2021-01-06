@@ -1,4 +1,8 @@
+<div *ngIf="!(user.loginStateChanges| async).loggedIn">
+  <app-welcome-component></app-welcome-component>
+</div>
 <div
+  *ngIf="(user.loginStateChanges| async).loggedIn"
   class="row-divider"
   fxLayout="row"
   fxLayout.xs="column"

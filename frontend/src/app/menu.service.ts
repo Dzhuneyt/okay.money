@@ -16,6 +16,7 @@ export class MenuService {
   public isOpened = true;
 
   public items = new BehaviorSubject<MenuItem[]>([]);
+  public headerVisible = new BehaviorSubject<boolean>(true);
 
   constructor() {
   }

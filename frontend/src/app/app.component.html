@@ -1,7 +1,10 @@
-<app-header></app-header>
+<app-header *ngIf="shouldShowHeader()"></app-header>
 
 <mat-sidenav-container *ngIf="appReady" class="example-container">
-  <mat-sidenav #sidenav [(opened)]="menuService.isOpened" mode="side">
+  <mat-sidenav
+    #sidenav
+    *ngIf="(user.loginStateChanges|async).loggedIn"
+    [(opened)]="menuService.isOpened" mode="side">
     <div class="sidenav-wrap">
       <app-sidenav></app-sidenav>
     </div>

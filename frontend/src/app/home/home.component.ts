@@ -1,11 +1,12 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BackendService} from '../services/backend.service';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatTabGroup } from '@angular/material/tabs';
+import {MatDialog} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatTabGroup} from '@angular/material/tabs';
 import {AddAccountComponent} from './parts/add-account/add-account.component';
 import {DialogService} from '../services/dialog.service';
 import {AccountSummaryListComponent} from 'src/app/home/parts/accounts-list/account-summary-list.component';
+import {UserService} from "../services/user.service";
 
 @Component({
   selector: 'app-home',
@@ -19,27 +20,15 @@ export class HomeComponent implements OnInit {
   @ViewChild(MatTabGroup) public tabs: MatTabGroup;
 
   constructor(
-    private backend: BackendService,
-    private matDialog: MatDialog,
-    private dialogService: DialogService,
-    private snackbar: MatSnackBar,
+    public user: UserService,
   ) {
   }
 
   ngOnInit() {
-
-  }
-
-  public openAddAccountModal() {
-    this.dialogService.open(AddAccountComponent, {
-      width: '600px'
-    }, (res) => {
-      this.accountListComponent.goToPage();
-
-      this.snackbar.open('Account successfully created', null, {
-        duration: 1000,
-      });
+    this.user.loginStateChanges.subscribe(value => {
+      const {loggedIn} = value;
     });
+
   }
 
 }
