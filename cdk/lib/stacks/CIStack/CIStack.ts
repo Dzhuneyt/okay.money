@@ -16,7 +16,7 @@ class MyApplication extends Stage {
     constructor(scope: Construct, id: string, props: Props) {
         super(scope, id, props);
 
-        const appName = `finance-${process.env.ENV_NAME}`;
+        const appName = `finance-${props.branch}`;
 
         const dynamoStack = new DynamoDBStack(this, `${appName}-dynamodb`, {
             env: props.env,
