@@ -5,8 +5,10 @@
     "cdk": "bin/cdk.js"
   },
   "scripts": {
-    "deploy": "cdk deploy '*' -v --require-approval=never --outputs-file ./outputs.json",
-    "deploy:ci": "cdk deploy '*' --app 'npx ts-node --prefer-ts-exts bin/ci.ts' -v --require-approval=never --outputs-file ./ci-outputs.json",
+    "deploy": "npm run deploy:backend",
+    "deploy:backend": "cdk deploy '*-backend' --require-approval=never --outputs-file ./outputs.json",
+    "deploy:frontend": "cdk deploy '*-frontend' --require-approval=never --outputs-file ./outputs.json",
+    "deploy:ci": "cdk deploy '*' --app 'npx ts-node --prefer-ts-exts bin/ci.ts' --require-approval=never --outputs-file ./ci-outputs.json",
     "test": "jest",
     "cdk": "cdk",
     "build": "cdk synth"
@@ -25,6 +27,8 @@
   },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "^1.83.0",
+    "@aws-cdk/aws-cloudfront": "^1.83.0",
+    "@aws-cdk/aws-cloudfront-origins": "^1.83.0",
     "@aws-cdk/aws-cloudwatch": "^1.83.0",
     "@aws-cdk/aws-codebuild": "^1.83.0",
     "@aws-cdk/aws-cognito": "^1.83.0",

@@ -5,6 +5,7 @@ import 'source-map-support/register';
 import {CognitoStack} from '../lib/stacks/CognitoStack/CognitoStack';
 import {DynamoDBStack} from '../lib/stacks/DynamoDBStack/DynamoDBStack';
 import {RestApisStack} from '../lib/stacks/RestApisStack/RestApisStack';
+import {FrontendStack} from "../lib/stacks/FrontendStack/FrontendStack";
 
 const app = new cdk.App({});
 const env: Environment = {
@@ -36,8 +37,10 @@ try {
 
     // Provide a high level stack that depends on all others, providing
     // an easy mechanism to deploy "everything" by just deploying this stack
-    const mainStack = new Stack(app, `${appName}-main`, {env});
+    const mainStack = new Stack(app, `${appName}-backend`, {env});
     mainStack.addDependency(restApisStack);
+
+    new FrontendStack(app, `${appName}-frontend`, {env});
 
     Tags.of(app).add('app', 'personal-finance');
 } catch (e) {

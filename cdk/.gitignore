@@ -11,4 +11,4 @@ cdk.out
 .cache
 .build
 
-outputs.json
+*outputs.json
