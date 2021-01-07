@@ -1,3 +1,54 @@
-<p>
-  profile works!
-</p>
+<div>
+  <mat-card>
+    <mat-card-title>Profile</mat-card-title>
+    <mat-card-subtitle>
+      Edit your account information
+    </mat-card-subtitle>
+  </mat-card>
+  <br/>
+  <mat-card [class.isLoading]="isLoading" fxLayout="column" fxLayoutAlign="center center">
+
+    <form [formGroup]="form" fxFlexFill>
+      <div class="example-container" fxLayout="column">
+        <mat-form-field>
+          <input matInput placeholder="Email" formControlName="email" required>
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput placeholder="Firstname" formControlName="firstname">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Lastname" formControlName="lastname">
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput placeholder="Current password" [type]="'password'" formControlName="old_password">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>New password</mat-label>
+          <input matInput [type]="'password'" formControlName="new_password">
+        </mat-form-field>
+        <mat-form-field *ngIf="form.controls['new_password'].valid && form.controls['new_password'].value">
+          <mat-label>Repeat the new password</mat-label>
+          <input matInput placeholder="" [type]="'password'" formControlName="new_password_repeat">
+          <mat-error *ngIf="form.controls['new_password_repeat'].hasError('repeatPasswordMismatch')">
+            The two passwords do not match
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <br/>
+
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <button
+          fxFlex="0 1 auto"
+          mat-raised-button
+          (click)="save()"
+          [disabled]="form.invalid || isLoading"
+        >Save
+        </button>
+        <mat-spinner *ngIf="isLoading" diameter="30" style="margin-left:0.5em;"></mat-spinner>
+      </div>
+
+    </form>
+  </mat-card>
+</div>

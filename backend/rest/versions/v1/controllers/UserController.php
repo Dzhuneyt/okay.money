@@ -4,6 +4,7 @@ namespace rest\versions\v1\controllers;
 
 use rest\versions\v1\actions\user\LoginAction;
 use rest\versions\v1\actions\user\ProfileAction;
+use rest\versions\v1\actions\user\ProfileGetAction;
 use yii\filters\auth\QueryParamAuth;
 use yii\filters\Cors;
 use yii\rest\Controller;
@@ -42,6 +43,9 @@ class UserController extends Controller
             ],
             'profile' => [
                 'class' => ProfileAction::class,
+            ],
+            'profile_get' => [
+                'class' => ProfileGetAction::class,
             ],
             'options' => [
                 'class' => OptionsAction::class,

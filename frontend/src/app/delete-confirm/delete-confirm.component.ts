@@ -1,8 +1,9 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {Observable} from 'rxjs';
 import {take} from 'rxjs/operators';
 
+// @TODO Move to UiKit module
 @Component({
   selector: 'app-delete-confirm',
   templateUrl: './delete-confirm.component.html',

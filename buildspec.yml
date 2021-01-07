@@ -1,0 +1,31 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Starting Docker
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2&
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+      - echo Docker started
+    runtime-versions:
+      docker: 18
+  pre_build:
+    commands:
+      - aws --version
+      - cd $CODEBUILD_SRC_DIR && npm i --no-audit
+      - cd $CODEBUILD_SRC_DIR/cdk && npm i --no-audit
+      - cd $CODEBUILD_SRC_DIR/frontend && npm i --no-audit
+  build:
+    commands:
+      - echo Deploying backend infrastructure
+      - cd $CODEBUILD_SRC_DIR/cdk && npm run deploy:backend
+      - echo Building the frontend
+      - cd $CODEBUILD_SRC_DIR/frontend && npm run build:prod
+      - echo Deploying frontend
+      - cd $CODEBUILD_SRC_DIR/cdk && FRONTEND_PATH=$CODEBUILD_SRC_DIR/frontend/dist/frontend npm run deploy:frontend
+
+cache:
+  paths:
+    - ./cdk/node_modules
+    - ./frontend/node_modules
+    - ./node_modules

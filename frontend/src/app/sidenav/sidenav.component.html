@@ -1,23 +1,34 @@
 <mat-list>
   <mat-list-item [routerLink]="['/home']" routerLinkActive="true">
-    <mat-icon mat-list-icon>home</mat-icon>
-    <h4 mat-line>Homepage</h4>
-    <p mat-line> Overview of your accounts and recent spending/income </p>
+    <mat-icon mat-list-icon>account_balance</mat-icon>
+    <h4 mat-line>Overview</h4>
+    <p mat-line> Review your account standings </p>
   </mat-list-item>
+  <mat-divider></mat-divider>
   <mat-list-item [routerLink]="['/transactions']" routerLinkActive="true">
     <mat-icon mat-list-icon>format_list_bulleted</mat-icon>
     <h4 mat-line>Transactions</h4>
-    <p mat-line> See and manage all transactions </p>
+    <p mat-line> Manage your transactions </p>
   </mat-list-item>
   <mat-list-item [routerLink]="['/accounts']" routerLinkActive="true">
-    <mat-icon mat-list-icon>category</mat-icon>
+    <mat-icon mat-list-icon>account_balance_wallet</mat-icon>
     <h4 mat-line>Accounts</h4>
     <p mat-line> Manage your accounts </p>
+  </mat-list-item>
+  <mat-list-item [routerLink]="['/categories']" routerLinkActive="true">
+    <mat-icon mat-list-icon>category</mat-icon>
+    <h4 mat-line>Categories</h4>
+    <p mat-line> Manage income/expense categories </p>
   </mat-list-item>
   <mat-divider></mat-divider>
   <mat-list-item [routerLink]="['/profile']" routerLinkActive="true">
     <mat-icon mat-list-icon>person</mat-icon>
     <h4 mat-line>My profile</h4>
-    <p mat-line> Edit your name, email, avatar </p>
+    <p mat-line> Edit your email, password etc </p>
+  </mat-list-item>
+  <mat-list-item (click)="logout()">
+    <mat-icon mat-list-icon>exit_to_app</mat-icon>
+    <h4 mat-line>Logout</h4>
+    <p mat-line> Sign out from your account</p>
   </mat-list-item>
 </mat-list>

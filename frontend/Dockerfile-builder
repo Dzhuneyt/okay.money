@@ -1,16 +1,18 @@
-FROM node:11
+FROM node:12
+
+# Allow Node to run as non root
+ARG uid
+RUN groupmod -g ${uid} node && usermod -u ${uid} -g ${uid} node
 
 WORKDIR /app
 
-RUN rm -rf /app/*
-
-RUN mkdir /.npm-global && npm config set prefix '/.npm-global' &&  export PATH=/.npm-global/bin:$PATH
 COPY build.sh /build.sh
 RUN chmod +x /build.sh
 
-# Dumb init for proper exit code handling
 RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64
 RUN chmod +x /usr/local/bin/dumb-init
+
+# Runs "/usr/bin/dumb-init -- /my/script --with --args"
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 
 CMD ["/build.sh"]

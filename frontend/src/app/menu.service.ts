@@ -1,16 +1,27 @@
 import {Injectable} from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
+
+export interface MenuItem {
+  label: string;
+  matIcon: string;
+  route?: string;
+  onClick?: () => void;
+}
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class MenuService {
 
-    public isOpened = false;
+  public isOpened = true;
 
-    constructor() {
-    }
+  public items = new BehaviorSubject<MenuItem[]>([]);
+  public headerVisible = new BehaviorSubject<boolean>(true);
 
-    toggle() {
-        this.isOpened = !this.isOpened;
-    }
+  constructor() {
+  }
+
+  toggle() {
+    this.isOpened = !this.isOpened;
+  }
 }

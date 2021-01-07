@@ -1,5 +1,5 @@
 import {Injectable, TemplateRef} from '@angular/core';
-import {MatDialog, MatDialogConfig} from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import {ComponentType} from '@angular/cdk/portal';
 
 @Injectable({
@@ -20,6 +20,7 @@ export class DialogService {
     config?: MatDialogConfig<any>,
     onDialogClose?: (result: any) => any,
   ) {
+
     const dialogRef = this.dialog.open(componentOrTemplateRef, config);
 
     // Subscribe for dialog closing and propagate the value

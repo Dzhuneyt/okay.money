@@ -10,3 +10,23 @@
 .mat-header-row {
   min-height: 35px;
 }
+
+.loading {
+  width: 100%;
+
+  mat-spinner {
+    // Center spinner
+    margin: auto;
+  }
+}
+
+.table-footer {
+  margin-top: 1em;
+}
+
+.footer-actions {
+  .button-wrapper {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+  }
+}

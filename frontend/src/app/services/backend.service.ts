@@ -1,10 +1,10 @@
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {LocalStorage} from '@ngx-pwa/local-storage';
-import {catchError, flatMap} from 'rxjs/operators';
 import {Router} from '@angular/router';
-import {environment} from "src/environments/environment";
+import {LocalStorage} from '@ngx-pwa/local-storage';
+import {EMPTY, Observable} from 'rxjs';
+import {catchError, mergeMap, tap} from 'rxjs/operators';
+import {environment} from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -23,24 +23,37 @@ export class BackendService {
   request(path: string, method: string = 'get', queryParams = {}, bodyParams = {}): Observable<any> {
     const absoluteUrl = this.baseUrl + path;
 
-    return this.localStorage.getItem('auth_key')
-      .pipe(flatMap(authKey => {
-        if (authKey) {
-          queryParams['access-token'] = authKey;
-        }
-        return this.http.request(method, absoluteUrl, {
-          body: bodyParams,
-          params: queryParams,
-        }).pipe(
-          catchError(err => {
-            console.log(err);
-            if (err.status === 401) {
-              // Unauthorized
-              this.router.navigate(['/login']);
-            }
-            throw err;
-          })
-        );
-      }));
+    return this.localStorage.getItem('access_token')
+      .pipe(
+        mergeMap(authKey => {
+          console.time(`${method.toUpperCase()} /${path}`);
+          const headers = new HttpHeaders(authKey ? {
+            'Authorization': authKey['IdToken'],
+          } : {});
+          return this.http.request(method, absoluteUrl, {
+            body: bodyParams,
+            params: queryParams,
+            headers,
+          }).pipe(
+            tap(() => console.timeEnd(`${method.toUpperCase()} /${path}`)),
+            catchError(err => {
+              console.error(`${method.toUpperCase()} /${path} ERROR:`, err.message);
+              if (err.status === 401 || err.status === 403) {
+                // Unauthorized. Most likely Access token has expired
+                console.log('Access token expired. Redirecting to login page');
+                this.localStorage.removeItem('access_token').subscribe(() => {
+                  this.router.navigate(['/login']);
+                });
+                return EMPTY;
+              }
+              throw err;
+            }),
+            tap((response) => console.log(
+              `${method.toUpperCase()} /${path} response:`,
+              response
+            )),
+          );
+        })
+      );
   }
 }

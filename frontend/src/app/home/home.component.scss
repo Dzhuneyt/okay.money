@@ -7,6 +7,8 @@
 // by default it has some extra left spacing (expects always an avatar)
 ::ng-deep mat-card-header .mat-card-header-text {
   margin: 0 16px 0 0;
+  width: 100%;
+  text-align: center;
 }
 
 .row-divider {

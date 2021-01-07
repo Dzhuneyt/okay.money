@@ -5,6 +5,7 @@ import {AppComponent} from './app.component';
 import {LoginComponent} from './login/login.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {RegisterComponent} from './register/register.component';
 import {BackendService} from './services/backend.service';
 import {HttpClientModule} from '@angular/common/http';
 import {HomeComponent} from './home/home.component';
@@ -24,7 +25,8 @@ import {StatsByCategoryComponent} from 'src/app/stats-by-category/stats-by-categ
 import {UserService} from 'src/app/services/user.service';
 import {CommonModule} from '@angular/common';
 import {SidenavComponent} from 'src/app/sidenav/sidenav.component';
-import {MatListModule, MatSlideToggleModule} from '@angular/material';
+import {MatListModule} from '@angular/material/list';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';
@@ -33,6 +35,8 @@ import {AnonymousUserGuard} from 'src/app/guards/anonymous-user.guard';
 import {AccountListComponent} from 'src/app/account-list/account-list.component';
 import {AccountEditComponent} from 'src/app/account-edit/account-edit.component';
 import {ProfileComponent} from 'src/app/profile/profile.component';
+import {StorageModule} from '@ngx-pwa/local-storage';
+import {WelcomeComponent} from './welcome/welcome.component';
 
 const routes: Routes = [
   {
@@ -41,9 +45,13 @@ const routes: Routes = [
     canActivate: [AnonymousUserGuard]
   },
   {
+    path: 'register',
+    component: RegisterComponent,
+    canActivate: [AnonymousUserGuard]
+  },
+  {
     path: 'home',
     component: HomeComponent,
-    canActivate: [LoggedInGuard],
   },
   {
     path: 'transactions',
@@ -53,6 +61,11 @@ const routes: Routes = [
   {
     path: 'accounts',
     component: AccountListComponent,
+    canActivate: [LoggedInGuard],
+  },
+  {
+    path: 'categories',
+    loadChildren: () => import('./category/category.module').then(m => m.CategoryModule),
     canActivate: [LoggedInGuard],
   },
   {
@@ -71,6 +84,7 @@ const routes: Routes = [
     AppComponent,
     HomeComponent,
     LoginComponent,
+    RegisterComponent,
     AccountSummaryListComponent,
     AddAccountComponent,
     TransactionListComponent,
@@ -81,6 +95,7 @@ const routes: Routes = [
     AccountListComponent,
     AccountEditComponent,
     ProfileComponent,
+    WelcomeComponent,
   ],
   imports: [
     BrowserModule,
@@ -88,7 +103,7 @@ const routes: Routes = [
     FormsModule,
     FlexLayoutModule,
     HttpClientModule,
-    RouterModule.forRoot(routes),
+    RouterModule.forRoot(routes, {relativeLinkResolution: 'legacy'}),
     BrowserAnimationsModule,
     MaterialComponentsModule,
     ChartsModule,
@@ -98,6 +113,7 @@ const routes: Routes = [
     MatListModule,
     ReactiveFormsModule,
     MatSlideToggleModule,
+    StorageModule.forRoot({IDBNoWrap: false}),
   ],
   providers: [
     BackendService,

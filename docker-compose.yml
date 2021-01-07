@@ -2,10 +2,8 @@ version: "3"
 
 services:
   nginx:
-    image: ${ECR_PREFIX}/nginx:${TAG}
     build: nginx
     environment:
-      - IS_AWS=${IS_AWS}
       - BACKEND_HOST=backend
       - FRONTEND_HOST=frontend
     ports:
@@ -14,31 +12,28 @@ services:
       - backend
       - frontend
   backend:
-    image: ${ECR_PREFIX}/backend:${TAG}
     build:
       context: backend
     volumes:
       - ./backend:/app
     environment:
-      - MYSQL_HOST=${MYSQL_HOST}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASS=${MYSQL_PASS}
-      - MYSQL_DB=${MYSQL_DB}
-      - MAILER_HOST=${MAILER_HOST}
-      - MAILER_USERNAME=${MAILER_USERNAME}
-      - MAILER_PASSWORD=${MAILER_PASSWORD}
-    env_file:
-      - .env
+      - MYSQL_HOST=${MYSQL_HOST:-mysql}
+      - MYSQL_USER=${MYSQL_USER:-user}
+      - MYSQL_PASS=${MYSQL_PASS:-password}
+      - MYSQL_DB=${MYSQL_DB:-db}
+      - MAILER_HOST=${MAILER_HOST:-smtp.mailtrap.io}
+      - MAILER_USERNAME=${MAILER_USERNAME:-changeme}
+      - MAILER_PASSWORD=${MAILER_PASSWORD:-changeme}
+      - PLATFORM_OWNER_EMAIL=${PLATFORM_OWNER_EMAIL:-owner@example.com}
     ports:
       - "8081:80"
     depends_on:
       - mysql
   frontend:
-    image: ${ECR_PREFIX}/frontend:${TAG}
     build:
       context: frontend
     volumes:
-      - ./frontend:/app
+      - ./frontend:/app:cached
     ports:
       - 8082:80
 
@@ -50,9 +45,9 @@ services:
     environment:
       MYSQL_DATABASE: 'db'
       # So you don't have to use root, but you can if you like
-      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_USER: ${MYSQL_USER:-user}
       # You can use whatever password you like
-      MYSQL_PASSWORD: ${MYSQL_PASS}
+      MYSQL_PASSWORD: ${MYSQL_PASS:-password}
       # Password for root access
       MYSQL_ROOT_PASSWORD: 'password'
     volumes:

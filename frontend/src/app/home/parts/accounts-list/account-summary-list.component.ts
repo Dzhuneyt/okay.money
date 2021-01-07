@@ -10,15 +10,15 @@ import {TableColumn, TableComponent} from "../../../table/table.component";
 })
 export class AccountSummaryListComponent implements OnInit {
 
-  @ViewChild(TableComponent) table: TableComponent;
+  @ViewChild(TableComponent, {static: true}) table: TableComponent;
 
   public displayedColumns: TableColumn[] = [
     {
       label: 'Name',
-      code: 'name',
+      code: 'title',
     },
     {
-      label: 'Current balance',
+      label: 'Balance',
       code: 'current_balance',
     }
   ];
@@ -35,7 +35,7 @@ export class AccountSummaryListComponent implements OnInit {
   public rowFetchers = (page: number, pageSize: number) => {
     return this.backend
       .request(
-        'v1/accounts',
+        'account',
         'get',
         {
           page: page,
@@ -44,14 +44,14 @@ export class AccountSummaryListComponent implements OnInit {
       )
       .pipe(
         take(1),
-        map(result => {
+        map((result: Account[]) => {
           return {
-            items: result['items'],
-            totalCount: result['_meta']['totalCount']
-          }
+            items: result,
+            totalCount: result.length,
+          };
         })
       );
-  };
+  }
 
   ngOnInit() {
 

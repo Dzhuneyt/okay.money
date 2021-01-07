@@ -1,8 +1,6 @@
 <form (ngSubmit)="login().subscribe()" class="example-form">
   <mat-card class="example-card">
-    <mat-card-header>
-      <mat-card-title>Signin</mat-card-title>
-    </mat-card-header>
+    <h2>Login</h2>
     <mat-card-content>
 
       <table cellspacing="0" class="example-full-width">
@@ -25,8 +23,19 @@
 
       <mat-spinner [style.display]="showSpinner ? 'block' : 'none'"></mat-spinner>
     </mat-card-content>
-    <mat-card-actions>
-      <button (click)="login().subscribe()" color="primary" mat-raised-button>Login</button>
+
+    <mat-card-actions style="text-align: center;">
+      <button
+        type="button"
+        [disabled]="!username || !password"
+        (click)="login().subscribe()" color="primary" mat-raised-button>Login
+      </button>
     </mat-card-actions>
+    <br/>
   </mat-card>
+
+  <p class="side-note">
+    Not a member yet? <a [attr.href]="router.createUrlTree(['/register'])" [routerLink]="['/register']">Register</a>
+  </p>
+
 </form>

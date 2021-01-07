@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable, Observer} from 'rxjs';
-import {LocalStorage} from '@ngx-pwa/local-storage';
 import {UserService} from 'src/app/services/user.service';
 
 @Injectable({
@@ -9,7 +8,6 @@ import {UserService} from 'src/app/services/user.service';
 })
 export class LoggedInGuard implements CanActivate {
   constructor(
-    private localStorage: LocalStorage,
     private router: Router,
     private user: UserService,
   ) {
@@ -22,7 +20,7 @@ export class LoggedInGuard implements CanActivate {
       this.user.restoreUserState().subscribe(() => {
         // Don't allow anonymous users here
         // This route allows only logged in users
-        if (this.user.loginStageChanges.getValue().loggedIn) {
+        if (this.user.loginStateChanges.getValue().loggedIn) {
           observer.next(true);
         } else {
           observer.next(false);

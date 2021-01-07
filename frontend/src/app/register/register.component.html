@@ -1,0 +1,78 @@
+<form
+  *ngIf="token$ | async"
+  [formGroup]="formWithToken" class="example-form"
+>
+  <mat-card class="example-card">
+    <h2>Finish registration</h2>
+    <mat-card-content>
+      <div fxLayout="column">
+        <mat-form-field fxFlex>
+          <label>
+            <input
+              [formControlName]="'password'"
+              matInput
+              name="password"
+              placeholder="Password"
+              required>
+          </label>
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <label>
+            <input
+              [formControlName]="'passwordRepeat'"
+              matInput
+              name="password_repeat"
+              placeholder="Repeat the password"
+              required>
+          </label>
+        </mat-form-field>
+      </div>
+      <mat-spinner [style.display]="showSpinner ? 'block' : 'none'"></mat-spinner>
+    </mat-card-content>
+    <mat-card-actions style="text-align: center;">
+      <button
+        type="button"
+        (click)="confirmRegistration().subscribe()" color="primary" mat-raised-button>Register
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</form>
+<form
+  *ngIf="!(token$ | async)"
+  [formGroup]="form"
+  class="example-form">
+  <mat-card class="example-card">
+    <h2>Register</h2>
+    <mat-card-content>
+      <table cellspacing="0" class="example-full-width">
+        <tr>
+          <td>
+            <mat-form-field class="example-full-width">
+              <input
+                [formControlName]="'email'"
+                matInput
+                name="email"
+                placeholder="Email"
+                required
+              >
+            </mat-form-field>
+          </td>
+        </tr>
+      </table>
+
+      <mat-spinner [style.display]="showSpinner ? 'block' : 'none'"></mat-spinner>
+    </mat-card-content>
+    <mat-card-actions style="text-align: center;">
+      <button
+        [disabled]="form.invalid"
+        type="button"
+        (click)="register().subscribe()" color="primary" mat-raised-button>Register
+      </button>
+    </mat-card-actions>
+    <br/>
+  </mat-card>
+
+  <p class="side-note">
+    Already a member? <a [attr.href]="router.createUrlTree(['/login'])" [routerLink]="['/login']">Login</a>
+  </p>
+</form>
