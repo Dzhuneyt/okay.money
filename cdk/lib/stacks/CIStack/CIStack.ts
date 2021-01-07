@@ -49,11 +49,11 @@ export class CIStack extends Stack {
                     enabled: true,
                     logGroup: new LogGroup(this, 'cdk-deploy-logs', {
                         removalPolicy: RemovalPolicy.DESTROY,
-                        retention: RetentionDays.FIVE_MONTHS,
+                        retention: RetentionDays.ONE_MONTH,
                     })
                 },
             },
-            cache: Cache.local(LocalCacheMode.CUSTOM, LocalCacheMode.DOCKER_LAYER, LocalCacheMode.SOURCE),
+            cache: Cache.bucket(this.cacheBucket, {prefix: 'ci'}),
             environment: {
                 buildImage: LinuxBuildImage.AMAZON_LINUX_2_3,
                 computeType: ComputeType.LARGE,

@@ -45,29 +45,31 @@ export class DynamoDBStack extends Stack {
     }
 
     private storeInParameterStore() {
+        const appName = `finance-${process.env.ENV_NAME}`;
+
         new StringParameter(this, 'accounts-arn', {
             stringValue: this.tableAccount.tableArn,
-            parameterName: '/personalfinance/table/accounts/arn',
+            parameterName: `/${appName}/table/accounts/arn`,
         });
         new StringParameter(this, 'accounts-name', {
             stringValue: this.tableAccount.tableName,
-            parameterName: '/personalfinance/table/accounts/name',
+            parameterName: `/${appName}/table/accounts/name`,
         });
         new StringParameter(this, 'categories-arn', {
             stringValue: this.tableCategory.tableArn,
-            parameterName: '/personalfinance/table/categories/arn',
+            parameterName: `/${appName}/table/categories/arn`,
         });
         new StringParameter(this, 'categories-name', {
             stringValue: this.tableCategory.tableName,
-            parameterName: '/personalfinance/table/categories/name',
+            parameterName: `/${appName}/table/categories/name`,
         });
         new StringParameter(this, 'transactions-arn', {
             stringValue: this.tableTransaction.tableArn,
-            parameterName: '/personalfinance/table/transactions/arn',
+            parameterName: `/${appName}/table/transactions/arn`,
         });
         new StringParameter(this, 'transactions-name', {
             stringValue: this.tableTransaction.tableName,
-            parameterName: '/personalfinance/table/transactions/name',
+            parameterName: `/${appName}/table/transactions/name`,
         });
     }
 }
