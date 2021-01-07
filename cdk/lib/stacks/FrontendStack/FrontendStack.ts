@@ -1,8 +1,8 @@
-import {Construct, RemovalPolicy, Stack, StackProps} from "@aws-cdk/core";
+import {Annotations, Construct, RemovalPolicy, Stack, StackProps} from "@aws-cdk/core";
 import {Bucket, IBucket} from "@aws-cdk/aws-s3";
 import {Distribution, OriginAccessIdentity} from "@aws-cdk/aws-cloudfront";
 import * as origins from '@aws-cdk/aws-cloudfront-origins';
-
+import {BucketDeployment, Source} from "@aws-cdk/aws-s3-deployment";
 
 export class FrontendStack extends Stack {
     private readonly bucket: IBucket;
@@ -14,6 +14,15 @@ export class FrontendStack extends Stack {
             removalPolicy: RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
         });
+
+        if (!process.env.FRONTEND_PATH) {
+            Annotations.of(this).addError(`FRONTEND_PATH environment variable not set. FrontendStack can not be deployed`);
+        } else {
+            new BucketDeployment(this, 'BucketDeployment', {
+                sources: [Source.asset(process.env.FRONTEND_PATH as string)],
+                destinationBucket: this.bucket,
+            });
+        }
 
         // Allow CloudFront to access private bucket contents using OriginAccessIdentity
         const originAccessIdentity = new OriginAccessIdentity(this, 'OriginAccessIdentity');
