@@ -10,6 +10,7 @@ import {FrontendStack} from "../lib/stacks/FrontendStack/FrontendStack";
 const app = new cdk.App({});
 const env: Environment = {
     account: "347315207830", // SS Personal
+    region: process.env.CDK_DEFAULT_REGION, // SS Personal
 }
 
 if (!process.env.ENV_NAME) {
