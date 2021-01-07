@@ -12,13 +12,19 @@ phases:
   pre_build:
     commands:
       - aws --version
-      - npm i --no-audit
-      - (cd cdk && npm i --no-audit)
+      - cd $CODEBUILD_SRC_DIR && npm i --no-audit
+      - cd $CODEBUILD_SRC_DIR/cdk && npm i --no-audit
+      - cd $CODEBUILD_SRC_DIR/frontend && npm i --no-audit
   build:
     commands:
-      - cd cdk && npm run deploy
+      - echo Deploying backend infrastructure
+      - cd $CODEBUILD_SRC_DIR/cdk && npm run deploy:backend
+      - echo Building the frontend
+      - cd $CODEBUILD_SRC_DIR/frontend && npm run build:prod
+      - echo Deploying frontend
 
 cache:
   paths:
     - ./cdk/node_modules
+    - ./frontend/node_modules
     - ./node_modules
