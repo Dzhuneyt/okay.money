@@ -22,7 +22,7 @@ phases:
       - echo Building the frontend
       - cd $CODEBUILD_SRC_DIR/frontend && npm run build:prod
       - echo Deploying frontend
-      - cd $CODEBUILD_SRC_DIR/cdk && FRONTEND_PATH=$CODEBUILD_SRC_DIR/frontend/dist/frontend npm run deploy:backend
+      - cd $CODEBUILD_SRC_DIR/cdk && FRONTEND_PATH=$CODEBUILD_SRC_DIR/frontend/dist/frontend npm run deploy:frontend
 
 cache:
   paths:
