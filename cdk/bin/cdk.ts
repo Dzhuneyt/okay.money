@@ -41,7 +41,7 @@ try {
     const mainStack = new Stack(app, `${appName}-backend`, {env});
     mainStack.addDependency(restApisStack);
 
-    new FrontendStack(app, `${appName}-frontend`, {env});
+    new FrontendStack(app, `${appName}-frontend`, {env, api: restApisStack.api});
 
     Tags.of(app).add('app', 'personal-finance');
 } catch (e) {

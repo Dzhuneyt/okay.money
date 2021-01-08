@@ -1,4 +1,4 @@
-import {AuthorizationType, IRestApi} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, IResource, IRestApi} from '@aws-cdk/aws-apigateway';
 import {IUserPool} from '@aws-cdk/aws-cognito';
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {Construct} from '@aws-cdk/core';
@@ -10,11 +10,11 @@ import {Table} from "../../../../constructs/Table";
 export class Register extends Construct {
     constructor(scope: Construct, id: string, props: {
         userPool: IUserPool,
-        api: IRestApi,
+        apiRootResource: IResource,
     }) {
         super(scope, id);
 
-        const apiResourceRegister = props.api.root
+        const apiResourceRegister = props.apiRootResource
             .addResource('register');
 
         const tableForTokens = new Table(this, 'RegistrationTokens', {});

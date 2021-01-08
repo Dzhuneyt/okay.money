@@ -1,8 +1,8 @@
-import {AuthorizationType, CfnAuthorizer, IAuthorizer, RestApi} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, CfnAuthorizer, IAuthorizer, Resource, RestApi} from '@aws-cdk/aws-apigateway';
 import {UserPool} from '@aws-cdk/aws-cognito';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import * as cdk from '@aws-cdk/core';
-import {CfnOutput, StackProps} from '@aws-cdk/core';
+import {Aspects, CfnOutput, IConstruct, StackProps} from '@aws-cdk/core';
 import {AccountEndpoints} from './constructs/AccountEndpoints/AccountEndpoints';
 import {ApiGateway} from './constructs/ApiGateway';
 import {AuthEndpoints} from './constructs/AuthEndpoints/AuthEndpoints';
@@ -10,6 +10,7 @@ import {CategoryEndpoints} from './constructs/CategoryEndpoints/CategoryEndpoint
 import {StatsEndpoints} from './constructs/StatsEndpoints/StatsEndpoints';
 import {TransactionEndpoints} from './constructs/TransactionEndpoints/TransactionEndpoints';
 import {UserEndpoints} from './constructs/UserEndpoints/UserEndpoints';
+import {NodejsFunction} from "@aws-cdk/aws-lambda-nodejs";
 
 interface Props extends StackProps {
     userPool: UserPool;
@@ -21,9 +22,10 @@ interface Props extends StackProps {
 }
 
 export class RestApisStack extends cdk.Stack {
-    private api: RestApi;
+    public api: RestApi;
     private props: Props;
     private cognitoAuthorizer: IAuthorizer;
+    private apiRootResource: Resource;
 
     constructor(scope: cdk.Construct, id: string, props: Props) {
         super(scope, id, props);
@@ -32,6 +34,8 @@ export class RestApisStack extends cdk.Stack {
 
         this.createApiGateway();
         this.createApigatewayEndpoints();
+
+        this.attachEnvNameToLambdas();
 
         new CfnOutput(this, 'rest-api', {
             value: this.api.url,
@@ -43,37 +47,38 @@ export class RestApisStack extends cdk.Stack {
             userPool: this.props.userPool,
         });
         this.api = apiGateway.api;
+        this.apiRootResource = this.api.root.addResource('api');
         this.createCognitoAuthorizer();
     }
 
     private createApigatewayEndpoints() {
         new AuthEndpoints(this, 'AuthEndpoints', {
-            apiGateway: this.api,
+            apiRootResource: this.apiRootResource,
             userPool: this.props.userPool,
         });
         new AccountEndpoints(this, 'account', {
-            api: this.api,
+            apiRootResource: this.apiRootResource,
             authorizer: this.cognitoAuthorizer,
             dynamoTables: this.props.dynamoTables,
         });
         new CategoryEndpoints(this, 'category', {
-            api: this.api,
+            apiRootResource: this.apiRootResource,
             authorizer: this.cognitoAuthorizer,
             dynamoTables: this.props.dynamoTables,
         });
         new TransactionEndpoints(this, 'transaction', {
-            api: this.api,
+            apiRootResource: this.apiRootResource,
             authorizer: this.cognitoAuthorizer,
             dynamoTables: this.props.dynamoTables,
         });
         new StatsEndpoints(this, 'stats', {
-            api: this.api,
+            apiRootResource: this.apiRootResource,
             authorizer: this.cognitoAuthorizer,
             dynamoTables: this.props.dynamoTables,
         });
 
         new UserEndpoints(this, 'ProfileEndpoints', {
-            apiGateway: this.api,
+            apiRootResource: this.apiRootResource,
             userPool: this.props.userPool,
             authorizer: this.cognitoAuthorizer,
         });
@@ -93,5 +98,16 @@ export class RestApisStack extends cdk.Stack {
             authorizerId: cognitoAuthorizer.ref,
             // authorizationType: AuthorizationType.COGNITO,
         }
+    }
+
+    private attachEnvNameToLambdas() {
+        Aspects.of(this).add({
+            visit(node: IConstruct) {
+                // Make the ENV_NAME variable available to all Lambdas
+                if (node instanceof NodejsFunction) {
+                    node.addEnvironment('ENV_NAME', process.env.ENV_NAME as string);
+                }
+            }
+        })
     }
 }

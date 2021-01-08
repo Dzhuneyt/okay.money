@@ -1,4 +1,4 @@
-import {AuthorizationType, IRestApi} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, IResource, IRestApi} from '@aws-cdk/aws-apigateway';
 import {IUserPool} from '@aws-cdk/aws-cognito';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Construct} from '@aws-cdk/core';
@@ -9,7 +9,7 @@ import {getPropsByLambdaFilename} from '../../../../constructs/rest/util/getLamb
 export class Login extends Construct {
     constructor(scope: Construct, id: string, props: {
         userPool: IUserPool,
-        api: IRestApi,
+        apiRootResource: IResource,
     }) {
         super(scope, id);
 
@@ -33,7 +33,7 @@ export class Login extends Construct {
             ]
         }));
 
-        props.api.root
+        props.apiRootResource
             .addResource('login')
             .addMethod('POST', new LambdaIntegration(fnLogin), {
                 authorizationType: AuthorizationType.NONE,

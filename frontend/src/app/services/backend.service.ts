@@ -11,7 +11,13 @@ import {environment} from 'src/environments/environment';
 })
 export class BackendService {
 
-  baseUrl = environment.baseUrl;
+  get baseUrl(): string {
+    console.log(environment);
+    if (environment.baseUrl && environment.baseUrl.length > 0) {
+      return environment.baseUrl;
+    }
+    return '/api/';
+  }
 
   constructor(
     private http: HttpClient,

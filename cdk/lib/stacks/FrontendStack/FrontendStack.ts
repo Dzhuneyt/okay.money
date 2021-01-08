@@ -1,10 +1,15 @@
 import {Annotations, CfnOutput, Construct, RemovalPolicy, Stack, StackProps} from "@aws-cdk/core";
 import {Bucket, IBucket} from "@aws-cdk/aws-s3";
 import {
+    AllowedMethods,
     CachePolicy,
     Distribution,
     IDistribution,
     OriginAccessIdentity,
+    OriginRequestCookieBehavior,
+    OriginRequestHeaderBehavior,
+    OriginRequestPolicy,
+    OriginRequestQueryStringBehavior,
     PriceClass,
     ViewerProtocolPolicy
 } from "@aws-cdk/aws-cloudfront";
@@ -13,12 +18,35 @@ import {BucketDeployment, Source} from "@aws-cdk/aws-s3-deployment";
 import {ARecord, HostedZone, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
 import {Certificate, ICertificate} from "@aws-cdk/aws-certificatemanager";
 import {CloudFrontTarget} from "@aws-cdk/aws-route53-targets";
+import {RestApi} from "@aws-cdk/aws-apigateway";
+
+function isDirectory(directory: string) {
+    const fs = require('fs');
+    try {
+        // Query the entry
+        const stats = fs.lstatSync(directory);
+
+        // Is it a directory?
+        if (stats.isDirectory()) {
+            // Yes it is
+            return true;
+        }
+    } catch (e) {
+        // ...
+        console.error(e);
+    }
+    return false;
+}
+
+interface Props extends StackProps {
+    api: RestApi,
+}
 
 export class FrontendStack extends Stack {
     private readonly bucket: IBucket;
-    private distribution: IDistribution;
+    private readonly distribution: IDistribution;
 
-    constructor(scope: Construct, id: string, props: StackProps) {
+    constructor(scope: Construct, private id: string, private props: Props) {
         super(scope, id, props);
 
         const hostedZone = this.getHostedZone();
@@ -30,29 +58,70 @@ export class FrontendStack extends Stack {
         });
 
         if (!process.env.FRONTEND_PATH) {
-            Annotations.of(this).addError(`FRONTEND_PATH environment variable not set. FrontendStack can not be deployed`);
-        } else {
-            new BucketDeployment(this, 'BucketDeployment', {
-                sources: [Source.asset(process.env.FRONTEND_PATH as string)],
-                destinationBucket: this.bucket,
-            });
+            // Try to auto resolve, relatively
+            process.env.FRONTEND_PATH = require('path')
+                .resolve(__dirname, '../../../frontend/dist/frontend/');
         }
 
-        // Allow CloudFront to access private bucket contents using OriginAccessIdentity
+        if (!isDirectory(process.env.FRONTEND_PATH as string)) {
+            Annotations.of(this).addError(`Can not deploy FrontendStack because process.env.FRONTEND_PATH does not lead to a valid directory`);
+        }
+
+        new BucketDeployment(this, 'BucketDeployment', {
+            sources: [Source.asset(process.env.FRONTEND_PATH as string)],
+            destinationBucket: this.bucket,
+        });
+
+        /**
+         * Allow this OriginAccessIdentity to access private bucket contents
+         * CloudFront will use this OriginAccessIdentity to communicate with S3
+         */
         const originAccessIdentity = new OriginAccessIdentity(this, 'OriginAccessIdentity');
         this.bucket.grantRead(originAccessIdentity);
 
+        /**
+         * Create the CloudFront distribution that serves as a "proxy"
+         * before the static Angular frontend (stored in S3) and the backend
+         * APIs (powered by API Gateway)
+         */
         this.distribution = new Distribution(this, 'Distribution', {
             defaultBehavior: {
-                origin: new origins.S3Origin(this.bucket, {
-                    originAccessIdentity,
-                }),
+                origin: new origins.S3Origin(this.bucket, {originAccessIdentity}),
                 viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                cachePolicy: CachePolicy.CACHING_DISABLED, // @TODO default seems to cache too aggressively so disable for now
                 compress: true,
-                cachePolicy: CachePolicy.CACHING_OPTIMIZED,
             },
-            // When "/" is visited, assume it's index.html
+
+            /**
+             * When "/" is visited, assume it's index.html
+             */
             defaultRootObject: 'index.html',
+
+            additionalBehaviors: {
+                /**
+                 * Define path regex and behavior configuration for backend API calls
+                 */
+                '/api/*': {
+                    origin: new origins.HttpOrigin(this.props.api.url.split('/')[2], {
+                        originPath: '/prod',
+                    }),
+
+                    // Prevent CloudFront from caching API responses
+                    cachePolicy: CachePolicy.CACHING_DISABLED,
+                    allowedMethods: AllowedMethods.ALLOW_ALL,
+                    compress: true,
+                    viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+
+                    // Forward everything (headers, query params, etc) to API Gateway for further processing
+                    originRequestPolicy: new OriginRequestPolicy(this, 'OriginRequestPolicy', {
+                        queryStringBehavior: OriginRequestQueryStringBehavior.all(),
+                        headerBehavior: OriginRequestHeaderBehavior.allowList('x-api-key'),
+                        cookieBehavior: OriginRequestCookieBehavior.all(),
+                        comment: "comment",
+                        originRequestPolicyName: "originRequestPolicyName",
+                    }),
+                }
+            },
             errorResponses: [
                 // Forward requests to non existing routes always to Angular
                 {
