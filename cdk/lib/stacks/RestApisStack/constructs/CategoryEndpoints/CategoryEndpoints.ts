@@ -1,4 +1,4 @@
-import {AuthorizationType, IAuthorizer, RestApi} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, IAuthorizer, IResource, RestApi} from '@aws-cdk/aws-apigateway';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {Construct} from '@aws-cdk/core';
@@ -11,7 +11,7 @@ export class CategoryEndpoints extends Construct {
     private readonly role: Role;
 
     constructor(scope: Construct, id: string, private props: {
-        api: RestApi,
+        apiRootResource: IResource,
         dynamoTables: {
             [key: string]: Table,
         },
@@ -39,7 +39,8 @@ export class CategoryEndpoints extends Construct {
         );
         props.dynamoTables.category.grantReadWriteData(this.role);
 
-        const apiResource = props.api.root.addResource('category', {});
+        const apiResource = props.apiRootResource
+            .addResource('category', {});
 
         // Category listing
         const fnCategoryList = new LambdaTypescript(this, 'fn-category-list', {

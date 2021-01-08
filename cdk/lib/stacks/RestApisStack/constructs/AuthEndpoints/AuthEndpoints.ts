@@ -1,12 +1,12 @@
-import {IRestApi} from '@aws-cdk/aws-apigateway';
+import {IResource, IRestApi} from '@aws-cdk/aws-apigateway';
 import {IUserPool} from '@aws-cdk/aws-cognito';
 import {Construct} from '@aws-cdk/core';
 import {Login} from './Login';
 import {Register} from './Register';
 
 interface Props {
-    apiGateway: IRestApi,
     userPool: IUserPool,
+    apiRootResource: IResource,
 }
 
 export class AuthEndpoints extends Construct {
@@ -18,14 +18,14 @@ export class AuthEndpoints extends Construct {
 
     private createLoginEndpoint() {
         new Login(this, 'Login', {
-            api: this.props.apiGateway,
+            apiRootResource: this.props.apiRootResource,
             userPool: this.props.userPool,
         })
     }
 
     private createRegisterEndpoint() {
         new Register(this, 'Register', {
-            api: this.props.apiGateway,
+            apiRootResource: this.props.apiRootResource,
             userPool: this.props.userPool,
         })
     }

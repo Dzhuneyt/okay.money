@@ -1,4 +1,4 @@
-import {AuthorizationType, IAuthorizer, IRestApi} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, IAuthorizer, IResource, IRestApi} from '@aws-cdk/aws-apigateway';
 import {IUserPool} from '@aws-cdk/aws-cognito';
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {NodejsFunction} from '@aws-cdk/aws-lambda-nodejs';
@@ -8,7 +8,7 @@ import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
 
 export class UserEndpoints extends Construct {
     constructor(scope: Construct, id: string, private props: {
-        apiGateway: IRestApi,
+        apiRootResource: IResource,
         userPool: IUserPool,
         authorizer: IAuthorizer,
     }) {
@@ -42,7 +42,8 @@ export class UserEndpoints extends Construct {
             resources: [this.props.userPool.userPoolArn],
         }));
 
-        const userResource = this.props.apiGateway.root.addResource('user');
+        const userResource = this.props.apiRootResource
+            .addResource('user');
 
         const profileResource = userResource.addResource('profile', {});
 

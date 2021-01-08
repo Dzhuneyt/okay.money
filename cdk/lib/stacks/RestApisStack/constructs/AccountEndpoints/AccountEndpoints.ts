@@ -1,4 +1,4 @@
-import {AuthorizationType, IAuthorizer, RestApi} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, IAuthorizer, IResource, RestApi} from '@aws-cdk/aws-apigateway';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
@@ -9,7 +9,7 @@ export class AccountEndpoints extends Construct {
     private readonly authorizer: IAuthorizer;
 
     constructor(scope: Construct, id: string, props: {
-        api: RestApi,
+        apiRootResource: IResource,
         dynamoTables: {
             [key: string]: Table,
         },
@@ -19,7 +19,7 @@ export class AccountEndpoints extends Construct {
 
         this.authorizer = props.authorizer;
 
-        const apiResources = this.createApiResources(props.api);
+        const apiResources = this.createApiResources(props.apiRootResource);
 
         const fnAccountList = new LambdaTypescript(this, 'fn-account-list', {
             ...getPropsByLambdaFilename('account-list.ts'),
@@ -79,8 +79,8 @@ export class AccountEndpoints extends Construct {
         });
     }
 
-    private createApiResources(api: RestApi) {
-        const accounts = api.root.addResource('account', {});
+    private createApiResources(api: IResource) {
+        const accounts = api.addResource('account', {});
         const account = accounts.addResource('{id}');
         return {
             accounts,

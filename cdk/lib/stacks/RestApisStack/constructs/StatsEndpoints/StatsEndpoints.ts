@@ -1,4 +1,4 @@
-import {AuthorizationType, IAuthorizer, RestApi} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, IAuthorizer, IResource, RestApi} from '@aws-cdk/aws-apigateway';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
@@ -7,7 +7,7 @@ import {getPropsByLambdaFilename} from '../../../../constructs/rest/util/getLamb
 
 export class StatsEndpoints extends Construct {
     constructor(scope: Construct, id: string, props: {
-        api: RestApi,
+        apiRootResource: IResource,
         dynamoTables: {
             [key: string]: Table,
         },
@@ -19,7 +19,7 @@ export class StatsEndpoints extends Construct {
             ...getPropsByLambdaFilename('stats/byCategory.ts'),
         });
 
-        props.api.root
+        props.apiRootResource
             .addResource('stats', {})
             .addResource('by_category')
             .addMethod('GET', new LambdaIntegration(fnByCategory), {

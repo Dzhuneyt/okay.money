@@ -1,4 +1,4 @@
-import {AuthorizationType, IAuthorizer, RestApi} from '@aws-cdk/aws-apigateway';
+import {AuthorizationType, IAuthorizer, IResource, RestApi} from '@aws-cdk/aws-apigateway';
 import {Table} from '@aws-cdk/aws-dynamodb';
 import {Construct} from '@aws-cdk/core';
 import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
@@ -9,7 +9,7 @@ export class TransactionEndpoints extends Construct {
     private readonly authorizer: IAuthorizer;
 
     constructor(scope: Construct, id: string, props: {
-        api: RestApi,
+        apiRootResource: IResource,
         dynamoTables: {
             [key: string]: Table,
         },
@@ -27,7 +27,8 @@ export class TransactionEndpoints extends Construct {
             },
         });
 
-        const transactions = props.api.root.addResource('transaction', {});
+        const transactions = props.apiRootResource
+            .addResource('transaction', {});
         const transaction = transactions.addResource('{id}');
         transactions.addMethod('POST', new LambdaIntegration(fnTransactionCreate), {
             authorizationType: AuthorizationType.COGNITO,
