@@ -57,7 +57,7 @@ async function createDefaultAccount(userId: string) {
     return true;
 }
 
-async function userExistsInPool(username: string, userPoolId: string) {
+export async function userExistsInPool(username: string, userPoolId: string) {
     try {
         const oldUser = await new CognitoIdentityServiceProvider()
             .adminGetUser({
