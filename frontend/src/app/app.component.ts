@@ -37,12 +37,6 @@ export class AppComponent implements OnInit {
   }
 
   shouldShowHeader() {
-    if (this.user.loginStateChanges.value.loggedIn) {
-      return true;
-    }
-    if (this.router.url === '/home') {
-      return false;
-    }
     return true;
   }
 }
