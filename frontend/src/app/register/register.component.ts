@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, Router} from '@angular/router';
 import {LocalStorage} from '@ngx-pwa/local-storage';
-import {EMPTY, Observable, Observer} from 'rxjs';
+import {BehaviorSubject, EMPTY, Observable, Observer, ReplaySubject} from 'rxjs';
 import {BackendService} from '../services/backend.service';
 import {UserService} from '../services/user.service';
 import {catchError, filter, map} from 'rxjs/operators';
@@ -16,24 +16,20 @@ import {SnackbarService} from '../services/snackbar.service';
 })
 export class RegisterComponent implements OnInit {
 
-  public showSpinner = false;
+  public isLoading = false;
 
-  /**
-   * On registration user receives a confirmation email with link + token query param
-   * When clicked, user lands on this component, with this variable populated
-   */
-  public token$ = this.activatedRoute.queryParamMap.pipe(
-    filter(value => value.has('token')),
-    map(value => value.get('token')),
-  );
+  public registrationTokenInfo: {
+    id: string,
+    email: string,
+  };
 
   public form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
   });
 
   public formWithToken = new FormGroup({
-    password: new FormControl('', [Validators.required]),
-    passwordRepeat: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required, Validators.min(6)]),
+    passwordRepeat: new FormControl('', [Validators.required, Validators.min(6)]),
   });
 
   constructor(
@@ -42,17 +38,51 @@ export class RegisterComponent implements OnInit {
     private localStorage: LocalStorage,
     private snackbar: MatSnackBar,
     private snackbarService: SnackbarService,
-    private router: Router,
+    public router: Router,
     private activatedRoute: ActivatedRoute,
+    private ref: ChangeDetectorRef,
   ) {
   }
 
+  public hasConfirmToken(): boolean {
+    return this.activatedRoute.snapshot.queryParamMap.has('token');
+  }
+
   ngOnInit() {
+
+    // Whenever the current Component is visited with the ?token=xxx query param
+    this.activatedRoute.queryParamMap.pipe(
+      filter(value => value.has('token')),
+      map(value => value.get('token')),
+    )
+      .subscribe(token => {
+        this.backendService
+          .request('register/registrationToken', 'GET', {token})
+          .pipe(
+            catchError(err => {
+              this.snackbarService.error('Invalid registration link. It may be expired');
+              // Redirect to registration page so the user can re-register
+              this.router.navigate(['/register']);
+              this.ref.detectChanges();
+              // Prevent further code execution
+              return EMPTY;
+            })
+          )
+          .subscribe((value: {
+            id: string,
+            email: string,
+          }) => {
+            this.registrationTokenInfo = {
+              id: value.id,
+              email: value.email,
+            };
+          });
+      });
   }
 
   register(): Observable<boolean> {
     return new Observable<boolean>((observer: Observer<boolean>) => {
-      this.showSpinner = true;
+      this.isLoading = true;
       this.backendService
         .request('register', 'post', {}, {
           email: this.form.controls['email'].value,
@@ -64,7 +94,7 @@ export class RegisterComponent implements OnInit {
                 ? err.error.message
                 : JSON.stringify(err.error)
             );
-            this.showSpinner = false;
+            this.isLoading = false;
             observer.next(false);
             observer.complete();
             console.log(err.error);
@@ -74,7 +104,7 @@ export class RegisterComponent implements OnInit {
         .subscribe(result => {
           console.log(result);
           console.log('Register initiation success');
-          this.showSpinner = false;
+          this.isLoading = false;
 
           this.snackbarService.success('Registered successfully. Please check your email for a confirmation link.');
 
@@ -85,7 +115,7 @@ export class RegisterComponent implements OnInit {
         }, (result) => {
           console.error('Registration failed with errors', result);
           this.snackbarService.error(`Registration failed: ${result.error}`);
-          this.showSpinner = false;
+          this.isLoading = false;
 
           observer.next(false);
           observer.complete();
@@ -95,7 +125,7 @@ export class RegisterComponent implements OnInit {
 
   confirmRegistration() {
     return new Observable<boolean>((observer: Observer<boolean>) => {
-      this.showSpinner = true;
+      this.isLoading = true;
       this.backendService
         .request('register/confirm', 'post', {}, {
           token: this.activatedRoute.snapshot.queryParams['token'],
@@ -108,7 +138,7 @@ export class RegisterComponent implements OnInit {
                 ? err.error.message
                 : JSON.stringify(err.error)
             );
-            this.showSpinner = false;
+            this.isLoading = false;
             observer.next(false);
             observer.complete();
             console.log(err.error);
@@ -118,7 +148,7 @@ export class RegisterComponent implements OnInit {
         .subscribe(result => {
           console.log(result);
           console.log('Register success');
-          this.showSpinner = false;
+          this.isLoading = false;
 
           this.snackbarService.success('Registered successfully');
 
@@ -129,7 +159,7 @@ export class RegisterComponent implements OnInit {
         }, (result) => {
           console.error('Registration failed with errors', result);
           this.snackbarService.error(`Registration failed: ${result.error}`);
-          this.showSpinner = false;
+          this.isLoading = false;
 
           observer.next(false);
           observer.complete();

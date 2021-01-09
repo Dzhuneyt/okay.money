@@ -12,9 +12,8 @@ import {environment} from 'src/environments/environment';
 export class BackendService {
 
   get baseUrl(): string {
-    console.log(environment);
     if (environment.baseUrl && environment.baseUrl.length > 0) {
-      return environment.baseUrl;
+      return environment.baseUrl + 'api/';
     }
     return '/api/';
   }

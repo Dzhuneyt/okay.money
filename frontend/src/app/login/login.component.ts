@@ -14,7 +14,7 @@ import {SnackbarService} from '../services/snackbar.service';
 })
 export class LoginComponent {
 
-  username: string;
+  email: string;
   password: string;
 
   public showSpinner = false;
@@ -34,7 +34,7 @@ export class LoginComponent {
       this.showSpinner = true;
       this.backendService
         .request('login', 'post', {}, {
-          username: this.username,
+          username: this.email,
           password: this.password,
         })
         .subscribe(result => {

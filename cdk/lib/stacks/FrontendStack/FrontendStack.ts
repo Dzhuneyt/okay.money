@@ -1,8 +1,7 @@
 import {Annotations, CfnOutput, Construct, RemovalPolicy, Stack, StackProps} from "@aws-cdk/core";
 import {Bucket, IBucket} from "@aws-cdk/aws-s3";
 import {
-    AllowedMethods,
-    CachePolicy,
+    AllowedMethods, CachePolicy,
     Distribution,
     IDistribution,
     OriginAccessIdentity,
@@ -60,11 +59,11 @@ export class FrontendStack extends Stack {
         if (!process.env.FRONTEND_PATH) {
             // Try to auto resolve, relatively
             process.env.FRONTEND_PATH = require('path')
-                .resolve(__dirname, '../../../frontend/dist/frontend/');
+                .resolve(__dirname, '../../../../frontend/dist/frontend/');
         }
 
         if (!isDirectory(process.env.FRONTEND_PATH as string)) {
-            Annotations.of(this).addError(`Can not deploy FrontendStack because process.env.FRONTEND_PATH does not lead to a valid directory`);
+            throw new Error(`Can not deploy FrontendStack because process.env.FRONTEND_PATH does not lead to a valid directory`);
         }
 
         new BucketDeployment(this, 'BucketDeployment', {

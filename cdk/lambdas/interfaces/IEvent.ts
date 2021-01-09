@@ -15,6 +15,10 @@ export interface IEvent {
         [key: string]: string,
     },
 
+    queryStringParameters: {
+        [key: string]: string,
+    }
+
     // Request body
     body: string,
 }
