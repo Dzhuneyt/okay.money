@@ -31,8 +31,6 @@ function isDirectory(directory: string) {
             return true;
         }
     } catch (e) {
-        // ...
-        console.error(e);
     }
     return false;
 }
@@ -63,13 +61,14 @@ export class FrontendStack extends Stack {
         }
 
         if (!isDirectory(process.env.FRONTEND_PATH as string)) {
-            throw new Error(`Can not deploy FrontendStack because process.env.FRONTEND_PATH does not lead to a valid directory`);
+            Annotations.of(this)
+                .addWarning(`Skipping deployment of frontend because process.env.FRONTEND_PATH does not lead to a valid directory`);
+        } else {
+            new BucketDeployment(this, 'BucketDeployment', {
+                sources: [Source.asset(process.env.FRONTEND_PATH as string)],
+                destinationBucket: this.bucket,
+            });
         }
-
-        new BucketDeployment(this, 'BucketDeployment', {
-            sources: [Source.asset(process.env.FRONTEND_PATH as string)],
-            destinationBucket: this.bucket,
-        });
 
         /**
          * Allow this OriginAccessIdentity to access private bucket contents
