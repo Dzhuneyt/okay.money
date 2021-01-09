@@ -3,6 +3,7 @@ import {Handler} from './shared/Handler';
 import {v4} from 'uuid';
 import {DynamoDB} from "aws-sdk";
 import {MailDataRequired} from "@sendgrid/helpers/classes/mail";
+import {userExistsInPool} from "./registerConfirm";
 
 const sendgrid = require('@sendgrid/mail');
 const SENDGRID_API_KEY = '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';
@@ -18,6 +19,10 @@ function getBaseUrl() {
     }
 }
 
+async function emailRegistered(email: string) {
+    return await userExistsInPool(email, process.env.COGNITO_USERPOOL_ID as string);
+}
+
 export const handler = new Handler(async (event: IEvent) => {
     try {
         const body: {
@@ -31,6 +36,13 @@ export const handler = new Handler(async (event: IEvent) => {
                     message: 'Email is invalid',
                 })
             };
+        }
+
+        if (await emailRegistered(body.email)) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({message: "User already registered. Try logging in"}),
+            }
         }
 
         const uuid = v4();
