@@ -9,6 +9,15 @@ const SENDGRID_API_KEY = 'SG.85XsFvlmR4GfjO4hpzAfow.zvcSQHOTKg-YZ838oBmI_-TFI-Ij
 
 sendgrid.setApiKey(SENDGRID_API_KEY);
 
+function getBaseUrl() {
+    switch (process.env.ENV_NAME) {
+        case 'master':
+            return 'https://okay.money';
+        default:
+            return 'http://localhost:3000';
+    }
+}
+
 export const handler = new Handler(async (event: IEvent) => {
     try {
         const body: {
@@ -36,7 +45,8 @@ export const handler = new Handler(async (event: IEvent) => {
             }),
         }).promise();
 
-        const link = `http://localhost:3000/register?token=${uuid}`;
+
+        const link = getBaseUrl() + `/register?token=${uuid}`;
 
         const msg: MailDataRequired = {
             // Prevent emails from ending up in spam, by disabling link cloaking
