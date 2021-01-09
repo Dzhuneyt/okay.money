@@ -14,11 +14,11 @@ export class WelcomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.menuService.headerVisible.next(false);
+    // this.menuService.headerVisible.next(false);
   }
 
   ngOnDestroy() {
-    this.menuService.headerVisible.next(true);
+    // this.menuService.headerVisible.next(true);
   }
 
 }
