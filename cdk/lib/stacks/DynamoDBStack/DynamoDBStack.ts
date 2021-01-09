@@ -45,7 +45,7 @@ export class DynamoDBStack extends Stack {
     }
 
     private storeInParameterStore() {
-        const appName = `finance-${process.env.ENV_NAME}`;
+        const appName = `finance/${process.env.ENV_NAME}`;
 
         new StringParameter(this, 'accounts-arn', {
             stringValue: this.tableAccount.tableArn,
