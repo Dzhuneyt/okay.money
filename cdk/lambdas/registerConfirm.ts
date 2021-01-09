@@ -37,7 +37,7 @@ async function createDefaultAccount(userId: string) {
     const dynamo = new AWS.DynamoDB();
 
     for (const account of [
-        'Cash at hand',
+        'Cash',
         'Bank account',
     ]) {
         const uuid = uuidv4();
@@ -131,12 +131,6 @@ export const handler = new Handler(async (event: IEvent) => {
             };
         }
 
-        // Mark the link as consumed
-        await new DynamoDB().deleteItem({
-            TableName: process.env.TABLE_NAME_TOKENS as string,
-            Key: DynamoDB.Converter.marshall({id: body.token}),
-        }).promise()
-
         const username = tokenItem.email;
         const password = body.password;
 
@@ -145,17 +139,6 @@ export const handler = new Handler(async (event: IEvent) => {
                 statusCode: 400,
                 body: JSON.stringify({
                     message: `Password must be longer than 6 characters`,
-                })
-            }
-        }
-
-        const exists = await userExistsInPool(username, userPoolId);
-
-        if (exists) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    message: 'User already exists',
                 })
             }
         }
@@ -214,6 +197,12 @@ export const handler = new Handler(async (event: IEvent) => {
         // Create default things for this newly created user
         await createDefaultCategories(sub);
         await createDefaultAccount(sub);
+
+        // Mark the link as consumed
+        await new DynamoDB().deleteItem({
+            TableName: process.env.TABLE_NAME_TOKENS as string,
+            Key: DynamoDB.Converter.marshall({id: body.token}),
+        }).promise()
 
         return {
             statusCode: 200,

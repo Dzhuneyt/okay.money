@@ -18,6 +18,8 @@ export class CognitoStack extends Stack {
     constructor(scope: Construct, id: string, props: Props) {
         super(scope, id, props);
 
+        const appName = `finance/${process.env.ENV_NAME}`;
+
         this.userPool = new UserPool(this, 'users', {
             passwordPolicy: {
                 minLength: 6,
@@ -29,7 +31,7 @@ export class CognitoStack extends Stack {
         });
         new StringParameter(this, 'param-cognito-userpool-id', {
             stringValue: this.userPool.userPoolId,
-            parameterName: `/personalfinance/${process.env.ENV_NAME}/pool/id`,
+            parameterName: `/${appName}/pool/id`,
         });
         // Allow the Lambda to do username/password login to Cognito and get Access Token
         this.userPoolClient = this.userPool.addClient('cognito-login', {
@@ -40,7 +42,7 @@ export class CognitoStack extends Stack {
         });
         new StringParameter(this, 'param-cognito-userpool-client-id', {
             stringValue: this.userPoolClient.userPoolClientId,
-            parameterName: `/personalfinance/${process.env.ENV_NAME}/pool/client/id`,
+            parameterName: `/${appName}/pool/client/id`,
         });
 
         this.userTable = new Table(this, 'table-users', {
@@ -51,13 +53,15 @@ export class CognitoStack extends Stack {
             billingMode: BillingMode.PAY_PER_REQUEST,
             serverSideEncryption: true,
         });
+
+
         new StringParameter(this, 'param-table-name-users', {
             stringValue: this.userTable.tableName,
-            parameterName: `/personalfinance/${process.env.ENV_NAME}/table/users/name`,
+            parameterName: `/${appName}/table/users/name`,
         });
         new StringParameter(this, 'param-table-arn-users', {
             stringValue: this.userTable.tableArn,
-            parameterName: `/personalfinance/${process.env.ENV_NAME}/table/users/arn`,
+            parameterName: `/${appName}/table/users/arn`,
         });
 
         // Create a utility Lambda for being able to create new users
