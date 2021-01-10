@@ -1,4 +1,4 @@
-import {Construct, RemovalPolicy, SecretValue, Stack, StackProps} from "@aws-cdk/core";
+import {Construct, Duration, RemovalPolicy, SecretValue, Stack, StackProps} from "@aws-cdk/core";
 import {Bucket, BucketEncryption, IBucket} from "@aws-cdk/aws-s3";
 import * as codepipeline from "@aws-cdk/aws-codepipeline";
 import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";

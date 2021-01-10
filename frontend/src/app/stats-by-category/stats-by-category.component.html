@@ -5,7 +5,7 @@
     </div>
     <div *ngIf="!isLoading">
       <div *ngIf="!hasExpensesData()" class='no-activity-label'>
-        <h2>No activity for this period</h2>
+        <p>No activity for this period</p>
       </div>
       <canvas *ngIf="hasExpensesData()"
               [chartType]="'doughnut'"
@@ -23,7 +23,7 @@
 
     <div *ngIf="!isLoading">
       <div *ngIf="!hasIncomeData()" class='no-activity-label'>
-        <h2>No activity for this period</h2>
+        <p>No activity for this period</p>
       </div>
       <canvas *ngIf="hasIncomeData()"
               [chartType]="'doughnut'"

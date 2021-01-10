@@ -1,5 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MenuService} from "../menu.service";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-welcome-component',
@@ -10,15 +11,15 @@ export class WelcomeComponent implements OnInit, OnDestroy {
 
   constructor(
     private menuService: MenuService,
+    private titleService: Title,
   ) {
   }
 
   ngOnInit(): void {
-    // this.menuService.headerVisible.next(false);
+    this.titleService.setTitle('okay.money - Personal Finance App');
   }
 
   ngOnDestroy() {
-    // this.menuService.headerVisible.next(true);
   }
 
 }

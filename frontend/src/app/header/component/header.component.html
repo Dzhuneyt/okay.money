@@ -1,59 +1,93 @@
-<mat-toolbar color="primary">
+<mat-toolbar
+  color="primary"
+  style="padding-top: 0.5em;padding-bottom: 0.5em;"
+>
   <mat-toolbar-row>
-    <button
-      (click)="toggleMenu()"
-      *ngIf="(this.userService.loginStateChanges | async).loggedIn"
-      aria-label="Home page"
-      class="hamburger"
-      mat-icon-button>
-      <mat-icon>menu</mat-icon>
-    </button>
-    <a class="logo" href="#" routerLink="['/home']" routerLinkActive="true">Finance</a>
-    <span fxFlex="1 1 auto"></span>
-
-    <!-- List of dynamic buttons, fetched from the MenuService service -->
-    <!-- Any component can inject the service and replace those -->
-    <ng-container *ngFor="let menuItem of menuItems">
+    <div
+      [fxFlex]="''+getHeaderFxFlex()"
+      style="margin:auto;"
+      fxLayout="row wrap"
+    >
       <button
-        *ngIf="menuItem.route && !menuItem.onClick"
-        [routerLink]="[menuItem.route]"
+        (click)="toggleMenu()"
+        *ngIf="(this.userService.loginStateChanges | async).loggedIn"
+        aria-label="Home page"
+        class="hamburger"
+        mat-icon-button
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+      <div>
+        <a class="logo"
+           href="#"
+           routerLink="['/home']"
+           routerLinkActive="true"
+           fxLayoutGap="0.2em"
+           fxLayoutAlign="center center"
+           fxLayout="row">
+          <i fxFlex=""
+             class="fas fa-chart-pie"
+             style="font-size: 2em"></i>
+          <span style="font-size: 1.2em">Finance</span>
+        </a>
+      </div>
+
+      <span fxFlex="1 1 auto"></span>
+
+      <!-- List of dynamic buttons, fetched from the MenuService service -->
+      <!-- Any component can inject the service and replace those -->
+      <ng-container *ngFor="let menuItem of menuItems">
+        <button
+          *ngIf="menuItem.route && !menuItem.onClick"
+          fxFlex="0 1 auto"
+          style="margin-right: 1em;"
+          [routerLink]="[menuItem.route]"
+          class="navbar-icon"
+          color="warn"
+          mat-raised-button
+          routerLinkActive="true">
+          <mat-icon inline="true">{{menuItem.matIcon}}</mat-icon>
+          {{menuItem.label}}
+        </button>
+        <button
+          *ngIf="!menuItem.route && menuItem.onClick"
+          fxFlex="0 1 auto"
+          style="margin-right: 1em;"
+          (click)="menuItem.onClick()"
+          color="warn"
+          mat-raised-button
+          class="navbar-icon">
+          <mat-icon inline="true">{{menuItem.matIcon}}</mat-icon>
+          {{menuItem.label}}
+        </button>
+      </ng-container>
+
+      <!-- Profile button -->
+      <button
+        *ngIf="(this.userService.loginStateChanges | async).loggedIn"
+        [routerLink]="['/profile']"
+        aria-label="Profile"
         class="navbar-icon"
-        mat-button
-        routerLinkActive="true">
-        <mat-icon inline="true">{{menuItem.matIcon}}</mat-icon>
-        {{menuItem.label}}
+        color="warn"
+        mat-raised-button
+      >
+        <mat-icon inline="true">person</mat-icon>
+        Profile
       </button>
-      <button
-        *ngIf="!menuItem.route && menuItem.onClick"
-        (click)="menuItem.onClick()"
-        mat-button
-        class="navbar-icon">
-        <mat-icon inline="true">{{menuItem.matIcon}}</mat-icon>
-        {{menuItem.label}}
+
+      <!-- Login button -->
+      <button *ngIf="!(this.userService.loginStateChanges | async).loggedIn"
+              [routerLink]="['/login']"
+              aria-label="Login"
+              class="navbar-icon"
+              color="warn"
+              mat-raised-button
+              routerLinkActive="true">
+        <mat-icon inline="true">lock_open</mat-icon>
+        Sign In
       </button>
-    </ng-container>
+    </div>
 
-    <!-- Profile button -->
-    <button
-      *ngIf="(this.userService.loginStateChanges | async).loggedIn"
-      [routerLink]="['/profile']"
-      aria-label="Profile"
-      class="navbar-icon"
-      mat-button>
-      <mat-icon inline="true">person</mat-icon>
-      Profile
-    </button>
-
-    <!-- Login button -->
-    <button *ngIf="!(this.userService.loginStateChanges | async).loggedIn"
-            [routerLink]="['/login']"
-            aria-label="Login"
-            class="navbar-icon"
-            mat-button
-            routerLinkActive="true">
-      <mat-icon inline="true">lock_open</mat-icon>
-      Login
-    </button>
 
   </mat-toolbar-row>
 </mat-toolbar>

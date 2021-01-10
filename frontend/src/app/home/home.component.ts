@@ -7,6 +7,7 @@ import {AddAccountComponent} from './parts/add-account/add-account.component';
 import {DialogService} from '../services/dialog.service';
 import {AccountSummaryListComponent} from 'src/app/home/parts/accounts-list/account-summary-list.component';
 import {UserService} from "../services/user.service";
+import {MenuService} from "../menu.service";
 
 @Component({
   selector: 'app-home',
@@ -21,13 +22,11 @@ export class HomeComponent implements OnInit {
 
   constructor(
     public user: UserService,
+    public menuService: MenuService,
   ) {
   }
 
   ngOnInit() {
-    this.user.loginStateChanges.subscribe(value => {
-      const {loggedIn} = value;
-    });
 
   }
 

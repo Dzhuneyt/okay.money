@@ -12,6 +12,7 @@ import {environment} from 'src/environments/environment';
 export class BackendService {
 
   get baseUrl(): string {
+    // return 'https://2noax5lb45.execute-api.eu-west-1.amazonaws.com/prod/api/';
     if (environment.baseUrl && environment.baseUrl.length > 0) {
       return environment.baseUrl + 'api/';
     }
