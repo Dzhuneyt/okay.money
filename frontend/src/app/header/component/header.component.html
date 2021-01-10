@@ -39,6 +39,8 @@
       <ng-container *ngFor="let menuItem of menuItems">
         <button
           *ngIf="menuItem.route && !menuItem.onClick"
+          fxFlex="0 1 auto"
+          style="margin-right: 1em;"
           [routerLink]="[menuItem.route]"
           class="navbar-icon"
           color="warn"
@@ -49,6 +51,8 @@
         </button>
         <button
           *ngIf="!menuItem.route && menuItem.onClick"
+          fxFlex="0 1 auto"
+          style="margin-right: 1em;"
           (click)="menuItem.onClick()"
           color="warn"
           mat-raised-button
