@@ -3,6 +3,7 @@ import {UserType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
 import {Handler} from '../../../../../../lambdas/shared/Handler';
 import AWS = require('aws-sdk');
+import {TableNames} from "../../../../../../lambdas/shared/TableNames";
 
 export async function getUserByCognitoSub(sub: string, userPoolId: string): Promise<UserType | undefined> {
     const data = await (new AWS.CognitoIdentityServiceProvider()).listUsers({
@@ -18,21 +19,12 @@ export async function getUserByCognitoSub(sub: string, userPoolId: string): Prom
         return;
     }
     return user;
-    // const dynamoUser = await getDynamoUser(sub);
-    // return {
-    //     email: user.Username as string,
-    //     firstname: dynamoUser.firstname as string,
-    //     lastname: dynamoUser.lastname as string,
-    // };
 }
 
 export async function getDynamoUser(sub: string) {
     const dynamoUserRaw = (await new DynamoDB().getItem({
         Key: {id: {S: sub}},
-        TableName: (await new SSM().getParameter({
-            Name: `/personalfinance/${process.env.ENV_NAME}/table/users/name`,
-            WithDecryption: true
-        }).promise()).Parameter?.Value!,
+        TableName: await TableNames.users(),
     }).promise()).Item;
 
     if (!dynamoUserRaw) {

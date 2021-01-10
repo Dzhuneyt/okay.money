@@ -2,10 +2,13 @@ import {CognitoIdentityServiceProvider, DynamoDB, SSM} from 'aws-sdk';
 import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
 import {Handler} from '../../../../../../lambdas/shared/Handler';
 import {getDynamoUser, getUserByCognitoSub} from './getProfile';
+import {TableNames} from "../../../../../../lambdas/shared/TableNames";
+
+export const appName = () => `finance/${process.env.ENV_NAME}`;
 
 async function changeCognitoUserPassword(Username: string, Password: string) {
     const UserPoolId = (await new SSM().getParameter({
-        Name: `/personalfinance/${process.env.ENV_NAME}/pool/id`,
+        Name: `/${appName()}/pool/id`,
         WithDecryption: true,
     }).promise()).Parameter?.Value as string;
     const passwordUpdated = await new CognitoIdentityServiceProvider().adminSetUserPassword({
@@ -19,8 +22,9 @@ async function changeCognitoUserPassword(Username: string, Password: string) {
 }
 
 async function checkOldPasswordIsValid(Username: string, Password: string) {
+
     const userPoolClientId = (await new SSM().getParameter({
-        Name: `/personalfinance/${process.env.ENV_NAME}/pool/client/id`,
+        Name: `/${appName()}/pool/client/id`,
         WithDecryption: true,
     }).promise()).Parameter?.Value as string;
 
@@ -78,13 +82,9 @@ export const handler = new Handler(async (event: IEvent) => {
         }
 
         await (new DynamoDB()).putItem({
-            TableName: (await new SSM().getParameter({
-                Name: `/personalfinance/${process.env.ENV_NAME}/table/users/name`,
-                WithDecryption: true
-            }).promise()).Parameter?.Value!,
+            TableName: await TableNames.users(),
             Item: DynamoDB.Converter.marshall(dynamoUser),
         }).promise();
-
 
         console.log(cognitoUser);
         return {
