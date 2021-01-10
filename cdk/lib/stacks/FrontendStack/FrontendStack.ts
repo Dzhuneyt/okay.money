@@ -105,7 +105,7 @@ export class FrontendStack extends Stack {
                     }),
 
                     // Disable cache completely for this origin
-                    cachePolicy: new CachePolicy(this, 'CachePolicy', {
+                    cachePolicy: new CachePolicy(this, 'CachePolicy2', {
                         headerBehavior: CacheHeaderBehavior.allowList(
                             // These headers will reach the Origin
                             // All others are stripped
@@ -114,9 +114,8 @@ export class FrontendStack extends Stack {
                         ),
                         cookieBehavior: CacheCookieBehavior.none(),
                         queryStringBehavior: CacheQueryStringBehavior.all(),
-                        minTtl: Duration.seconds(0),
-                        maxTtl: Duration.seconds(0),
-                        defaultTtl: Duration.seconds(0),
+                        maxTtl: Duration.seconds(1),
+                        defaultTtl: Duration.seconds(1),
                         enableAcceptEncodingBrotli: true,
                         enableAcceptEncodingGzip: true,
                     }),
