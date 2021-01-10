@@ -11,6 +11,10 @@ export interface IEvent {
         }
     },
 
+    headers: {
+        origin: string,
+    },
+
     pathParameters: {
         [key: string]: string,
     },

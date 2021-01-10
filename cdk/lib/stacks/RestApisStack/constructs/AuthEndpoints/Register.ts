@@ -61,6 +61,11 @@ export class Register extends Construct {
             ]
         }));
 
+        role.addToPrincipalPolicy(new PolicyStatement({
+            actions: ['ses:SendEmail'],
+            resources: ['*'],
+        }))
+
         return role;
     }
 
@@ -77,10 +82,22 @@ export class Register extends Construct {
         const context = new Construct(this, 'register');
         const lambda = new LambdaTypescript(context, 'lambda', {
             ...getPropsByLambdaFilename('register.ts'),
+            description: 'POST /api/register',
             role: this.role,
         });
         lambda.addEnvironment('TABLE_NAME_TOKENS', this.tableForRegistrationTokens.tableName);
         lambda.addEnvironment('COGNITO_USERPOOL_ID', this.props.userPool.userPoolId);
+
+        function getBaseUrl() {
+            switch (process.env.ENV_NAME) {
+                case 'master':
+                    return 'https://okay.money/';
+                default:
+                    return 'http://localhost:4000/';
+            }
+        }
+
+        lambda.addEnvironment('BASE_URL', getBaseUrl());
 
         this.apiResource
             .addMethod('POST', new LambdaIntegration(lambda), {
