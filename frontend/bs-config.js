@@ -3,7 +3,7 @@ const {createProxyMiddleware} = require("http-proxy-middleware");
 const proxy = createProxyMiddleware('/api', {
   target: resolveApiGatewayBaseUrlFromCdkOutputs(),
   logLevel: "debug",
-  changeOrigin: true,    // for vhosted sites, changes host header to match to target's host
+  changeOrigin: true,
   secure: false
 });
 

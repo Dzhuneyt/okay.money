@@ -27,4 +27,9 @@ export class HeaderComponent implements OnInit {
     this.menuService.toggle();
   }
 
+  getHeaderFxFlex() {
+    return this.userService.getLoginStageChanges().value.loggedIn
+      ? '1 1 auto'
+      : '0 1 1024px';
+  }
 }

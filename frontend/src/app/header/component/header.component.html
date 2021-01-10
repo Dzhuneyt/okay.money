@@ -3,7 +3,11 @@
   style="padding-top: 0.5em;padding-bottom: 0.5em;"
 >
   <mat-toolbar-row>
-    <div fxFlex="0 1 1024px" style="margin:auto;" fxLayout="row wrap">
+    <div
+      [fxFlex]="''+getHeaderFxFlex()"
+      style="margin:auto;"
+      fxLayout="row wrap"
+    >
       <button
         (click)="toggleMenu()"
         *ngIf="(this.userService.loginStateChanges | async).loggedIn"
