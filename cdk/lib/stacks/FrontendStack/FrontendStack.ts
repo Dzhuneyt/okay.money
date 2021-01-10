@@ -1,7 +1,7 @@
-import {Annotations, CfnOutput, Construct, RemovalPolicy, Stack, StackProps} from "@aws-cdk/core";
+import {Annotations, CfnOutput, Construct, Duration, RemovalPolicy, Stack, StackProps} from "@aws-cdk/core";
 import {Bucket, IBucket} from "@aws-cdk/aws-s3";
 import {
-    AllowedMethods, CachePolicy,
+    AllowedMethods, CacheCookieBehavior, CachedMethods, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior,
     Distribution,
     IDistribution,
     OriginAccessIdentity,
@@ -104,20 +104,24 @@ export class FrontendStack extends Stack {
                         originPath: '/prod',
                     }),
 
-                    // Prevent CloudFront from caching API responses
-                    cachePolicy: CachePolicy.CACHING_DISABLED,
-                    allowedMethods: AllowedMethods.ALLOW_ALL,
-                    compress: true,
-                    viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-
-                    // Forward everything (headers, query params, etc) to API Gateway for further processing
-                    originRequestPolicy: new OriginRequestPolicy(this, 'OriginRequestPolicy', {
-                        queryStringBehavior: OriginRequestQueryStringBehavior.all(),
-                        headerBehavior: OriginRequestHeaderBehavior.allowList('x-api-key'),
-                        cookieBehavior: OriginRequestCookieBehavior.all(),
-                        comment: "comment",
-                        originRequestPolicyName: "originRequestPolicyName",
+                    // Disable cache completely for this origin
+                    cachePolicy: new CachePolicy(this, 'CachePolicy', {
+                        headerBehavior: CacheHeaderBehavior.allowList(
+                            // These headers will reach the Origin
+                            // All others are stripped
+                            'x-api-key',
+                            'authorization',
+                        ),
+                        cookieBehavior: CacheCookieBehavior.none(),
+                        queryStringBehavior: CacheQueryStringBehavior.all(),
+                        minTtl: Duration.seconds(0),
+                        maxTtl: Duration.seconds(0),
+                        defaultTtl: Duration.seconds(0),
+                        enableAcceptEncodingBrotli: true,
+                        enableAcceptEncodingGzip: true,
                     }),
+                    allowedMethods: AllowedMethods.ALLOW_ALL,
+                    viewerProtocolPolicy: ViewerProtocolPolicy.HTTPS_ONLY,
                 }
             },
             errorResponses: [

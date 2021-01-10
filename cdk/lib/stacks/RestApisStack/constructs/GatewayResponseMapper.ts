@@ -38,6 +38,7 @@ export class GatewayResponseMapper extends Construct {
                 responseHeaders: {
                     "Access-Control-Allow-Origin": "'*'",
                     "Access-Control-Allow-Headers": "'*'"
+
                 },
                 templates: {
                     "application/json": "{\n     \"message\": $context.error.messageString,\n     \"type\":  \"$context.error.responseType\",\n     \"resourcePath\":  \"$context.resourcePath\",\n }"
