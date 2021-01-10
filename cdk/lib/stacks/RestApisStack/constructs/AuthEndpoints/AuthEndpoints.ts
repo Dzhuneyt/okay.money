@@ -1,4 +1,4 @@
-import {IResource, IRestApi} from '@aws-cdk/aws-apigateway';
+import {IResource} from '@aws-cdk/aws-apigateway';
 import {IUserPool} from '@aws-cdk/aws-cognito';
 import {Construct} from '@aws-cdk/core';
 import {Login} from './Login';
