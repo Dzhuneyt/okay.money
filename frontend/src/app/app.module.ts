@@ -42,6 +42,7 @@ import {PrivacyPolicyComponent} from "./privacy-policy/privacy-policy.component"
 import {CookiePolicyComponent} from "./cookie-policy/cookie-policy.component";
 import {CookieInformationPopupComponent} from "./cookie-information-popup/cookie-information-popup.component";
 import {CookieService} from "./cookie.service";
+import {FeedbackComponent} from "./feedback/feedback.component";
 
 const routes: Routes = [
   {
@@ -116,6 +117,7 @@ const routes: Routes = [
     CookiePolicyComponent,
     PrivacyPolicyComponent,
     CookieInformationPopupComponent,
+    FeedbackComponent,
   ],
   imports: [
     BrowserModule,
