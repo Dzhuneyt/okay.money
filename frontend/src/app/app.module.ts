@@ -37,6 +37,11 @@ import {AccountEditComponent} from 'src/app/account-edit/account-edit.component'
 import {ProfileComponent} from 'src/app/profile/profile.component';
 import {StorageModule} from '@ngx-pwa/local-storage';
 import {WelcomeComponent} from './welcome/welcome.component';
+import {FooterComponent} from "./footer/footer.component";
+import {PrivacyPolicyComponent} from "./privacy-policy/privacy-policy.component";
+import {CookiePolicyComponent} from "./cookie-policy/cookie-policy.component";
+import {CookieInformationPopupComponent} from "./cookie-information-popup/cookie-information-popup.component";
+import {CookieService} from "./cookie.service";
 
 const routes: Routes = [
   {
@@ -54,17 +59,20 @@ const routes: Routes = [
     component: HomeComponent,
   },
   {
+    // @TODO refactor into lazy loaded module
     path: 'transactions',
     component: TransactionListComponent,
     canActivate: [LoggedInGuard],
   },
   {
+    // @TODO refactor into lazy loaded module
     path: 'accounts',
     component: AccountListComponent,
     canActivate: [LoggedInGuard],
   },
   {
     path: 'categories',
+    // @ts-ignore
     loadChildren: () => import('./category/category.module').then(m => m.CategoryModule),
     canActivate: [LoggedInGuard],
   },
@@ -72,6 +80,14 @@ const routes: Routes = [
     path: 'profile',
     component: ProfileComponent,
     canActivate: [LoggedInGuard],
+  },
+  {
+    path: 'privacy-policy',
+    component: PrivacyPolicyComponent,
+  },
+  {
+    path: 'cookie-policy',
+    component: CookiePolicyComponent,
   },
   {
     path: '**',
@@ -96,6 +112,10 @@ const routes: Routes = [
     AccountEditComponent,
     ProfileComponent,
     WelcomeComponent,
+    FooterComponent,
+    CookiePolicyComponent,
+    PrivacyPolicyComponent,
+    CookieInformationPopupComponent,
   ],
   imports: [
     BrowserModule,
@@ -122,6 +142,7 @@ const routes: Routes = [
     CategoriesService,
     UserService,
     TransactionService,
+    CookieService,
   ],
   entryComponents: [
     AddAccountComponent,

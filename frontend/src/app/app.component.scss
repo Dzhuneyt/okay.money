@@ -17,3 +17,14 @@ mat-sidenav-content {
 .mat-sidenav-content {
   min-height: 1000px;
 }
+
+.cookie-popup {
+  border-radius: 30px;
+  padding: 30px;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  max-width: 300px;
+  background: #fafafa;
+  z-index: 3;
+}

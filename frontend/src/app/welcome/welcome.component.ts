@@ -16,7 +16,7 @@ export class WelcomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.titleService.setTitle('okay.money - Personal Finance App');
+    this.titleService.setTitle('Personal Finance - Okay.money');
   }
 
   ngOnDestroy() {
