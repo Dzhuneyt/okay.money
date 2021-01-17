@@ -2,17 +2,36 @@ import {APIGatewayProxyResult} from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 import {IEvent} from './interfaces/IEvent';
 import {Handler} from './shared/Handler';
+import {SSM} from "aws-sdk";
+import appName from "./appName";
 
 interface Request {
     username: string;
     password: string;
 }
 
+export async function getCognitoUserPoolClientId() {
+    const Name = `/${appName()}/pool/client/id`;
+    try {
+        const userPoolClientId = (await new SSM().getParameter({
+            Name,
+            WithDecryption: true,
+        }).promise()).Parameter?.Value as string;
+
+        if (userPoolClientId) {
+            return userPoolClientId;
+        }
+    } catch (e) {
+        console.error(e);
+        console.error(`Can not find SSM parameter with name ${Name}`);
+    }
+    throw new Error(`Can not find SSM parameter with name ${Name}`);
+}
+
 const originalHandler = async (event: IEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
     const cognito = new AWS.CognitoIdentityServiceProvider();
-    const userPoolClientId = process.env.COGNITO_USERPOOL_CLIENT_ID as string;
-
+    const userPoolClientId = await getCognitoUserPoolClientId();
     const request: Request = JSON.parse(event.body as string);
 
     try {
@@ -26,7 +45,8 @@ const originalHandler = async (event: IEvent): Promise<APIGatewayProxyResult> =>
         }).promise();
 
         if (result.AuthenticationResult) {
-            console.log('Logged in successfully');
+            console.log('AuthenticationResult',
+                JSON.stringify(result.AuthenticationResult, null, 2));
             return {
                 statusCode: 200,
                 body: JSON.stringify(result.AuthenticationResult),

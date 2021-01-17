@@ -47,6 +47,11 @@ export class UserService {
 
   public setAccessToken(key): Observable<boolean> {
     return new Observable((observer: Observer<boolean>) => {
+      if (key['ExpiresIn']) {
+        const time = new Date();
+        time.setTime(time.getTime() + (key['ExpiresIn'] * 1000));
+        key['ExpiresAt'] = Math.round(time.getTime() / 1000);
+      }
       this.localStorage.setItem('access_token', key).subscribe(() => {
         observer.next(true);
         observer.complete();
