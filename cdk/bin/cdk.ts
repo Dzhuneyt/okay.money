@@ -44,6 +44,7 @@ try {
     new FrontendStack(app, `${appName}-frontend`, {env, api: restApisStack.api});
 
     Tags.of(app).add('app', 'personal-finance');
+    Tags.of(app).add('environment', process.env.ENV_NAME as string);
 } catch (e) {
     console.error(e);
     throw new Error('Failed to deploy CDK stacks');

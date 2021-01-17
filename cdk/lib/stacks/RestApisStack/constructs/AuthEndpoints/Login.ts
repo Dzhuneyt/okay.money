@@ -18,20 +18,16 @@ export class Login extends Construct {
         });
         fnLogin.addEnvironment('COGNITO_USERPOOL_ID', props.userPool.userPoolId);
 
-        // Allow the Lambda to do username/password login to Cognito and get Access Token
-        const userPoolClientId = props.userPool.addClient('login', {
-            authFlows: {
-                userPassword: true,
-                // refreshToken: true,
-            },
-        }).userPoolClientId;
-        fnLogin.addEnvironment('COGNITO_USERPOOL_CLIENT_ID', userPoolClientId);
         fnLogin.addToRolePolicy(new PolicyStatement({
             resources: [props.userPool.userPoolArn],
             actions: [
                 "cognito-idp:InitiateAuth",
             ]
         }));
+        fnLogin.addToRolePolicy(new PolicyStatement({
+            actions: ['ssm:Get*'],
+            resources: ['*'],
+        }))
 
         props.apiRootResource
             .addResource('login')

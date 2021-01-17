@@ -11,6 +11,7 @@ import {StatsEndpoints} from './constructs/StatsEndpoints/StatsEndpoints';
 import {TransactionEndpoints} from './constructs/TransactionEndpoints/TransactionEndpoints';
 import {UserEndpoints} from './constructs/UserEndpoints/UserEndpoints';
 import {NodejsFunction} from "@aws-cdk/aws-lambda-nodejs";
+import {FeedbackEndpoints} from "./constructs/FeedbackEndpoints/FeedbackEndpoints";
 
 interface Props extends StackProps {
     userPool: UserPool;
@@ -82,6 +83,12 @@ export class RestApisStack extends cdk.Stack {
             userPool: this.props.userPool,
             authorizer: this.cognitoAuthorizer,
         });
+
+        new FeedbackEndpoints(this, 'FeedbackEndpoints', {
+            apiRootResource: this.apiRootResource,
+            userPool: this.props.userPool,
+            authorizer: this.cognitoAuthorizer,
+        })
     }
 
     private createCognitoAuthorizer() {

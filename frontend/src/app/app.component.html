@@ -14,3 +14,11 @@
   </mat-sidenav-content>
 </mat-sidenav-container>
 
+<app-footer></app-footer>
+
+<div
+  *ngIf="!(this.cookieService.policyAccepted$|async)"
+  class="cookie-popup">
+  <app-cookie-information-popup></app-cookie-information-popup>
+</div>
+

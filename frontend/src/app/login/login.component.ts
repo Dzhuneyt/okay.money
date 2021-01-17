@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
 import {LocalStorage} from '@ngx-pwa/local-storage';
@@ -6,13 +6,14 @@ import {Observable, Observer} from 'rxjs';
 import {UserService} from 'src/app/services/user.service';
 import {BackendService} from '../services/backend.service';
 import {SnackbarService} from '../services/snackbar.service';
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
   email: string;
   password: string;
@@ -26,6 +27,7 @@ export class LoginComponent {
     private snackBar: MatSnackBar,
     private snackbarService: SnackbarService,
     public router: Router,
+    private title: Title,
   ) {
   }
 
@@ -72,4 +74,7 @@ export class LoginComponent {
     });
   }
 
+  ngOnInit() {
+    this.title.setTitle('Okay.money - Login');
+  }
 }

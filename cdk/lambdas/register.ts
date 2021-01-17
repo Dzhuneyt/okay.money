@@ -14,7 +14,6 @@ async function emailRegistered(email: string) {
     return await userExistsInPool(email, process.env.COGNITO_USERPOOL_ID as string);
 }
 
-const useSesMailer = true;
 const getFromEmail = () => 'no-reply-registration@em5577.dzhuneyt.com';
 const getSubject = () => 'okay.money - Complete your registration';
 const getBody = (type: "plaintext" | "html", confirmationLink: string) => {
@@ -98,13 +97,14 @@ class SesMailer extends Mailer {
 }
 
 async function sendEmail(config: {
+    mailerType: "ses" | "sendgrid",
     to: string,
     confirmationLink: string,
 }) {
     let mailer: Mailer;
 
-    switch (useSesMailer) {
-        case true:
+    switch (config.mailerType) {
+        case "ses":
             mailer = new SesMailer(
                 'no-reply@okay.money',
                 config.to,
@@ -115,7 +115,7 @@ async function sendEmail(config: {
                 }
             );
             break;
-        default:
+        case "sendgrid":
             mailer = new SendGridMailer(
                 getFromEmail(),
                 config.to,
@@ -125,6 +125,9 @@ async function sendEmail(config: {
                     html: getBody("html", config.confirmationLink),
                 }
             );
+            break;
+        default:
+            throw new Error(`Invalid mailer type ${config.mailerType}. Can not send email`);
     }
 
 
@@ -170,6 +173,7 @@ export const handler = new Handler(async (event: IEvent) => {
 
         try {
             await sendEmail({
+                mailerType: "ses",
                 confirmationLink: getBaseUrl(event) + `/register?token=${uuid}`,
                 to: body.email,
             });

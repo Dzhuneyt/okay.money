@@ -12,29 +12,15 @@ export class ApiGateway extends Construct {
     }) {
         super(scope, id);
 
-        new CfnUserPoolResourceServer(this, 'CfnUserPoolResourceServer', {
-            identifier: 'https://example.com',
-            name: 'CfnUserPoolResourceServer',
-            userPoolId: props.userPool.userPoolId,
-            scopes: [
-                {
-                    scopeName: 'default',
-                    scopeDescription: "Default scope",
-                }
-            ]
-        });
-
-        const logGroup = new LogGroup(this, 'api-logs', {
-            removalPolicy: RemovalPolicy.DESTROY,
-            // @TODO increase retention
-            retention: RetentionDays.ONE_DAY,
-        });
-
         this.api = new RestApi(this, 'Default', {
             restApiName: `${Stack.of(this).stackName}-${process.env.ENV_NAME}`,
-            description: `API GW for Personal Finance app. Environment: ${process.env.ENV_NAME}`,
+            description: `API Gateway for Personal Finance app. Environment: ${process.env.ENV_NAME}`,
             deployOptions: {
-                accessLogDestination: new LogGroupLogDestination(logGroup),
+                accessLogDestination: new LogGroupLogDestination(new LogGroup(this, 'api-logs', {
+                    removalPolicy: RemovalPolicy.DESTROY,
+                    // @TODO increase retention
+                    retention: RetentionDays.ONE_WEEK,
+                })),
                 accessLogFormat: AccessLogFormat.jsonWithStandardFields(),
                 tracingEnabled: true,
                 throttlingRateLimit: 50, // API calls per second
