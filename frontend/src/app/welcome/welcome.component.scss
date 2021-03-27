@@ -1,3 +1,13 @@
+:host {
+  background-image: url("/assets/fabian-blank-pElSkGRA2NU-unsplash.jpg");
+  background-size: cover;
+  min-height: 1024px;
+  display: block;
+  padding: 0;
+  // Offset the positive "global" padding from home.component.scss
+  margin: -1em;
+}
+
 h2 {
   text-align: center;
   padding: 10vh 5vh 0;
