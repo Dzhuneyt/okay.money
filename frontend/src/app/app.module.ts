@@ -37,12 +37,12 @@ import {AccountEditComponent} from 'src/app/account-edit/account-edit.component'
 import {ProfileComponent} from 'src/app/profile/profile.component';
 import {StorageModule} from '@ngx-pwa/local-storage';
 import {WelcomeComponent} from './welcome/welcome.component';
-import {FooterComponent} from "./footer/footer.component";
-import {PrivacyPolicyComponent} from "./privacy-policy/privacy-policy.component";
-import {CookiePolicyComponent} from "./cookie-policy/cookie-policy.component";
-import {CookieInformationPopupComponent} from "./cookie-information-popup/cookie-information-popup.component";
-import {CookieService} from "./cookie.service";
-import {FeedbackComponent} from "./feedback/feedback.component";
+import {FooterComponent} from './footer/footer.component';
+import {PrivacyPolicyComponent} from './privacy-policy/privacy-policy.component';
+import {CookiePolicyComponent} from './cookie-policy/cookie-policy.component';
+import {CookieInformationPopupComponent} from './cookie-information-popup/cookie-information-popup.component';
+import {CookieService} from './cookie.service';
+import {FeedbackComponent} from './feedback/feedback.component';
 
 const routes: Routes = [
   {

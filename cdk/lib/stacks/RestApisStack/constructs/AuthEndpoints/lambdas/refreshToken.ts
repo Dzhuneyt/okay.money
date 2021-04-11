@@ -16,7 +16,6 @@ export const handler = async (event: IEvent) => {
         const userPoolClientId = await getCognitoUserPoolClientId();
 
         const request: RefreshTokenRequest = JSON.parse(event.body as string);
-        console.log(request);
         const result = await cognito.initiateAuth({
             ClientId: userPoolClientId,
             AuthFlow: 'REFRESH_TOKEN_AUTH',
@@ -36,7 +35,14 @@ export const handler = async (event: IEvent) => {
             })
         }
     } catch (e) {
-        console.error(e);
+        if (e.message && e.message.includes('Refresh Token has expired')) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    message: e.message,
+                })
+            }
+        }
         return {
             statusCode: 500,
             body: JSON.stringify({message: "Internal error with refreshing token"}),
