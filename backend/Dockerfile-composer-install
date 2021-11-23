@@ -1,7 +1,0 @@
-FROM composer
-WORKDIR /app
-
-RUN composer global require hirak/prestissimo
-RUN chmod 777 -R /tmp
-
-CMD ["composer", "install", "--prefer-dist"]
