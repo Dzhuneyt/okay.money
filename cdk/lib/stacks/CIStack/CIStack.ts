@@ -36,9 +36,9 @@ export class CIStack extends Stack {
                     oauthToken: SecretValue.secretsManager('GITHUB_TOKEN_PERSONAL'),
                     // Replace these with your actual GitHub project name
                     owner: 'Dzhuneyt',
-                    repo: 'Personal-Finance',
+                    repo: 'okay.money',
                     branch: branchName,
-                })
+                }),
             ],
         });
 
