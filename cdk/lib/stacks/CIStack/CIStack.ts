@@ -23,7 +23,7 @@ export class CIStack extends Stack {
         const sourceArtifact = new codepipeline.Artifact();
 
         const pipeline = new codepipeline.Pipeline(this, 'Pipeline', {
-            crossAccountKeys: false,
+            crossAccountKeys: false, // save some costs
             artifactBucket: this.cacheBucket,
             pipelineName: `finance-${branchName}-ci`,
         });
