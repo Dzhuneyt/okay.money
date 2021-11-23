@@ -39,10 +39,11 @@ export class AuthEndpoints extends Construct {
 
     private createRefreshTokenEndpoint() {
         this.props.apiRootResource
-            .addResource('refreshToken')
+            .resourceForPath('refreshToken')
             .addMethod('POST', new LambdaIntegration(
                 new NodejsFunction(this, 'NodejsFunction-refreshToken', {
                     entry: path.resolve(__dirname, './lambdas/refreshToken.ts'),
+                    description: 'POST /api/refreshToken',
                     initialPolicy: [
                         new PolicyStatement({
                             actions: ['ssm:Get*'],

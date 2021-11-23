@@ -5,6 +5,7 @@ import {LocalStorage} from '@ngx-pwa/local-storage';
 import {EMPTY, Observable} from 'rxjs';
 import {catchError, map, mergeMap, switchMap, tap} from 'rxjs/operators';
 import {environment} from 'src/environments/environment';
+import {SnackbarService} from './snackbar.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,7 @@ export class BackendService {
     private http: HttpClient,
     private localStorage: LocalStorage,
     private router: Router,
+    private snackbar: SnackbarService,
   ) {
   }
 
@@ -60,7 +62,6 @@ export class BackendService {
           ExpiresIn: number,
         }) => {
           // Store it for future use
-          console.log('refreshTokenResponse', refreshTokenResponse);
           this.localStorage.setItem('access_token', {
             ...cachedTokens,
             ...refreshTokenResponse,
@@ -70,6 +71,17 @@ export class BackendService {
             subscriber.next(refreshTokenResponse['IdToken']);
             subscriber.complete();
           });
+        }, error => {
+          if (error.error?.message?.includes('Refresh Token has expired')) {
+            this.snackbar.error('Login expired. Please login again.');
+
+            this.localStorage.removeItem('access_token').subscribe(() => {
+              this.router.navigate(['/login']);
+            });
+            return EMPTY;
+          }
+          console.error(JSON.stringify(error, null, 2));
+          return error;
         });
       });
     });
