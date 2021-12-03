@@ -35,6 +35,7 @@ export const handler = async (event: IEvent) => {
             })
         }
     } catch (e) {
+        console.error(e);
         if (e.message && e.message.includes('Refresh Token has expired')) {
             return {
                 statusCode: 400,

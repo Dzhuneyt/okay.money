@@ -56,7 +56,14 @@ export class BackendService {
 
         this.http.post(this.baseUrl + 'refreshToken', {
           refreshToken: cachedTokens['RefreshToken'],
-        }).subscribe((refreshTokenResponse: {
+        }).pipe(
+          catchError(err => {
+            console.error(err);
+            this.localStorage.removeItem('access_token').subscribe();
+            this.router.navigate(['/login']).then();
+            return EMPTY;
+          })
+        ).subscribe((refreshTokenResponse: {
           IdToken: string,
           AccessToken: string,
           ExpiresIn: number,
