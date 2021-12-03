@@ -160,7 +160,7 @@ export class FrontendStack extends Stack {
     getCertificate(): ICertificate | undefined {
         // ACM to be used in CloudFront must be in us-east-1 regions
         return process.env.ENV_NAME === 'master'
-            ? Certificate.fromCertificateArn(this, 'Certificate', 'arn:aws:acm:us-east-1:347315207830:certificate/a855b6f4-8017-4a17-8daa-d56848a1a7af')
+            ? Certificate.fromCertificateArn(this, 'Certificate', 'arn:aws:acm:us-east-1:526302546747:certificate/615027f2-60ef-4a3d-b7a9-f41ded470cf5')
             : undefined;
     }
 }
