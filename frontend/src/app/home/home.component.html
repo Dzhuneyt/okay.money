@@ -1,26 +1,20 @@
 <div *ngIf="!(user.loginStateChanges| async).loggedIn">
   <app-welcome-component></app-welcome-component>
 </div>
+
 <div
   *ngIf="(user.loginStateChanges| async).loggedIn"
-  class="row-divider"
+  class="row-divider boxed"
   fxLayout="row"
   fxLayout.xs="column"
   fxLayoutAlign="space-between"
-  fxLayoutGap="1em"
->
+  fxLayoutGap="1em">
   <mat-card class="example-card" fxFlex="50%" fxGrow="1" fxShrink="0">
     <mat-card-header>
       <mat-card-title>
-        <h3>Accounts overview</h3>
+        <h3>Overview of accounts</h3>
         <br/>
       </mat-card-title>
-
-      <!--      <span fxFlex fxLayoutAlign="end center">-->
-      <!--        <button (click)="openAddAccountModal()" mat-button>-->
-      <!--          <mat-icon>add_circle</mat-icon>-->
-      <!--        </button>-->
-      <!--      </span>-->
     </mat-card-header>
     <mat-card-content>
       <app-accounts-list #appAccountList></app-accounts-list>
@@ -30,10 +24,7 @@
   <mat-card class="example-card" fxFlex="50%" fxGrow="1" fxShrink="1">
     <mat-card-header>
       <mat-card-title>
-        <h3>Recent spending
-          and
-          income</h3>
-        <br/>
+        <h3>Recent movement</h3>
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>

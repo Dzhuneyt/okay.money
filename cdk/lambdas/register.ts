@@ -41,7 +41,7 @@ abstract class Mailer {
     ) {
     }
 
-    abstract async send(): Promise<boolean>;
+    abstract send(): Promise<boolean>;
 }
 
 class SendGridMailer extends Mailer {

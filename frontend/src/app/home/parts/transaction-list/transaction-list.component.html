@@ -1,15 +1,16 @@
-<mat-card>
-  <mat-card-title>Transactions</mat-card-title>
-  <mat-card-subtitle>Where your money goes, or where your money comes from.</mat-card-subtitle>
-</mat-card>
-<br/>
-<mat-card>
-  <app-table
-    #table
-    [actions]="tableActions"
-    [footerActions]="footerActions"
-    [displayedColumns]="displayedColumns"
-    [pageSize]="pageSize"
-    [pagination]="getPage"
-  ></app-table>
-</mat-card>
+<div fxLayout="column" fxLayoutGap="1em" class="boxed">
+  <mat-card>
+    <mat-card-title>Transactions</mat-card-title>
+    <mat-card-subtitle>Where your money goes, or where your money comes from.</mat-card-subtitle>
+  </mat-card>
+  <mat-card>
+    <app-table
+      #table
+      [actions]="tableActions"
+      [footerActions]="footerActions"
+      [displayedColumns]="displayedColumns"
+      [pageSize]="pageSize"
+      [pagination]="getPage"
+    ></app-table>
+  </mat-card>
+</div>

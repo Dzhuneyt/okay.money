@@ -1,49 +1,50 @@
-<mat-tab-group #tabs mat-align-tabs="center" mat-stretch-tabs>
-  <mat-tab label="Expenses">
-    <div *ngIf="isLoading">
-      <mat-spinner></mat-spinner>
-    </div>
-    <div *ngIf="!isLoading">
-      <div *ngIf="!hasExpensesData()" class='no-activity-label'>
-        <p>No activity for this period</p>
-      </div>
-      <canvas *ngIf="hasExpensesData()"
-              [chartType]="'doughnut'"
-              [datasets]="this.dataSets.expenses"
-              [labels]="legends.expense"
-              [options]="chartOptions"
-              baseChart></canvas>
-    </div>
+<div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="1em">
+  <mat-form-field>
+    <mat-select
+      (selectionChange)="changeTab($event.value)"
+      [value]="'expenses'">
+      <mat-option value="expenses">Expenses</mat-option>
+      <mat-option value="income">Income</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select
+      (selectionChange)="changePeriod($event.value)"
+      [value]="'weekly'">
+      <mat-option value="weekly">Last 7 days</mat-option>
+      <mat-option value="monthly">Last 30 days</mat-option>
+      <mat-option value="half_year">Last 6 months</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
 
-  </mat-tab>
-  <mat-tab label="Incomes">
-    <div *ngIf="isLoading">
-      <mat-spinner></mat-spinner>
-    </div>
+<div *ngIf="isLoading">
+  <mat-spinner></mat-spinner>
+</div>
 
-    <div *ngIf="!isLoading">
-      <div *ngIf="!hasIncomeData()" class='no-activity-label'>
-        <p>No activity for this period</p>
-      </div>
-      <canvas *ngIf="hasIncomeData()"
-              [chartType]="'doughnut'"
-              [datasets]="this.dataSets.income"
-              [labels]="legends.income"
-              [options]="chartOptions"
-              baseChart></canvas>
+<div *ngIf="!isLoading">
+  <div *ngIf="tab==='expenses'">
+    <div *ngIf="!hasExpensesData()" class='no-activity-label'>
+      <p>No activity for this period</p>
     </div>
-  </mat-tab>
-</mat-tab-group>
+    <canvas *ngIf="hasExpensesData()"
+            [chartType]="'doughnut'"
+            [datasets]="this.dataSets.expenses"
+            [labels]="legends.expense"
+            [options]="chartOptions"
+            baseChart></canvas>
+  </div>
+  <div *ngIf="tab==='income'">
+    <div *ngIf="!hasIncomeData()" class='no-activity-label'>
+      <p>No activity for this period</p>
+    </div>
+    <canvas *ngIf="hasIncomeData()"
+            [chartType]="'doughnut'"
+            [datasets]="this.dataSets.income"
+            [labels]="legends.income"
+            [options]="chartOptions"
+            baseChart></canvas>
+  </div>
+</div>
 
-<br/>
-<mat-form-field fxLayout fxLayoutAlign="center center">
-  <mat-select
-    (selectionChange)="changePeriod($event.value)"
-    [value]="'weekly'"
-  >
-    <mat-option value="weekly">Last 7 days</mat-option>
-    <mat-option value="monthly">Last 30 days</mat-option>
-    <mat-option value="half_year">Last 6 months</mat-option>
-  </mat-select>
-</mat-form-field>
 
