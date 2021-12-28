@@ -67,29 +67,28 @@ export class AccountListComponent implements OnInit {
     this.page = page;
 
     let totalCount;
-    return this.backendService
-      .request(
-        'account',
-        'get',
-        {
-          page: page,
-          page_size: pageSize,
-          sort: '-created_at'
-        }
-      )
-      .pipe(
-        map((apiResult: Account[]) => {
-          // Extract total count
-          totalCount = apiResult.length;
-          return apiResult;
-        }),
-        map(items => {
-          return {
-            items: items,
-            totalCount: totalCount
-          };
-        })
-      );
+    return this.backendService.request(
+      'account',
+      'get',
+      {
+        page: page,
+        page_size: pageSize,
+        sort: '-created_at'
+      }
+    ).pipe(
+      map(res => res.accounts),
+      map((apiResult: Account[]) => {
+        // Extract total count
+        totalCount = apiResult.length;
+        return apiResult;
+      }),
+      map(items => {
+        return {
+          items: items,
+          totalCount: totalCount
+        };
+      })
+    );
   }
 
   private openEditAccountDialog(account: Account) {

@@ -3,8 +3,14 @@ import {ITransaction} from './interfaces/ITransaction';
 import {DynamoManager} from './shared/DynamoManager';
 import {Handler} from './shared/Handler';
 
+function getTotalBalance(allTransactions: ITransaction[]) {
+    if (!allTransactions.length) {
+        return 0;
+    }
+    return allTransactions.map(value => value.sum).reduce((previousValue, currentValue) => currentValue + previousValue);
+}
+
 const originalHandler = async (event: IEvent) => {
-    console.log(JSON.stringify(event));
     try {
         const userId = event.requestContext.authorizer.claims.sub;
 
@@ -16,24 +22,31 @@ const originalHandler = async (event: IEvent) => {
             .forUser(userId)
             .list();
 
+        const total_balance: number = getTotalBalance(allTransactions);
+
+        console.log(total_balance);
         // Enrich the accounts array with the current balance,
         // calculated by aggregating all transactions for this account
-        const response = accounts.map(account => {
-            let balance = 0.00;
-            allTransactions
-                .filter(transaction => transaction.account_id === account.id)
-                .forEach(transaction => {
-                    balance += transaction.sum;
-                });
+        const response = {
+            accounts: accounts.map(account => {
+                let balance = 0.00;
+                allTransactions
+                    .filter(transaction => transaction.account_id === account.id)
+                    .forEach(transaction => {
+                        balance += transaction.sum;
+                    });
 
-            account.current_balance = balance;
-            return account;
-        });
+                account.current_balance = balance;
+                return account;
+            }),
+            total_balance,
+        };
         return {
             statusCode: 200,
             body: JSON.stringify(response),
         }
     } catch (e) {
+        console.error(e);
         return {
             statusCode: 500,
             body: JSON.stringify(e),

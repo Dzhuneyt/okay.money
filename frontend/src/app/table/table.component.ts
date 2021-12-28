@@ -15,6 +15,7 @@ export interface TableColumn {
 
   // Required if type=function
   renderer?: (element: any) => any;
+  footerRenderer?: () => any;
 }
 
 export interface TablePaginationResponse {
@@ -43,6 +44,9 @@ export class TableComponent implements OnInit {
   @Input() displayedColumns: TableColumn[] = [];
   @Input() pageSize = 20;
   @Input() actions: TableAction[] = [];
+  @Input() hasFooterRow = false;
+  @Input() hasPagination = true;
+
   public totalCount = 0;
   public currentPage = 0;
 
@@ -89,6 +93,10 @@ export class TableComponent implements OnInit {
   }
 
   shouldShowPagination(): boolean {
+    if (!this.hasPagination) {
+      // Hide pagination if it was explicitly hidden by developer
+      return false;
+    }
     if (this.isLoading) {
       // Hide pagination temporarily while page results are loading
       return false;
