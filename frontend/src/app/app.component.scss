@@ -6,16 +6,15 @@
   padding: 0 0.5em;
 }
 
-mat-sidenav-content {
-  min-height: 100%;
-}
-
-.mat-drawer-container {
-  //min-height: 1000px;
-}
-
 .mat-sidenav-content {
-  min-height: 1000px;
+  min-height: 100vh;
+  padding: 2em 1em;
+}
+
+.mat-sidenav-content ::ng-deep .boxed {
+  max-width: 1900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .cookie-popup {

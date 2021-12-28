@@ -12,9 +12,8 @@ phases:
   pre_build:
     commands:
       - aws --version
-      - cd $CODEBUILD_SRC_DIR && npm i --no-audit
-      - cd $CODEBUILD_SRC_DIR/cdk && npm i --no-audit
-      - cd $CODEBUILD_SRC_DIR/frontend && npm i --no-audit
+      - cd $CODEBUILD_SRC_DIR && npm ci
+      - cd $CODEBUILD_SRC_DIR && npx lerna bootstrap
   build:
     commands:
       - echo Deploying backend infrastructure

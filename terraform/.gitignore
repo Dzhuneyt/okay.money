@@ -1,7 +1,0 @@
-# Ignore AWS credentials and any other sensitive Terraform related files
-.terraform
-*.tfstate.backup
-.terraform.tfstate.lock.info
-
-# Important credentials are present there (MySQL password, etc)
-terraform.tfvars

@@ -1,23 +1,23 @@
 #!/usr/bin/env node
 import * as cdk from '@aws-cdk/core';
-import {Environment, Stack, Tags} from '@aws-cdk/core';
+import {Environment, Tags} from '@aws-cdk/core';
 import 'source-map-support/register';
-import {CognitoStack} from '../lib/stacks/CognitoStack/CognitoStack';
-import {DynamoDBStack} from '../lib/stacks/DynamoDBStack/DynamoDBStack';
-import {RestApisStack} from '../lib/stacks/RestApisStack/RestApisStack';
 import {CIStack} from "../lib/stacks/CIStack/CIStack";
 
 const app = new cdk.App({});
 const env: Environment = {
-    account: "347315207830", // SS Personal
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: 'us-east-1',
 }
 
-if (!process.env.BRANCH_NAME) {
+const envName = process.env.BRANCH_NAME;
+
+if (!envName) {
     throw new Error(`process.env.BRANCH_NAME is not defined`);
 }
 
 try {
-    const appName = `finance-${process.env.BRANCH_NAME}`;
+    const appName = `finance-${envName}`;
     new CIStack(app, `${appName}-ci`, {env});
 
     Tags.of(app).add('app', 'personal-finance');

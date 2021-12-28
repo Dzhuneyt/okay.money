@@ -1,9 +1,9 @@
 import {PolicyStatement} from '@aws-cdk/aws-iam';
-import {NodejsFunction as Original, NodejsFunctionProps} from '@aws-cdk/aws-lambda-nodejs';
 import {Construct, Duration} from '@aws-cdk/core';
+import {WatchableNodejsFunction, WatchableNodejsFunctionProps} from "cdk-watch";
 
-export class LambdaTypescript extends Original {
-    constructor(scope: Construct, id: string, props: NodejsFunctionProps) {
+export class LambdaTypescript extends WatchableNodejsFunction {
+    constructor(scope: Construct, id: string, props: WatchableNodejsFunctionProps) {
         super(scope, id, {
             timeout: Duration.seconds(30),
             ...props,
@@ -17,8 +17,7 @@ export class LambdaTypescript extends Original {
             actions: ["dynamodb:*"],
             resources: ["*"],
         }));
-        this.node.addInfo(`Compiling ${props.entry}`);
-        console.log(props.entry);
+        this.addEnvironment('ENV_NAME', process.env.ENV_NAME as string);
     }
 
 }

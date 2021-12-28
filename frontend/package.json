@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "npx concurrently 'npm run build:watch' 'npm run util:lite-server' ",
     "start": "npx ng build",
-    "serve": "npx ng serve",
+    "serve": "npx ng serve --proxy-config proxy.conf.json",
     "build": "npx ng build",
     "util:lite-server": "npx lite-server",
     "build:watch": "npx ng build --watch=true --progress=true",

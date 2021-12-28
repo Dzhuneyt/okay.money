@@ -1,21 +1,8 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {ChartOptions} from 'chart.js';
 import {BackendService} from 'src/app/services/backend.service';
-import {CategoriesService} from 'src/app/services/categories.service';
+import {tap} from 'rxjs/operators';
 
-interface Account {
-  id?: number;
-  name: string;
-  starting_balance: number;
-  current_balance: number;
-}
-
-interface CategoryStats {
-  id: number;
-  name?: string;
-  income_for_period: number;
-  expense_for_period: number;
-}
 
 const chartOptions: ChartOptions = {
   responsive: true,
@@ -40,6 +27,8 @@ const chartOptions: ChartOptions = {
 export class StatsByCategoryComponent implements OnInit {
 
   public isLoading = true;
+
+  public tab: 'income' | 'expenses' = 'expenses';
 
   /**
    * Holds an array of datasets for both charts
@@ -66,12 +55,10 @@ export class StatsByCategoryComponent implements OnInit {
     income: [],
     expense: [],
   };
-  private categoryInfos: CategoryStats[] = [];
 
   constructor(
     private elementRef: ChangeDetectorRef,
     private backend: BackendService,
-    private categories: CategoriesService,
   ) {
   }
 
@@ -140,17 +127,13 @@ export class StatsByCategoryComponent implements OnInit {
       params['end_date'] = this.formatDate(endDate);
     }
 
-    // this.makeFakeChart();
-
-    this.backend.request('stats/by_category', 'GET')
-      .subscribe((apiResult: {
+    this.backend.request('stats/by_category', 'GET').pipe(
+      tap((apiResult: {
         id: string,
         name: string,
         income_for_period: number,
         expense_for_period: number,
       }[]) => {
-        console.log(apiResult);
-
         this.legends.income = apiResult
           .filter(elem => {
             return elem.income_for_period > 0;
@@ -180,76 +163,17 @@ export class StatsByCategoryComponent implements OnInit {
               .map(elem => Math.abs(elem.expense_for_period)),
           }
         ];
-
-        this.isLoading = false;
-
-        this.toggleChartVisibility(true);
-      });
-    // this.backend.request('stats/by_category', 'GET', params).subscribe(apiResult => {
-    //
-    //   // Extract and fill category names for each stats object
-    //   this.categoryInfos = apiResult['categories'].map(cat => {
-    //     return cat;
-    //   });
-    //
-    //   this.legends.income = this.categoryInfos
-    //     .filter(elem => {
-    //       return elem.income_for_period > 0;
-    //     })
-    //     .map(elem => elem.name ? elem.name : elem.id);
-    //   this.legends.expense = this.categoryInfos
-    //     .filter(elem => {
-    //       return elem.expense_for_period < 0;
-    //     })
-    //     .map(elem => elem.name ? elem.name : elem.id);
-    //
-    //   this.dataSets.expenses = [
-    //     {
-    //       label: 'Expenses',
-    //       data: this.categoryInfos
-    //         .filter(elem => elem.expense_for_period < 0)
-    //         .map(elem => elem.expense_for_period),
-    //     }
-    //   ];
-    //   this.dataSets.income = [
-    //     {
-    //       label: 'Income',
-    //       data: this.categoryInfos
-    //         .filter(elem => elem.income_for_period > 0)
-    //         .map(elem => elem.income_for_period),
-    //     }
-    //   ];
-    //
-    //   this.toggleChartVisibility(true);
-    // });
+      }),
+      tap(() => this.isLoading = false),
+      tap(() => this.toggleChartVisibility(true)),
+    ).subscribe();
   }
 
   private formatDate(date: Date) {
     return date.getTime();
-    // const d = date;
-    // return d.getFullYear() + '-' +
-    //   ('00' + (d.getMonth() + 1)).slice(-2) + '-' +
-    //   ('00' + d.getDate()).slice(-2) + ' ' +
-    //   ('00' + d.getHours()).slice(-2) + ':' +
-    //   ('00' + d.getMinutes()).slice(-2) + ':' +
-    //   ('00' + d.getSeconds()).slice(-2);
   }
 
   private makeFakeChart() {
-    this.categoryInfos = [
-      {
-        id: 1,
-        name: 'Food',
-        expense_for_period: 100,
-        income_for_period: 13,
-      },
-      {
-        id: 2,
-        name: 'Clothes',
-        expense_for_period: 100,
-        income_for_period: 13,
-      },
-    ];
 
     this.legends.income = [
       'Food',
@@ -274,5 +198,9 @@ export class StatsByCategoryComponent implements OnInit {
       }
     ];
     this.toggleChartVisibility(true);
+  }
+
+  changeTab(tab: 'expenses' | 'income') {
+    this.tab = tab;
   }
 }
