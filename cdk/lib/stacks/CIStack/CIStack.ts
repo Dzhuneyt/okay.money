@@ -5,6 +5,8 @@ import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";
 import {BuildSpec, Cache, ComputeType, LinuxBuildImage, LocalCacheMode, PipelineProject} from "@aws-cdk/aws-codebuild";
 import {LogGroup, RetentionDays} from "@aws-cdk/aws-logs";
 import {ManagedPolicy} from "@aws-cdk/aws-iam";
+import {CodePipelinePostToGitHub} from "@awesome-cdk/cdk-report-codepipeline-status-to-github";
+import {StringParameter} from "@aws-cdk/aws-ssm/lib/parameter";
 
 export class CIStack extends Stack {
     private readonly cacheBucket: IBucket;
@@ -18,6 +20,12 @@ export class CIStack extends Stack {
             removalPolicy: RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
             encryption: BucketEncryption.S3_MANAGED,
+            lifecycleRules: [
+                {
+                    expiration: Duration.days(7),
+                    abortIncompleteMultipartUploadAfter: Duration.days(7),
+                }
+            ],
         });
 
         const sourceArtifact = new codepipeline.Artifact();
@@ -27,6 +35,15 @@ export class CIStack extends Stack {
             artifactBucket: this.cacheBucket,
             pipelineName: `finance-${branchName}-ci`,
         });
+
+        new CodePipelinePostToGitHub(pipeline, 'CodePipelinePostToGitHub', {
+            pipeline,
+            githubToken: StringParameter.fromStringParameterName(this, 'GithubSecret', 'GITHUB_TOKEN'),
+        });
+
+        SecretValue.ssmSecure('', '');
+
+
         pipeline.addStage({
             stageName: "Source",
             actions: [
