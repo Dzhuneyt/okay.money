@@ -172,9 +172,11 @@ export const handler = new Handler(async (event: IEvent) => {
         }).promise();
 
         try {
+            const confirmationLink = `${getBaseUrl(event)}/register?token=${uuid}`;
+            console.log(confirmationLink);
             await sendEmail({
                 mailerType: "ses",
-                confirmationLink: getBaseUrl(event) + `/register?token=${uuid}`,
+                confirmationLink,
                 to: body.email,
             });
         } catch (e) {

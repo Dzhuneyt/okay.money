@@ -3,7 +3,7 @@ import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
 import {LocalStorage} from '@ngx-pwa/local-storage';
 import {EMPTY, Observable} from 'rxjs';
-import {catchError, map, mergeMap, switchMap, tap} from 'rxjs/operators';
+import {catchError, switchMap, tap} from 'rxjs/operators';
 import {environment} from 'src/environments/environment';
 import {SnackbarService} from './snackbar.service';
 
@@ -13,7 +13,6 @@ import {SnackbarService} from './snackbar.service';
 export class BackendService {
 
   get baseUrl(): string {
-    // return 'https://2noax5lb45.execute-api.eu-west-1.amazonaws.com/prod/api/';
     if (environment.baseUrl && environment.baseUrl.length > 0) {
       return environment.baseUrl + 'api/';
     }
@@ -73,7 +72,7 @@ export class BackendService {
             ...cachedTokens,
             ...refreshTokenResponse,
             ExpiresAt: Math.round(new Date().getTime() / 1000 + refreshTokenResponse.ExpiresIn),
-          }).subscribe(value1 => {
+          }).subscribe(() => {
             console.log('Stored to LocalStorage for future use');
             subscriber.next(refreshTokenResponse['IdToken']);
             subscriber.complete();
