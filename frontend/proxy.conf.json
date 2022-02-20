@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "https://87hg6tcfva.execute-api.us-east-1.amazonaws.com/prod/",
+    "target": "https://q5tmksewn5.execute-api.us-east-1.amazonaws.com/prod/",
     "secure": false,
     "changeOrigin": true
   }

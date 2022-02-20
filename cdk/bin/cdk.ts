@@ -31,12 +31,8 @@ const env: Environment = {
 try {
     const appName = `finance-${process.env.ENV_NAME}`;
 
-    const dynamoStack = new DynamoDBStack(app, `${appName}-dynamodb`, {
-        env,
-    })
-    const cognitoStack = new CognitoStack(app, `${appName}-cognito`, {
-        env
-    });
+    const dynamoStack = new DynamoDBStack(app, `${appName}-dynamodb`, {env})
+    const cognitoStack = new CognitoStack(app, `${appName}-cognito`, {env});
     const restApisStack = new RestApisStack(app, `${appName}-rest-apis`, {
         env,
         userPool: cognitoStack.userPool,

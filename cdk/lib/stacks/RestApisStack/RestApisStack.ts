@@ -88,7 +88,7 @@ export class RestApisStack extends cdk.Stack {
             apiRootResource: this.apiRootResource,
             userPool: this.props.userPool,
             authorizer: this.cognitoAuthorizer,
-        })
+        });
     }
 
     private createCognitoAuthorizer() {

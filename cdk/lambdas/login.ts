@@ -54,15 +54,21 @@ const originalHandler = async (event: IEvent): Promise<APIGatewayProxyResult> =>
         } else {
             return {
                 statusCode: 400,
-                body: "Invalid credentials",
+                body: JSON.stringify({error: "Invalid credentials"}),
             }
         }
-    } catch (e) {
+    } catch (e: any) {
+        if (e.code === 'UserNotFoundException') {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({error: "Invalid credentials"}),
+            }
+        }
         console.log(e);
 
         return {
             statusCode: 500,
-            body: 'Login failed due to an internal error',
+            body: JSON.stringify({error: 'Login failed due to an internal error'}),
         }
     }
 }
