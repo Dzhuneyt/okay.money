@@ -7,14 +7,25 @@ import {DynamoDBStack} from '../lib/stacks/DynamoDBStack/DynamoDBStack';
 import {RestApisStack} from '../lib/stacks/RestApisStack/RestApisStack';
 import {FrontendStack} from "../lib/stacks/FrontendStack/FrontendStack";
 
-const app = new cdk.App({});
-const env: Environment = {
-    account: process.env.CDK_DEFAULT_ACCOUNT,
-    region: 'us-east-1',
-}
-
 if (!process.env.ENV_NAME) {
     throw new Error(`process.env.ENV_NAME is not defined`);
+}
+
+const envName = process.env.ENV_NAME as string;
+
+const resolveAccountFromEnvName = (envName: string) => {
+    switch (envName) {
+        case 'master':
+            return '526302546747';
+        default:
+            return '364533559210';
+    }
+}
+
+const app = new cdk.App({});
+const env: Environment = {
+    account: resolveAccountFromEnvName(envName),
+    region: 'us-east-1',
 }
 
 try {
