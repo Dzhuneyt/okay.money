@@ -4,14 +4,13 @@ import * as codepipeline from "@aws-cdk/aws-codepipeline";
 import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";
 import {BuildSpec, Cache, ComputeType, LinuxBuildImage, PipelineProject} from "@aws-cdk/aws-codebuild";
 import {LogGroup, RetentionDays} from "@aws-cdk/aws-logs";
-import {AccountRootPrincipal, CompositePrincipal, Role} from "@aws-cdk/aws-iam";
+import {ManagedPolicy} from "@aws-cdk/aws-iam";
 import {CodePipelinePostToGitHub} from "@awesome-cdk/cdk-report-codepipeline-status-to-github";
 import {StringParameter} from "@aws-cdk/aws-ssm/lib/parameter";
 
 export class CIStack extends Stack {
     private readonly cacheBucket: IBucket;
     private readonly branchName: string;
-    private readonly role: Role;
 
     constructor(scope: Construct, id: string, props: StackProps) {
         super(scope, id, props);
@@ -19,17 +18,16 @@ export class CIStack extends Stack {
         this.branchName = process.env.BRANCH_NAME as string;
 
         this.cacheBucket = this.getCacheBucket();
-        this.role = new Role(this, 'Role', {
-            assumedBy: new CompositePrincipal(new AccountRootPrincipal())
-        });
 
         const sourceArtifact = new codepipeline.Artifact();
 
         const pipeline = this.getPipeline();
 
+        const githubToken = StringParameter.fromStringParameterName(this, 'GithubSecret', 'GITHUB_TOKEN');
+
         new CodePipelinePostToGitHub(pipeline, 'CodePipelinePostToGitHub', {
             pipeline,
-            githubToken: StringParameter.fromStringParameterName(this, 'GithubSecret', 'GITHUB_TOKEN'),
+            githubToken,
         });
 
         pipeline.addStage({
@@ -38,8 +36,7 @@ export class CIStack extends Stack {
                 new codepipeline_actions.GitHubSourceAction({
                     actionName: 'GitHub',
                     output: sourceArtifact,
-                    oauthToken: SecretValue.secretsManager('GITHUB_TOKEN_PERSONAL'),
-                    // Replace these with your actual GitHub project name
+                    oauthToken: SecretValue.plainText(githubToken.stringValue),
                     owner: 'Dzhuneyt',
                     repo: 'okay.money',
                     branch: this.branchName,
@@ -47,38 +44,31 @@ export class CIStack extends Stack {
             ],
         });
 
+        const deployProject = new PipelineProject(this, 'CDK-Deploy', {
+            buildSpec: BuildSpec.fromSourceFilename('buildspec.yml'),
+            cache: Cache.bucket(this.cacheBucket, {prefix: 'ci'}),
+            environment: {
+                buildImage: LinuxBuildImage.AMAZON_LINUX_2_3,
+                // computeType: ComputeType.LARGE,
+                privileged: true,
+            },
+            environmentVariables: {
+                ENV_NAME: {
+                    value: this.branchName,
+                }
+            },
+        });
+        deployProject.role?.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'))
 
+        const deployAction = new codepipeline_actions.CodeBuildAction({
+            actionName: "CDK-Deploy",
+            input: sourceArtifact,
+            project: deployProject,
+        });
         pipeline.addStage({
             stageName: "Deploy",
             actions: [
-                new codepipeline_actions.CodeBuildAction({
-                    actionName: "CDK-Deploy",
-                    input: sourceArtifact,
-                    project: new PipelineProject(this, 'CDK-Deploy', {
-                        buildSpec: BuildSpec.fromSourceFilename('buildspec.yml'),
-                        logging: {
-                            cloudWatch: {
-                                enabled: true,
-                                logGroup: new LogGroup(this, 'cdk-deploy-logs', {
-                                    removalPolicy: RemovalPolicy.DESTROY,
-                                    retention: RetentionDays.ONE_MONTH,
-                                })
-                            },
-                        },
-                        cache: Cache.bucket(this.cacheBucket, {prefix: 'ci'}),
-                        environment: {
-                            buildImage: LinuxBuildImage.AMAZON_LINUX_2_3,
-                            computeType: ComputeType.LARGE,
-                            privileged: true,
-                        },
-                        environmentVariables: {
-                            ENV_NAME: {
-                                value: this.branchName,
-                            }
-                        },
-                        role: this.role,
-                    }),
-                })
+                deployAction,
             ],
         })
     }
