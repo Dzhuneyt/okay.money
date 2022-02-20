@@ -1,7 +1,0 @@
-{
-  "packages": [
-    "cdk/",
-    "frontend/"
-  ],
-  "version": "0.0.0"
-}
