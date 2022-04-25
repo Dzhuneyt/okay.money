@@ -41,6 +41,7 @@ try {
             transaction: dynamoStack.tableTransaction,
         }
     });
+    restApisStack.addDependency(dynamoStack);
 
     // Provide a high level stack that depends on all others, providing
     // an easy mechanism to deploy "everything" by just deploying this stack
