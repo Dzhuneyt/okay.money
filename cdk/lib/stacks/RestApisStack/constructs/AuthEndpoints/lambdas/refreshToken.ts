@@ -34,7 +34,7 @@ export const handler = async (event: IEvent) => {
                 ExpiresIn: result.AuthenticationResult?.ExpiresIn,
             })
         }
-    } catch (e) {
+    } catch (e: any) {
         console.error(e);
         if (e.message && e.message.includes('Refresh Token has expired')) {
             return {

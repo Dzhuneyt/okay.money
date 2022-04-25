@@ -65,7 +65,7 @@ export async function userExistsInPool(username: string, userPoolId: string) {
                 Username: username,
             }).promise();
         return !!oldUser.Username;
-    } catch (e) {
+    } catch (e: any) {
         if (e.toString().includes('UserNotFoundException')) {
             return false;
         }
@@ -104,118 +104,109 @@ export const handler = new Handler(async (event: IEvent) => {
     }
 
     const userPoolId = process.env.COGNITO_USERPOOL_ID as string;
-    try {
-        const body: {
-            token: string,
-            password: string,
-        } = event.body ? JSON.parse(event.body) : {};
+    const body: {
+        token: string,
+        password: string,
+    } = event.body ? JSON.parse(event.body) : {};
 
-        if (!body.token) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    message: 'Token not provided',
-                }),
-            };
-        }
-
-        console.log('body', body);
-        const tokenItem = await getTokenItem(body.token);
-
-        if (!tokenItem) {
-            return {
-                statusCode: 404,
-                body: JSON.stringify({
-                    message: 'Invalid registration attempt. Link expired?',
-                })
-            };
-        }
-
-        const username = tokenItem.email;
-        const password = body.password;
-
-        if (!password || password.length < 6) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    message: `Password must be longer than 6 characters`,
-                })
-            }
-        }
-
-        const cognitoUserCreated = await cognito.adminCreateUser({
-            UserPoolId: userPoolId,
-            Username: username,
-            TemporaryPassword: password,
-            MessageAction: 'SUPPRESS',
-        }).promise();
-
-        const cognitoChangePassword = await cognito.adminSetUserPassword({
-            Permanent: true,
-            Username: username,
-            Password: password,
-            UserPoolId: userPoolId,
-        }).promise();
-
-        if (!cognitoUserCreated.User?.Username || cognitoChangePassword.$response.error) {
-            console.error(cognitoUserCreated.$response);
-            console.error(cognitoChangePassword.$response);
-            return {
-                statusCode: 500,
-                body: JSON.stringify({
-                    message: `Can not create Cognito user due to an internal error`,
-                })
-            }
-        }
-
-        console.log('User created in Cognito', body);
-
-        const sub = cognitoUserCreated.User
-            ?.Attributes
-            ?.find((value: AttributeType) => {
-                return value.Name === 'sub';
-            })?.Value;
-
-        if (!sub) {
-            return {
-                statusCode: 500,
-                body: JSON.stringify({
-                    message: `Failed to extract user ID due to an internal error`,
-                })
-            }
-        }
-        console.log('sub', sub);
-
-        await dynamodb.putItem({
-            TableName: await TableNames.users(),
-            Item: DynamoDB.Converter.marshall({
-                ...cognitoUserCreated.User,
-                id: sub,
-            }),
-        }).promise();
-
-        // Create default things for this newly created user
-        await createDefaultCategories(sub);
-        await createDefaultAccount(sub);
-
-        // Mark the link as consumed
-        await new DynamoDB().deleteItem({
-            TableName: process.env.TABLE_NAME_TOKENS as string,
-            Key: DynamoDB.Converter.marshall({id: body.token}),
-        }).promise()
-
+    if (!body.token) {
         return {
-            statusCode: 200,
+            statusCode: 400,
             body: JSON.stringify({
-                id: sub,
+                message: 'Token not provided',
+            }),
+        };
+    }
+
+    console.log('body', body);
+    const tokenItem = await getTokenItem(body.token);
+
+    if (!tokenItem) {
+        return {
+            statusCode: 404,
+            body: JSON.stringify({
+                message: 'Invalid registration attempt. Link expired?',
+            })
+        };
+    }
+
+    const username = tokenItem.email;
+    const password = body.password;
+
+    if (!password || password.length < 6) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({
+                message: `Password must be longer than 6 characters`,
             })
         }
-    } catch (e) {
-        console.log('Failed to create a user');
-        console.log(e);
+    }
+
+    const cognitoUserCreated = await cognito.adminCreateUser({
+        UserPoolId: userPoolId,
+        Username: username,
+        TemporaryPassword: password,
+        MessageAction: 'SUPPRESS',
+    }).promise();
+
+    const cognitoChangePassword = await cognito.adminSetUserPassword({
+        Permanent: true,
+        Username: username,
+        Password: password,
+        UserPoolId: userPoolId,
+    }).promise();
+
+    if (!cognitoUserCreated.User?.Username || cognitoChangePassword.$response.error) {
+        console.error(cognitoUserCreated.$response);
+        console.error(cognitoChangePassword.$response);
         return {
             statusCode: 500,
-            body: JSON.stringify({message: e.toString()}),
+            body: JSON.stringify({
+                message: `Can not create Cognito user due to an internal error`,
+            })
         }
+    }
+
+    console.log('User created in Cognito', body);
+
+    const sub = cognitoUserCreated.User
+        ?.Attributes
+        ?.find((value: AttributeType) => {
+            return value.Name === 'sub';
+        })?.Value;
+
+    if (!sub) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                message: `Failed to extract user ID due to an internal error`,
+            })
+        }
+    }
+    console.log('sub', sub);
+
+    await dynamodb.putItem({
+        TableName: await TableNames.users(),
+        Item: DynamoDB.Converter.marshall({
+            ...cognitoUserCreated.User,
+            id: sub,
+        }),
+    }).promise();
+
+    // Create default things for this newly created user
+    await createDefaultCategories(sub);
+    await createDefaultAccount(sub);
+
+    // Mark the link as consumed
+    await new DynamoDB().deleteItem({
+        TableName: process.env.TABLE_NAME_TOKENS as string,
+        Key: DynamoDB.Converter.marshall({id: body.token}),
+    }).promise()
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify({
+            id: sub,
+        })
     }
 }).create();

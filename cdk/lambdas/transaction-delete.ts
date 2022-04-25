@@ -36,7 +36,7 @@ const originalHandler = async (event: IEvent) => {
             statusCode: 200,
             body: JSON.stringify(item),
         }
-    } catch (e) {
+    } catch (e: any) {
         console.log(e);
         return {
             statusCode: 500,
