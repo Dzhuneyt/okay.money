@@ -1,10 +1,11 @@
-import {CfnUserPoolResourceServer, UserPool, UserPoolClient} from '@aws-cdk/aws-cognito';
-import {AttributeType, BillingMode, Table} from '@aws-cdk/aws-dynamodb';
-import {PolicyStatement} from '@aws-cdk/aws-iam';
-import {StringParameter} from '@aws-cdk/aws-ssm';
-import {Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
 import {LambdaTypescript} from "../../constructs/LambdaTypescript";
 import {getPropsByLambdaFilename} from "../../constructs/rest/util/getLambdaCode";
+import {CfnUserPoolResourceServer, UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
+import {StringParameter} from "aws-cdk-lib/aws-ssm";
+import {AttributeType, BillingMode, Table, TableEncryption} from "aws-cdk-lib/aws-dynamodb";
+import {Duration, Stack, StackProps} from "aws-cdk-lib";
+import {Construct} from "constructs";
+import {PolicyStatement} from "aws-cdk-lib/aws-iam";
 
 interface Props extends StackProps {
 
@@ -65,7 +66,7 @@ export class CognitoStack extends Stack {
                 type: AttributeType.STRING,
             },
             billingMode: BillingMode.PAY_PER_REQUEST,
-            serverSideEncryption: true,
+            encryption: TableEncryption.AWS_MANAGED,
         });
 
 

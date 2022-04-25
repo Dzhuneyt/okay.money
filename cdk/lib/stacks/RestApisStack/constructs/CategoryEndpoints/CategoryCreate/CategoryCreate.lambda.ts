@@ -1,8 +1,9 @@
 import * as AWS from 'aws-sdk';
-import {IEvent} from './interfaces/IEvent';
+import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
 import {v4 as uuidv4} from 'uuid';
-import {Handler} from './shared/Handler';
+import {Handler} from '../../../../../../lambdas/shared/Handler';
 import DynamoDB = require('aws-sdk/clients/dynamodb');
+import {TableNames} from "../../../../../../lambdas/shared/TableNames";
 
 interface Input {
     title: string,
@@ -20,7 +21,7 @@ const originalHandler = async (event: IEvent) => {
             }
         }
 
-        const tableName = process.env.TABLE_NAME as string;
+        const tableName = await TableNames.categories();
         const dynamodb = new AWS.DynamoDB();
         const uuid = uuidv4();
         const result = await dynamodb.putItem({

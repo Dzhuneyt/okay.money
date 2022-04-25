@@ -1,23 +1,24 @@
-import {Annotations, CfnOutput, Construct, Duration, RemovalPolicy, Stack, StackProps} from "@aws-cdk/core";
-import {Bucket, IBucket} from "@aws-cdk/aws-s3";
 import {
-    AllowedMethods, CacheCookieBehavior, CachedMethods, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior,
+    AllowedMethods,
+    CacheCookieBehavior,
+    CacheHeaderBehavior,
+    CachePolicy,
+    CacheQueryStringBehavior,
     Distribution,
     IDistribution,
     OriginAccessIdentity,
-    OriginRequestCookieBehavior,
-    OriginRequestHeaderBehavior,
-    OriginRequestPolicy,
-    OriginRequestQueryStringBehavior,
     PriceClass,
     ViewerProtocolPolicy
-} from "@aws-cdk/aws-cloudfront";
-import * as origins from '@aws-cdk/aws-cloudfront-origins';
-import {BucketDeployment, Source} from "@aws-cdk/aws-s3-deployment";
-import {ARecord, HostedZone, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
-import {Certificate, ICertificate} from "@aws-cdk/aws-certificatemanager";
-import {CloudFrontTarget} from "@aws-cdk/aws-route53-targets";
-import {RestApi} from "@aws-cdk/aws-apigateway";
+} from "aws-cdk-lib/aws-cloudfront";
+import {BucketDeployment, Source} from "aws-cdk-lib/aws-s3-deployment";
+import {ARecord, HostedZone, IHostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
+import {Annotations, CfnOutput, Duration, RemovalPolicy, Stack, StackProps} from "aws-cdk-lib";
+import {CloudFrontTarget} from "aws-cdk-lib/aws-route53-targets";
+import {Bucket, IBucket} from "aws-cdk-lib/aws-s3";
+import {Construct} from "constructs";
+import {Certificate, ICertificate} from "aws-cdk-lib/aws-certificatemanager";
+import {RestApi} from "aws-cdk-lib/aws-apigateway";
+import {HttpOrigin, S3Origin} from "aws-cdk-lib/aws-cloudfront-origins";
 
 function isDirectory(directory: string) {
     const fs = require('fs');
@@ -84,7 +85,7 @@ export class FrontendStack extends Stack {
          */
         this.distribution = new Distribution(this, 'Distribution', {
             defaultBehavior: {
-                origin: new origins.S3Origin(this.bucket, {originAccessIdentity}),
+                origin: new S3Origin(this.bucket, {originAccessIdentity}),
                 viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
                 cachePolicy: CachePolicy.CACHING_DISABLED, // @TODO default seems to cache too aggressively so disable for now
                 compress: true,
@@ -100,7 +101,7 @@ export class FrontendStack extends Stack {
                  * Define path regex and behavior configuration for backend API calls
                  */
                 '/api/*': {
-                    origin: new origins.HttpOrigin(this.props.api.url.split('/')[2], {
+                    origin: new HttpOrigin(this.props.api.url.split('/')[2], {
                         originPath: '/prod',
                     }),
 

@@ -1,11 +1,12 @@
-import {IEvent} from './interfaces/IEvent';
-import {DynamoManager} from './shared/DynamoManager';
-import {Handler} from './shared/Handler';
+import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
+import {DynamoManager} from '../../../../../../lambdas/shared/DynamoManager';
+import {Handler} from '../../../../../../lambdas/shared/Handler';
+import {TableNames} from "../../../../../../lambdas/shared/TableNames";
 
 const originalHandler = async (event: IEvent) => {
     try {
         const userId = event.requestContext.authorizer.claims.sub;
-        const items = await new DynamoManager(process.env.TABLE_NAME as string)
+        const items = await new DynamoManager(await TableNames.categories())
             .forUser(userId)
             .list();
 

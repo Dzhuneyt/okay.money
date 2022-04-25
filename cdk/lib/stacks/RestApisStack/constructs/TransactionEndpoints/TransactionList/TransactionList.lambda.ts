@@ -1,7 +1,8 @@
-import {IAccount} from './interfaces/IAccount';
-import {ITransaction} from './interfaces/ITransaction';
-import {DynamoManager} from './shared/DynamoManager';
-import {Handler} from './shared/Handler';
+import {IAccount} from '../../../../../../lambdas/interfaces/IAccount';
+import {ITransaction} from '../../../../../../lambdas/interfaces/ITransaction';
+import {DynamoManager} from '../../../../../../lambdas/shared/DynamoManager';
+import {Handler} from '../../../../../../lambdas/shared/Handler';
+import {TableNames} from "../../../../../../lambdas/shared/TableNames";
 
 const findById = (collection: { id?: string }[], id: string) => {
     const found = collection.find(cat => cat.id === id);
@@ -15,15 +16,18 @@ export const originalHandler = async (event: any) => {
     try {
         const userId = event.requestContext.authorizer.claims.sub;
 
-        const categories = await new DynamoManager(process.env.TABLE_NAME_CATEGORIES as string)
+        const tableNameCategories = await TableNames.categories();
+        const categories = await new DynamoManager(tableNameCategories)
             .forUser(userId)
             .list() as ICategory[];
 
-        const accounts = await new DynamoManager(process.env.TABLE_NAME_ACCOUNTS as string)
+        const tableNameAccounts = await TableNames.accounts();
+        const accounts = await new DynamoManager(tableNameAccounts)
             .forUser(userId)
             .list() as IAccount[];
 
-        const transactions = await new DynamoManager(process.env.TABLE_NAME as string)
+        const tableNameTransactions = await TableNames.transactions();
+        const transactions = await new DynamoManager(tableNameTransactions)
             .forUser(userId)
             .list() as ITransaction[];
 

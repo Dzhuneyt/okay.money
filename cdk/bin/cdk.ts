@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-import * as cdk from '@aws-cdk/core';
-import {Environment, Stack, Tags} from '@aws-cdk/core';
 import 'source-map-support/register';
 import {CognitoStack} from '../lib/stacks/CognitoStack/CognitoStack';
 import {DynamoDBStack} from '../lib/stacks/DynamoDBStack/DynamoDBStack';
 import {RestApisStack} from '../lib/stacks/RestApisStack/RestApisStack';
 import {FrontendStack} from "../lib/stacks/FrontendStack/FrontendStack";
+import {App, Environment, Stack, Tags} from 'aws-cdk-lib';
 
 if (!process.env.ENV_NAME) {
     throw new Error(`process.env.ENV_NAME is not defined`);
@@ -22,7 +21,7 @@ const resolveAccountFromEnvName = (envName: string) => {
     }
 }
 
-const app = new cdk.App({});
+const app = new App({});
 const env: Environment = {
     account: resolveAccountFromEnvName(envName),
     region: 'us-east-1',

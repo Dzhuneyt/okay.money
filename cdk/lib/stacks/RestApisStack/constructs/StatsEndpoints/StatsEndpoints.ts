@@ -1,6 +1,6 @@
-import {AuthorizationType, IAuthorizer, IResource, RestApi} from '@aws-cdk/aws-apigateway';
-import {Table} from '@aws-cdk/aws-dynamodb';
-import {Construct} from '@aws-cdk/core';
+import {AuthorizationType, IAuthorizer, IResource} from 'aws-cdk-lib/aws-apigateway';
+import {Table} from 'aws-cdk-lib/aws-dynamodb';
+import {Construct} from 'constructs';
 import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
 import {LambdaTypescript} from '../../../../constructs/LambdaTypescript';
 import {getPropsByLambdaFilename} from '../../../../constructs/rest/util/getLambdaCode';

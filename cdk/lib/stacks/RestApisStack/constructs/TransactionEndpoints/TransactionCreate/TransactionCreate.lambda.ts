@@ -1,11 +1,11 @@
 import * as AWS from 'aws-sdk';
-import {IEvent} from './interfaces/IEvent';
-import DynamoDB = require('aws-sdk/clients/dynamodb');
+import {DynamoDB} from 'aws-sdk';
+import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
 import {v4 as uuidv4} from 'uuid';
-import {ITransaction} from './interfaces/ITransaction';
-import {DynamoManager} from './shared/DynamoManager';
-import {Handler} from './shared/Handler';
-import {isOwnedBy} from './shared/isOwnedBy';
+import {ITransaction} from '../../../../../../lambdas/interfaces/ITransaction';
+import {Handler} from '../../../../../../lambdas/shared/Handler';
+import {isOwnedBy} from '../../../../../../lambdas/shared/isOwnedBy';
+import {TableNames} from "../../../../../../lambdas/shared/TableNames";
 
 interface Input extends ITransaction {
     // Since the input is unpredictable, allow any other values
@@ -13,7 +13,7 @@ interface Input extends ITransaction {
     [key: string]: any,
 }
 
-const originalHandler = async (event: IEvent, context: any) => {
+const originalHandler = async (event: IEvent) => {
     console.log('Lambda called', event);
 
     try {
@@ -30,14 +30,16 @@ const originalHandler = async (event: IEvent, context: any) => {
             }
         });
 
-        if (!await isOwnedBy(params.account_id, userId, process.env.TABLE_NAME_ACCOUNTS as string)) {
+        const tableNameAccounts = await TableNames.accounts();
+        const tableNameCategories = await TableNames.categories();
+        if (!await isOwnedBy(params.account_id, userId, tableNameAccounts)) {
             throw new Error('Invalid "account_id"');
         }
-        if (!await isOwnedBy(params.category_id, userId, process.env.TABLE_NAME_CATEGORIES as string)) {
+        if (!await isOwnedBy(params.category_id, userId, tableNameCategories)) {
             throw new Error('Invalid "category_id"');
         }
 
-        const tableName = process.env.TABLE_NAME as string;
+        const tableName = await TableNames.transactions();
         const dynamodb = new AWS.DynamoDB();
         const uuid = uuidv4();
         const obj: ITransaction = {

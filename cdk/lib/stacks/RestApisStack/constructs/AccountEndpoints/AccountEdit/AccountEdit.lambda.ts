@@ -1,9 +1,10 @@
 import * as AWS from 'aws-sdk';
-import {IAccount} from './interfaces/IAccount';
-import {IEvent} from './interfaces/IEvent';
+import {IAccount} from '../../../../../../lambdas/interfaces/IAccount';
+import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
 import DynamoDB = require('aws-sdk/clients/dynamodb');
-import {DynamoManager} from './shared/DynamoManager';
-import {Handler} from './shared/Handler';
+import {DynamoManager} from '../../../../../../lambdas/shared/DynamoManager';
+import {Handler} from '../../../../../../lambdas/shared/Handler';
+import {TableNames} from "../../../../../../lambdas/shared/TableNames";
 
 interface Input extends IAccount {
     // Since the input is unpredictable, allow any other values
@@ -19,7 +20,8 @@ const originalHandler = async (event: IEvent) => {
 
         const params: Input = JSON.parse(event.body || '{}');
 
-        const item = await new DynamoManager(process.env.TABLE_NAME as string)
+        const tableName = await TableNames.accounts();
+        const item = await new DynamoManager(tableName)
             .forUser(userId).getOne(id);
 
         if (!item) {
@@ -32,7 +34,6 @@ const originalHandler = async (event: IEvent) => {
             id: item.id,
         }
 
-        const tableName = process.env.TABLE_NAME as string;
         const dynamodb = new AWS.DynamoDB();
         const obj: IAccount = {
             ...newItem,
@@ -49,13 +50,13 @@ const originalHandler = async (event: IEvent) => {
             }
         }
 
-        const refreshedItem = await new DynamoManager(process.env.TABLE_NAME as string)
+        const refreshedItem = await new DynamoManager(tableName)
             .forUser(userId).getOne(id);
         return {
             statusCode: 200,
             body: JSON.stringify(refreshedItem),
         }
-    } catch (e) {
+    } catch (e: any) {
         console.log(e);
         return {
             statusCode: 500,

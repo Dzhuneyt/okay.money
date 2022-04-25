@@ -2,7 +2,6 @@ import {IEvent} from './interfaces/IEvent';
 import {Handler} from './shared/Handler';
 import {v4} from 'uuid';
 import {DynamoDB, SES} from "aws-sdk";
-import {MailDataRequired} from "@sendgrid/helpers/classes/mail";
 import {userExistsInPool} from "./registerConfirm";
 
 
@@ -14,7 +13,6 @@ async function emailRegistered(email: string) {
     return await userExistsInPool(email, process.env.COGNITO_USERPOOL_ID as string);
 }
 
-const getFromEmail = () => 'no-reply-registration@em5577.dzhuneyt.com';
 const getSubject = () => 'okay.money - Complete your registration';
 const getBody = (type: "plaintext" | "html", confirmationLink: string) => {
     switch (type) {
@@ -44,37 +42,6 @@ abstract class Mailer {
     abstract send(): Promise<boolean>;
 }
 
-class SendGridMailer extends Mailer {
-    async send(): Promise<boolean> {
-        const msg: MailDataRequired = {
-            // Prevent emails from ending up in spam, by disabling link cloaking
-            // and embedding a pixel image inside email HTML
-            trackingSettings: {
-                clickTracking: {enable: false},
-                ganalytics: {enable: false},
-                openTracking: {enable: false},
-                subscriptionTracking: {enable: false},
-            },
-            to: this.to, // Change to your recipient
-            from: this.from, // Change to your verified sender
-            subject: this.subject,
-            text: this.body.plainText,
-            html: this.body.html,
-        }
-
-        const sendgrid = require('@sendgrid/mail');
-        const SENDGRID_API_KEY = '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';
-
-        sendgrid.setApiKey(SENDGRID_API_KEY);
-        const sendgridResult = await sendgrid
-            .send(msg);
-
-        console.log(JSON.stringify(Object.keys(sendgridResult), null, 2));
-        console.log(JSON.stringify(sendgridResult, null, 2));
-        return sendgridResult.statusCode === 202;
-    }
-}
-
 class SesMailer extends Mailer {
     async send(): Promise<boolean> {
         const ses = new SES();
@@ -97,7 +64,7 @@ class SesMailer extends Mailer {
 }
 
 async function sendEmail(config: {
-    mailerType: "ses" | "sendgrid",
+    mailerType: "ses",
     to: string,
     confirmationLink: string,
 }) {
@@ -107,17 +74,6 @@ async function sendEmail(config: {
         case "ses":
             mailer = new SesMailer(
                 'no-reply@okay.money',
-                config.to,
-                getSubject(),
-                {
-                    plainText: getBody("plaintext", config.confirmationLink),
-                    html: getBody("html", config.confirmationLink),
-                }
-            );
-            break;
-        case "sendgrid":
-            mailer = new SendGridMailer(
-                getFromEmail(),
                 config.to,
                 getSubject(),
                 {
@@ -196,7 +152,7 @@ export const handler = new Handler(async (event: IEvent) => {
                 success: true,
             })
         }
-    } catch (e) {
+    } catch (e: any) {
         return {
             statusCode: 500,
             body: e.toString(),

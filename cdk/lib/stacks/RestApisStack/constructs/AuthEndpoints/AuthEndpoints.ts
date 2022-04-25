@@ -1,12 +1,12 @@
-import {IResource} from '@aws-cdk/aws-apigateway';
-import {IUserPool, UserPoolClient} from '@aws-cdk/aws-cognito';
-import {Construct} from '@aws-cdk/core';
+import {IResource} from 'aws-cdk-lib/aws-apigateway';
+import {IUserPool} from 'aws-cdk-lib/aws-cognito';
 import {Login} from './Login';
 import {Register} from './Register';
 import {LambdaIntegration} from "../../../../constructs/LambdaIntegration";
-import {NodejsFunction} from "@aws-cdk/aws-lambda-nodejs";
+import {NodejsFunction} from "aws-cdk-lib/aws-lambda-nodejs";
 import * as path from "path";
-import {PolicyStatement} from "@aws-cdk/aws-iam";
+import {PolicyStatement} from "aws-cdk-lib/aws-iam";
+import {Construct} from 'constructs';
 
 interface Props {
     userPool: IUserPool,

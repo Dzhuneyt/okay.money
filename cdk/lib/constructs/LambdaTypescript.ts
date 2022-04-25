@@ -1,5 +1,6 @@
-import {PolicyStatement} from '@aws-cdk/aws-iam';
-import {Construct, Duration} from '@aws-cdk/core';
+import {Construct} from "constructs";
+import {Duration} from "aws-cdk-lib";
+import {PolicyStatement} from "aws-cdk-lib/aws-iam";
 import {WatchableNodejsFunction, WatchableNodejsFunctionProps} from "cdk-watch";
 
 export class LambdaTypescript extends WatchableNodejsFunction {

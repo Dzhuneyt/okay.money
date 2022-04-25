@@ -1,15 +1,13 @@
-import {AccessLogFormat, AuthorizationType, Cors, LogGroupLogDestination, RestApi} from '@aws-cdk/aws-apigateway';
-import {CfnUserPoolResourceServer, IUserPool} from '@aws-cdk/aws-cognito';
-import {LogGroup, RetentionDays} from '@aws-cdk/aws-logs';
-import {Construct, RemovalPolicy, Stack} from '@aws-cdk/core';
+import {AccessLogFormat, AuthorizationType, Cors, LogGroupLogDestination, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {LogGroup, RetentionDays} from 'aws-cdk-lib/aws-logs';
+import {RemovalPolicy, Stack} from 'aws-cdk-lib';
+import {Construct} from 'constructs';
 import {GatewayResponseMapper} from './GatewayResponseMapper';
 
 export class ApiGateway extends Construct {
     public readonly api: RestApi;
 
-    constructor(scope: Construct, id: string, props: {
-        userPool: IUserPool,
-    }) {
+    constructor(scope: Construct, id: string) {
         super(scope, id);
 
         this.api = new RestApi(this, 'Default', {

@@ -4,27 +4,6 @@ import {DynamoManager} from '../shared/DynamoManager';
 import {Handler} from '../shared/Handler';
 import {TableNames} from '../shared/TableNames';
 
-interface Input {
-    start_date: number;
-    end_date: number;
-}
-
-class StatsByCategory {
-    private categories: any[];
-
-    constructor(private userId: string) {
-    }
-
-    async getCategories() {
-        if (this.categories === undefined) {
-            this.categories = await new DynamoManager(await TableNames.categories())
-                .forUser(this.userId)
-                .list();
-        }
-        return this.categories;
-    }
-}
-
 const organizeTransactionsUnderCategories = async (transactions: ITransaction[], userId: string) => {
     const allCategories = await new DynamoManager(await TableNames.categories())
         .forUser(userId)

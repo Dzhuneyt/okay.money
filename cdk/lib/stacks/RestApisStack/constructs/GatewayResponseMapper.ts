@@ -1,5 +1,5 @@
-import {ResponseType, RestApi} from '@aws-cdk/aws-apigateway';
-import {Construct} from '@aws-cdk/core';
+import {ResponseType, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {Construct} from "constructs";
 
 export class GatewayResponseMapper extends Construct {
     constructor(scope: Construct, id: string, props: {

@@ -1,9 +1,9 @@
-import {LambdaIntegration as OriginalLambdaIntegration, PassthroughBehavior} from '@aws-cdk/aws-apigateway';
-import {LambdaIntegrationOptions} from '@aws-cdk/aws-apigateway/lib/integrations/lambda';
-import * as lambda from '@aws-cdk/aws-lambda';
+import {LambdaIntegrationOptions, PassthroughBehavior} from "aws-cdk-lib/aws-apigateway";
+import {IFunction} from "aws-cdk-lib/aws-lambda";
+import * as orig from 'aws-cdk-lib/aws-apigateway'
 
-export class LambdaIntegration extends OriginalLambdaIntegration {
-    constructor(handler: lambda.IFunction, options?: LambdaIntegrationOptions) {
+export class LambdaIntegration extends orig.LambdaIntegration {
+    constructor(handler: IFunction, options?: LambdaIntegrationOptions) {
         const newOptions: LambdaIntegrationOptions = {
             ...options,
             proxy: true,

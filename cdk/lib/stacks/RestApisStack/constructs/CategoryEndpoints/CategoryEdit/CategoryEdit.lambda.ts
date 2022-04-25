@@ -1,8 +1,9 @@
 import * as AWS from 'aws-sdk';
-import {IEvent} from './interfaces/IEvent';
-import {DynamoManager} from './shared/DynamoManager';
-import {Handler} from './shared/Handler';
+import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
+import {DynamoManager} from '../../../../../../lambdas/shared/DynamoManager';
+import {Handler} from '../../../../../../lambdas/shared/Handler';
 import DynamoDB = require('aws-sdk/clients/dynamodb');
+import {TableNames} from "../../../../../../lambdas/shared/TableNames";
 
 interface CategoryEditInput {
     title: string,
@@ -15,7 +16,7 @@ const originalHandler = async (event: IEvent) => {
 
         const categoryEditInput = JSON.parse(event.body || '{}') as CategoryEditInput;
 
-        const tableName = process.env.TABLE_NAME as string;
+        const tableName = await TableNames.categories();
 
         const originalItem = await new DynamoManager(tableName)
             .forUser(userId).getOne(id);
@@ -48,7 +49,7 @@ const originalHandler = async (event: IEvent) => {
             statusCode: 200,
             body: JSON.stringify(refreshedItem),
         }
-    } catch (e) {
+    } catch (e: any) {
         console.log(e);
         return {
             statusCode: 500,
