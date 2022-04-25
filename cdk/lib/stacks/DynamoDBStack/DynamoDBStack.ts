@@ -34,6 +34,7 @@ export class DynamoDBStack extends Stack {
         });
 
         this.tableTransaction = new Table(this, 'transaction', {});
+        this.exportValue(this.tableTransaction.tableName);
         this.tableTransaction.addGlobalSecondaryIndex({
             indexName: 'author_id',
             partitionKey: {
