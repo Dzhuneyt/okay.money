@@ -27,6 +27,7 @@ export class DynamoDBStack extends Stack {
 
         this.tableCategory = new Table(this, 'category', {});
         this.exportValue(this.tableCategory.tableName);
+        this.exportValue(this.tableCategory.tableArn);
         this.tableCategory.addGlobalSecondaryIndex({
             indexName: 'author_id',
             partitionKey: {
