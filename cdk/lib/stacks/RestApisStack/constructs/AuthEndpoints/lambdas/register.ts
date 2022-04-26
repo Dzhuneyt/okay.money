@@ -63,27 +63,18 @@ class SesMailer extends Mailer {
 }
 
 async function sendEmail(config: {
-    mailerType: "ses",
     to: string,
     confirmationLink: string,
 }) {
-    let mailer: Mailer;
-
-    switch (config.mailerType) {
-        case "ses":
-            mailer = new SesMailer(
-                'no-reply@okay.money',
-                config.to,
-                getSubject(),
-                {
-                    plainText: getBody("plaintext", config.confirmationLink),
-                    html: getBody("html", config.confirmationLink),
-                }
-            );
-            break;
-        default:
-            throw new Error(`Invalid mailer type ${config.mailerType}. Can not send email`);
-    }
+    const mailer = new SesMailer(
+        'no-reply@okay.money',
+        config.to,
+        getSubject(),
+        {
+            plainText: getBody("plaintext", config.confirmationLink),
+            html: getBody("html", config.confirmationLink),
+        }
+    );
 
 
     const emailResult = await mailer.send();
@@ -122,7 +113,7 @@ export const handler = new Handler(async (event: IEvent) => {
                 id: uuid,
                 email: body.email,
                 // Expires in 7 days
-                expires: new Date().getTime() + 3600 * 24 * 7,
+                ttl: new Date().getTime() + 3600 * 24 * 7,
             }),
         }).promise();
 
@@ -130,7 +121,6 @@ export const handler = new Handler(async (event: IEvent) => {
             const confirmationLink = `${getBaseUrl(event)}/register?token=${uuid}`;
             console.log(confirmationLink);
             await sendEmail({
-                mailerType: "ses",
                 confirmationLink,
                 to: body.email,
             });

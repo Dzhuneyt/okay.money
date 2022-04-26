@@ -37,6 +37,7 @@ export class Register extends Construct {
         return new Table(this, 'registration-tokens', {
             removalPolicy: RemovalPolicy.DESTROY,
             billingMode: BillingMode.PAY_PER_REQUEST,
+            timeToLiveAttribute: 'ttl',
         });
     }
 
