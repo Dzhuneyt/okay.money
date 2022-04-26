@@ -1,11 +1,11 @@
 import * as AWS from 'aws-sdk';
 import {AttributeType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import DynamoDB = require('aws-sdk/clients/dynamodb');
+import {TableNames} from "../../../../../lambdas/shared/TableNames";
 
 const dynamodb = new DynamoDB();
 const cognito = new AWS.CognitoIdentityServiceProvider();
 
-// @TODO deprecated
 export const handler = async (event: {
     username: string,
     password: string,
@@ -35,7 +35,7 @@ export const handler = async (event: {
         console.log(sub);
 
         await dynamodb.putItem({
-            TableName: process.env.TABLE_NAME_USERS as string,
+            TableName: await TableNames.users(),
             Item: DynamoDB.Converter.marshall({
                 ...cognitoUser.User,
                 id: sub,

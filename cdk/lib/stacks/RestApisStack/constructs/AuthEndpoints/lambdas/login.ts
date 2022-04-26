@@ -1,9 +1,9 @@
 import {APIGatewayProxyResult} from 'aws-lambda';
 import * as AWS from 'aws-sdk';
-import {IEvent} from './interfaces/IEvent';
-import {Handler} from './shared/Handler';
+import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
+import {Handler} from '../../../../../../lambdas/shared/Handler';
 import {SSM} from "aws-sdk";
-import appName from "./appName";
+import appName from "../../../../../../lambdas/appName";
 
 interface Request {
     username: string;

@@ -35,11 +35,6 @@ try {
     const restApisStack = new RestApisStack(app, `${appName}-rest-apis`, {
         env,
         userPool: cognitoStack.userPool,
-        dynamoTables: {
-            account: dynamoStack.tableAccount,
-            category: dynamoStack.tableCategory,
-            transaction: dynamoStack.tableTransaction,
-        }
     });
     restApisStack.addDependency(dynamoStack);
 

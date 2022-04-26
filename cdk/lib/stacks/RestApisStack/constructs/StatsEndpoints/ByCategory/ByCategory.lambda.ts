@@ -1,8 +1,8 @@
-import {IEvent} from '../interfaces/IEvent';
-import {ITransaction} from '../interfaces/ITransaction';
-import {DynamoManager} from '../shared/DynamoManager';
-import {Handler} from '../shared/Handler';
-import {TableNames} from '../shared/TableNames';
+import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
+import {ITransaction} from '../../../../../../lambdas/interfaces/ITransaction';
+import {DynamoManager} from '../../../../../../lambdas/shared/DynamoManager';
+import {Handler} from '../../../../../../lambdas/shared/Handler';
+import {TableNames} from '../../../../../../lambdas/shared/TableNames';
 
 const organizeTransactionsUnderCategories = async (transactions: ITransaction[], userId: string) => {
     const allCategories = await new DynamoManager(await TableNames.categories())

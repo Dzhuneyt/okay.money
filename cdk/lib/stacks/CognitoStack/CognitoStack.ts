@@ -1,11 +1,11 @@
 import {LambdaTypescript} from "../../constructs/LambdaTypescript";
-import {getPropsByLambdaFilename} from "../../constructs/rest/util/getLambdaCode";
 import {CfnUserPoolResourceServer, UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
 import {StringParameter} from "aws-cdk-lib/aws-ssm";
 import {AttributeType, BillingMode, Table, TableEncryption} from "aws-cdk-lib/aws-dynamodb";
 import {Duration, Stack, StackProps} from "aws-cdk-lib";
 import {Construct} from "constructs";
 import {PolicyStatement} from "aws-cdk-lib/aws-iam";
+import * as path from "path";
 
 interface Props extends StackProps {
 
@@ -69,7 +69,6 @@ export class CognitoStack extends Stack {
             encryption: TableEncryption.AWS_MANAGED,
         });
 
-
         new StringParameter(this, 'param-table-name-users', {
             stringValue: this.userTable.tableName,
             parameterName: `/${appName}/table/users/name`,
@@ -83,12 +82,11 @@ export class CognitoStack extends Stack {
         // by calling that Lambda from the AWS console using a payload like:
         // {username: "test", password: "testtest"}
         const fnCreateUser = new LambdaTypescript(this, 'fn-create-user', {
-            ...getPropsByLambdaFilename('user-create.ts'),
+            entry: path.resolve(__dirname, 'util/lambda/create-user.ts'),
             description: "Debugging lambda that allows you to skip the registration process and create a user immediately",
             timeout: Duration.seconds(10),
             environment: {
                 COGNITO_USERPOOL_ID: this.userPool.userPoolId,
-                TABLE_NAME_USERS: this.userTable.tableName,
             }
         });
         fnCreateUser.addToRolePolicy(new PolicyStatement({

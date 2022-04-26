@@ -1,9 +1,8 @@
-import {IEvent} from './interfaces/IEvent';
-import {Handler} from './shared/Handler';
+import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
+import {Handler} from '../../../../../../lambdas/shared/Handler';
 import {v4} from 'uuid';
 import {DynamoDB, SES} from "aws-sdk";
 import {userExistsInPool} from "./registerConfirm";
-
 
 function getBaseUrl(event: IEvent) {
     return event.headers.origin;

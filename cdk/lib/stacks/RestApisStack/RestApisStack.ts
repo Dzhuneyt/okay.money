@@ -1,8 +1,7 @@
 import {CognitoUserPoolsAuthorizer, IAuthorizer, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {UserPool} from 'aws-cdk-lib/aws-cognito';
-import {Table} from 'aws-cdk-lib/aws-dynamodb';
 import * as cdk from 'aws-cdk-lib';
-import {CfnOutput, StackProps} from 'aws-cdk-lib';
+import {CfnOutput, Duration, StackProps} from 'aws-cdk-lib';
 import {AccountEndpoints} from './constructs/AccountEndpoints/AccountEndpoints';
 import {ApiGateway} from './constructs/ApiGateway';
 import {AuthEndpoints} from './constructs/AuthEndpoints/AuthEndpoints';
@@ -15,15 +14,10 @@ import {Construct} from 'constructs';
 
 interface Props extends StackProps {
     userPool: UserPool;
-    dynamoTables: {
-        account: Table,
-        category: Table,
-        transaction: Table,
-    };
 }
 
 export class RestApisStack extends cdk.Stack {
-    public api: RestApi;
+    api: RestApi;
     cognitoAuthorizer: IAuthorizer;
     apiRootResource: Resource;
 
@@ -46,35 +40,38 @@ export class RestApisStack extends cdk.Stack {
     }
 
     private createEndpoints() {
-        new AuthEndpoints(this, 'AuthEndpoints', {
+        new AuthEndpoints(this, 'auth', {
             apiRootResource: this.apiRootResource,
             userPool: this.props.userPool,
         });
+
         new AccountEndpoints(this, 'account', {
             apiRootResource: this.apiRootResource,
             authorizer: this.cognitoAuthorizer,
         });
+
         new CategoryEndpoints(this, 'category', {
             apiRootResource: this.apiRootResource,
             authorizer: this.cognitoAuthorizer,
         });
+
         new TransactionEndpoints(this, 'transaction', {
             apiRootResource: this.apiRootResource,
             authorizer: this.cognitoAuthorizer,
         });
+
         new StatsEndpoints(this, 'stats', {
             apiRootResource: this.apiRootResource,
             authorizer: this.cognitoAuthorizer,
-            dynamoTables: this.props.dynamoTables,
         });
 
-        new UserEndpoints(this, 'ProfileEndpoints', {
+        new UserEndpoints(this, 'user', {
             apiRootResource: this.apiRootResource,
             userPool: this.props.userPool,
             authorizer: this.cognitoAuthorizer,
         });
 
-        new FeedbackEndpoints(this, 'FeedbackEndpoints', {
+        new FeedbackEndpoints(this, 'feedback', {
             apiRootResource: this.apiRootResource,
             userPool: this.props.userPool,
             authorizer: this.cognitoAuthorizer,
@@ -84,6 +81,7 @@ export class RestApisStack extends cdk.Stack {
     private createAuthorizer() {
         this.cognitoAuthorizer = new CognitoUserPoolsAuthorizer(this, 'Authorizer', {
             cognitoUserPools: [this.props.userPool],
+            resultsCacheTtl: Duration.seconds(0),
         })
     }
 }

@@ -2,9 +2,9 @@ import * as AWS from 'aws-sdk';
 import {CognitoIdentityServiceProvider, DynamoDB} from 'aws-sdk';
 import {AttributeType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import {v4 as uuidv4} from 'uuid';
-import {IEvent} from './interfaces/IEvent';
-import {Handler} from './shared/Handler';
-import {TableNames} from './shared/TableNames';
+import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
+import {Handler} from '../../../../../../lambdas/shared/Handler';
+import {TableNames} from '../../../../../../lambdas/shared/TableNames';
 
 async function createDefaultCategories(userId: string) {
     const tableName = await TableNames.categories();

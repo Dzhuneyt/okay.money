@@ -1,8 +1,6 @@
 import {IEvent} from "../../../../../../lambdas/interfaces/IEvent";
 import * as AWS from "aws-sdk";
-import {SSM} from "aws-sdk";
-import {appName} from "../../FeedbackEndpoints/lambdas/submitFeedback";
-import {getCognitoUserPoolClientId} from "../../../../../../lambdas/login";
+import {getCognitoUserPoolClientId} from "./login";
 
 interface RefreshTokenRequest {
     refreshToken: string,
