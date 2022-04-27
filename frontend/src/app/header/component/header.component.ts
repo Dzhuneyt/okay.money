@@ -14,7 +14,6 @@ import {TransactionService} from "../../services/transaction.service";
 })
 export class HeaderComponent implements OnInit {
 
-  public isLoggedIn = false;
   public menuItems: MenuItem[];
 
   constructor(
@@ -28,7 +27,6 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit() {
-
     this.menuService.items.subscribe(menuItems => {
       this.menuItems = menuItems;
       this.ref.detectChanges();
@@ -56,6 +54,9 @@ export class HeaderComponent implements OnInit {
             },
           }
         ]);
+        if (!this.menuService.isOpened) {
+          this.menuService.toggle();
+        }
       }
     });
   }

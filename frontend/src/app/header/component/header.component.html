@@ -1,20 +1,15 @@
 <mat-toolbar
-  color="primary"
-  style="padding-top: 0.5em;padding-bottom: 0.5em;"
->
+  color="primary">
   <mat-toolbar-row>
     <div
       [fxFlex]="''+getHeaderFxFlex()"
-      style="margin:auto;"
-      fxLayout="row wrap"
-    >
+      fxLayout="row wrap">
       <button
         (click)="toggleMenu()"
         *ngIf="(this.userService.loginStateChanges | async).loggedIn"
         aria-label="Home page"
         class="hamburger"
-        mat-icon-button
-      >
+        mat-icon-button>
         <mat-icon>menu</mat-icon>
       </button>
       <div>

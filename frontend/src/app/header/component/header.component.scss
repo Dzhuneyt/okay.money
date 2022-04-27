@@ -11,3 +11,12 @@
   text-decoration: none;
   padding-top: 3px;
 }
+
+mat-toolbar {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+mat-toolbar-row > div {
+  margin: auto;
+}
