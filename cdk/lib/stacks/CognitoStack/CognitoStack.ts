@@ -1,5 +1,5 @@
 import {LambdaTypescript} from "../../constructs/LambdaTypescript";
-import {CfnUserPoolResourceServer, UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
+import {UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
 import {StringParameter} from "aws-cdk-lib/aws-ssm";
 import {AttributeType, BillingMode, Table, TableEncryption} from "aws-cdk-lib/aws-dynamodb";
 import {Duration, Stack, StackProps} from "aws-cdk-lib";
@@ -8,7 +8,6 @@ import {PolicyStatement} from "aws-cdk-lib/aws-iam";
 import * as path from "path";
 
 interface Props extends StackProps {
-
 }
 
 export class CognitoStack extends Stack {
@@ -30,16 +29,24 @@ export class CognitoStack extends Stack {
                 requireUppercase: false,
             },
         });
+
+        this.userPool.addDomain('domain', {
+            cognitoDomain: {
+                domainPrefix: `okay-money-${process.env.ENV_NAME}`,
+            }
+        });
+
         new StringParameter(this, 'param-cognito-userpool-id', {
             stringValue: this.userPool.userPoolId,
             parameterName: `/${appName}/pool/id`,
         });
+
         // Allow the Lambda to do username/password login to Cognito and get Access Token
         this.userPoolClient = this.userPool.addClient('cognito-login', {
             authFlows: {
                 userPassword: true,
-                // refreshToken: true,
             },
+            accessTokenValidity: Duration.hours(12),
         });
         new StringParameter(this, 'param-cognito-userpool-client-id', {
             stringValue: this.userPoolClient.userPoolClientId,

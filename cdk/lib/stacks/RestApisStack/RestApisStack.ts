@@ -41,6 +41,7 @@ export class RestApisStack extends cdk.Stack {
 
     private createEndpoints() {
         new AuthEndpoints(this, 'auth', {
+            api: this.api,
             apiRootResource: this.apiRootResource,
             userPool: this.props.userPool,
         });
