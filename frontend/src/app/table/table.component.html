@@ -33,6 +33,7 @@
     <mat-header-cell *matHeaderCellDef></mat-header-cell>
     <mat-cell *matCellDef="let element" mat-cell>
       <button (click)="action.onClick(element)"
+              color="primary"
               *ngFor="let action of actions"
               mat-icon-button>
         <mat-icon>{{action.icon}}</mat-icon>
@@ -73,13 +74,12 @@
   >
     <div
       *ngFor="let action of footerActions"
-      class="button-wrapper"
-    >
+      class="button-wrapper">
       <button
         mat-raised-button
         (click)="action.onClick()"
-        fxFlex
-      >
+        color="primary"
+        fxFlex>
         <mat-icon>{{action.icon}}</mat-icon>
         {{action.label}}
       </button>
@@ -88,8 +88,7 @@
   </div>
   <div
     *ngIf="shouldShowPagination()"
-    fxFlex="0 0 auto"
-  >
+    fxFlex="0 0 auto">
     <mat-paginator
       [length]="totalCount"
       [pageSize]="pageSize"

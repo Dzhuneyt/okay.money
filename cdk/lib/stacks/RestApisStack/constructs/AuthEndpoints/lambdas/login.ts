@@ -29,7 +29,6 @@ export async function getCognitoUserPoolClientId() {
 }
 
 const originalHandler = async (event: IEvent): Promise<APIGatewayProxyResult> => {
-    console.log(event);
     const cognito = new AWS.CognitoIdentityServiceProvider();
     const userPoolClientId = await getCognitoUserPoolClientId();
     const request: Request = JSON.parse(event.body as string);

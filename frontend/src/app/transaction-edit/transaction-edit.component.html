@@ -2,7 +2,10 @@
   {{isNewRecord() ? 'Create a transaction' : 'Modify transaction'}}
 </h2>
 
-<mat-dialog-content>
+<div *ngIf="isLoading">
+  <mat-spinner></mat-spinner>
+</div>
+<mat-dialog-content *ngIf="!isLoading">
   <form [formGroup]="form">
     <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1em">
       <mat-form-field
@@ -31,24 +34,21 @@
     <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1em">
       <mat-form-field
         appearance="outline"
-        fxFlex
-      >
-        <mat-label>Account</mat-label>
+        fxFlex>
+        <mat-label>{{accounts.length ? 'Account' : 'Loading accounts...'}}</mat-label>
         <mat-select formControlName="account_id">
           <mat-option *ngFor="let account of accounts" [value]="account.id">{{account.title}}</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field
         appearance="outline"
-        fxFlex
-      >
-        <mat-label>Category</mat-label>
+        fxFlex>
+        <mat-label>{{accounts.length ? 'Category' : 'Loading categories...'}}</mat-label>
         <mat-select formControlName="category_id">
           <mat-option *ngFor="let category of categories" [value]="category.id">{{category.title}}</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
-
 
     <mat-form-field appearance="outline">
       <mat-label>Description</mat-label>
@@ -59,8 +59,8 @@
   </form>
 </mat-dialog-content>
 
-<mat-dialog-actions>
-  <button mat-button mat-dialog-close>Cancel</button>
-  <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
-  <button (click)="submit()" [disabled]="!form.valid" mat-button>Save</button>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between">
+  <button mat-dialog-close mat-button>Cancel</button>
+  <button (click)="submit()" [disabled]="!form.valid" mat-raised-button color="primary">Save</button>
 </mat-dialog-actions>
+<br/>
