@@ -28,7 +28,7 @@
     "@angular/platform-browser": "^13.2.3",
     "@angular/platform-browser-dynamic": "^13.2.3",
     "@angular/router": "^13.2.3",
-    "@ngx-pwa/local-storage": "^11.0.1",
+    "@ngx-pwa/local-storage": "^11.1.0",
     "chart.js": "^2.8.0",
     "concurrently": "^5.2.0",
     "core-js": "^2.6.9",

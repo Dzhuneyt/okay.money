@@ -1,11 +1,12 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {MenuItem, MenuService} from '../../menu.service';
 import {UserService} from 'src/app/services/user.service';
-import {tap} from 'rxjs/operators';
-import {TransactionEditComponent} from "../../transaction-edit/transaction-edit.component";
-import {DialogService} from "../../services/dialog.service";
-import {SnackbarService} from "../../services/snackbar.service";
-import {TransactionService} from "../../services/transaction.service";
+import {filter, take} from 'rxjs/operators';
+import {TransactionEditComponent} from '../../transaction-edit/transaction-edit.component';
+import {DialogService} from '../../services/dialog.service';
+import {SnackbarService} from '../../services/snackbar.service';
+import {TransactionService} from '../../services/transaction.service';
+import {StorageMap} from '@ngx-pwa/local-storage';
 
 @Component({
   selector: 'app-header',
@@ -23,6 +24,7 @@ export class HeaderComponent implements OnInit {
     private transactionService: TransactionService,
     public userService: UserService,
     public ref: ChangeDetectorRef,
+    private storage: StorageMap,
   ) {
   }
 
@@ -54,15 +56,24 @@ export class HeaderComponent implements OnInit {
             },
           }
         ]);
-        if (!this.menuService.isOpened) {
-          this.menuService.toggle();
-        }
+
+        // Restore menu open/closed state after a page refresh or after a login
+        this.storage.get('menu_open').pipe(
+          take(1),
+          filter(open => open === true), // only if sidebar was previously open
+          filter(() => !this.menuService.isOpened) // only if sidebar is NOT currently open
+        ).subscribe(() => {
+          this.menuService.toggle(); // open sidebar
+        });
       }
     });
   }
 
   public toggleMenu() {
     this.menuService.toggle();
+
+    // Store the current sidebar open/close state in local storage, so it can be restored after a page refresh
+    this.storage.set('menu_open', this.menuService.isOpened).subscribe();
   }
 
   getHeaderFxFlex() {
