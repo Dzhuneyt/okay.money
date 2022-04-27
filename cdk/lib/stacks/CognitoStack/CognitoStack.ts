@@ -46,20 +46,6 @@ export class CognitoStack extends Stack {
             parameterName: `/${appName}/pool/client/id`,
         });
 
-        // I created this at some point in the past but no longer remember if it's needed
-        // Probably to be deleted
-        new CfnUserPoolResourceServer(this, 'CfnUserPoolResourceServer', {
-            identifier: 'https://example.com',
-            name: 'CfnUserPoolResourceServer',
-            userPoolId: this.userPool.userPoolId,
-            scopes: [
-                {
-                    scopeName: 'default',
-                    scopeDescription: "Default scope",
-                }
-            ]
-        });
-
         this.userTable = new Table(this, 'table-users', {
             partitionKey: {
                 name: "id",
