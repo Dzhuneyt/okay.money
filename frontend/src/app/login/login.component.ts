@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {LocalStorage} from '@ngx-pwa/local-storage';
 import {Observable, Observer} from 'rxjs';
 import {UserService} from 'src/app/services/user.service';
 import {BackendService} from '../services/backend.service';
 import {SnackbarService} from '../services/snackbar.service';
 import {Title} from "@angular/platform-browser";
+import {filter, map} from "rxjs/operators";
 
 @Component({
   selector: 'app-login',
@@ -27,6 +28,7 @@ export class LoginComponent implements OnInit {
     private snackBar: MatSnackBar,
     private snackbarService: SnackbarService,
     public router: Router,
+    private activatedRoute: ActivatedRoute,
     private title: Title,
   ) {
   }
@@ -76,5 +78,18 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.title.setTitle('Okay.money - Login');
+
+    this.activatedRoute.queryParamMap
+      .pipe(filter(params => params.has('credentials')))
+      .pipe(map(params => JSON.parse(params.get('credentials'))))
+      .subscribe(credentials => {
+        this.userService.setAccessToken(credentials).subscribe(() => {
+          this.userService.setIsLoggedIn(true);
+
+          this.snackbarService.success('Welcome!');
+
+          this.router.navigate(['/home']).then();
+        });
+      });
   }
 }

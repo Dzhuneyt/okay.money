@@ -3,6 +3,7 @@ import {IUserPool} from "aws-cdk-lib/aws-cognito";
 import {AuthorizationType, IResource, LambdaIntegration} from "aws-cdk-lib/aws-apigateway";
 import {LambdaTypescript} from "../../../../../../constructs/LambdaTypescript";
 import * as path from "path";
+import {ITable} from "aws-cdk-lib/aws-dynamodb";
 
 export class GoogleSsoFinish extends Construct {
 
@@ -11,6 +12,8 @@ export class GoogleSsoFinish extends Construct {
         rootResource: IResource,
         userPoolClientId: string,
         userPoolClientSecret: string,
+        tableForTemporaryDestinations: ITable,
+        callbackUrl: string,
     }) {
         super(scope, id);
 
@@ -19,8 +22,16 @@ export class GoogleSsoFinish extends Construct {
             environment: {
                 USERPOOL_CLIENT_ID: props.userPoolClientId,
                 USERPOOL_CLIENT_SECRET: props.userPoolClientSecret,
+                CALLBACK_URL: props.callbackUrl,
+            },
+            bundling: {
+                externalModules: ['aws-sdk'],
             },
         })
+
+        fn.addEnvironment('TABLE_NAME_TEMPORARY_DESTINATIONS', props.tableForTemporaryDestinations.tableName);
+        props.tableForTemporaryDestinations.grantReadData(fn);
+
         props.rootResource
             .resourceForPath('auth/sso/google/finish')
             .addMethod('GET', new LambdaIntegration(fn), {

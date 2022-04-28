@@ -11,19 +11,7 @@ import {GoogleSsoInit} from "./GoogleSsoInit/GoogleSsoInit";
 import {UserPoolClientWithSecret} from "./UserPoolClientWithSecret";
 import {StringParameter} from "aws-cdk-lib/aws-ssm";
 import {GoogleSsoFinish} from "./GoogleSsoFinish/GoogleSsoFinish";
-
-export const getCognitoCallbackUrlForEnv = () => {
-    switch (process.env.ENV_NAME) {
-        case 'dzhuneyt':
-            return 'http://localhost';
-        case 'master':
-            return 'https://okay.money';
-        case 'develop':
-            return 'https://d2vib3tper0daj.cloudfront.net';
-        default:
-            return 'http://example.com/FIXME';
-    }
-}
+import {Table} from "../../../../../constructs/Table";
 
 export class GoogleSsoEndpoints extends Construct {
 
@@ -60,12 +48,14 @@ export class GoogleSsoEndpoints extends Construct {
             },
         });
 
+        const callbackUrl = `https://${props.api.restApiId}.execute-api.${Stack.of(props.api).region}.amazonaws.com/prod/api/auth/sso/google/finish`;
+
         const client = new UserPoolClientWithSecret(this, "UserPoolClient-Google", {
             userPool: props.userPool,
             generateSecret: true,
             supportedIdentityProviders: [UserPoolClientIdentityProvider.GOOGLE],
             oAuth: {
-                callbackUrls: [getCognitoCallbackUrlForEnv() + '/api/auth/sso/google/finish'],
+                callbackUrls: [callbackUrl],
             },
         });
 
@@ -78,11 +68,19 @@ export class GoogleSsoEndpoints extends Construct {
             stringValue: client.userPoolClientSecret,
         })
 
+        // Table to store temporary destination URLs that are first passed to the "Google SSO init" endpoint,
+        // stored in this table and ultimately retrieved and redirected to, by the "Google SSO finish" endpoint
+        const tableForTemporaryDestinations = new Table(this, 'TemporaryDestinationsURLs', {
+            timeToLiveAttribute: 'ttl',
+        });
+
         new GoogleSsoInit(this, 'GoogleSsoInit', {
             rootResource: props.apiRootResource,
             userPool: props.userPool,
             userPoolClientId: client.userPoolClientId,
             userPoolClientSecret: client.userPoolClientSecret,
+            tableForTemporaryDestinations,
+            callbackUrl,
         });
 
         new GoogleSsoFinish(this, 'GoogleSsoFinish', {
@@ -90,6 +88,8 @@ export class GoogleSsoEndpoints extends Construct {
             userPool: props.userPool,
             userPoolClientId: client.userPoolClientId,
             userPoolClientSecret: client.userPoolClientSecret,
+            tableForTemporaryDestinations,
+            callbackUrl,
         });
     }
 }
