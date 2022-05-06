@@ -24,9 +24,6 @@ export class GoogleSsoFinish extends Construct {
                 USERPOOL_CLIENT_SECRET: props.userPoolClientSecret,
                 CALLBACK_URL: props.callbackUrl,
             },
-            bundling: {
-                externalModules: ['aws-sdk'],
-            },
         })
 
         fn.addEnvironment('TABLE_NAME_TEMPORARY_DESTINATIONS', props.tableForTemporaryDestinations.tableName);

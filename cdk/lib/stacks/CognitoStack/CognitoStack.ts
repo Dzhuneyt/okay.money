@@ -1,5 +1,5 @@
 import {LambdaTypescript} from "../../constructs/LambdaTypescript";
-import {UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
+import {UserPool, UserPoolClient, UserPoolOperation} from "aws-cdk-lib/aws-cognito";
 import {StringParameter} from "aws-cdk-lib/aws-ssm";
 import {AttributeType, BillingMode, Table, TableEncryption} from "aws-cdk-lib/aws-dynamodb";
 import {Duration, Stack, StackProps} from "aws-cdk-lib";
@@ -29,6 +29,25 @@ export class CognitoStack extends Stack {
                 requireUppercase: false,
             },
         });
+
+        // Trigger a Lambda just when a user is about to be created in the UserPool
+        // This Lambda can enrich the user object, cancel registration or set extra attributes like "automatically confirm this user"
+        this.userPool.addTrigger(UserPoolOperation.PRE_SIGN_UP, new LambdaTypescript(this, 'PRE_SIGN_UP', {
+            entry: path.resolve(__dirname, 'triggers/pre-signup.ts'),
+            timeout: Duration.seconds(30),
+        }));
+
+        // If the user is confirmed (created) - invoke this Lambda. This usually happens just once for every user
+        this.userPool.addTrigger(UserPoolOperation.POST_CONFIRMATION, new LambdaTypescript(this, 'POST_CONFIRMATION', {
+            entry: path.resolve(__dirname, 'triggers/post-confirmation.ts'),
+            timeout: Duration.seconds(30),
+            initialPolicy: [
+                new PolicyStatement({
+                    actions: ['ses:SendEmail'],
+                    resources: ['*'],
+                }),
+            ]
+        }))
 
         this.userPool.addDomain('domain', {
             cognitoDomain: {

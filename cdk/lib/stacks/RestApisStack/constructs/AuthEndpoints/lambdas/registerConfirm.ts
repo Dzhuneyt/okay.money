@@ -6,64 +6,68 @@ import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
 import {Handler} from '../../../../../../lambdas/shared/Handler';
 import {TableNames} from '../../../../../../lambdas/shared/TableNames';
 
-async function createDefaultCategories(userId: string) {
-    const tableName = await TableNames.categories();
-    const dynamo = new AWS.DynamoDB();
-    for (const categoryName of [
-        'Other',
-        'Food',
-        'Clothes',
-        'Entertainment',
-    ]) {
-        const uuid = uuidv4();
-        const result = await dynamo.putItem({
-            TableName: tableName,
-            Item: DynamoDB.Converter.marshall({
-                id: uuid,
-                author_id: userId,
-                title: categoryName,
-            }),
-        }).promise();
-        if (result.$response.error) {
-            throw new Error(result.$response.error.message);
+export async function seedDataForUser(userUUID: string) {
+    async function createDefaultCategories(userUUID: string) {
+        const tableName = await TableNames.categories();
+        const dynamo = new AWS.DynamoDB();
+        for (const categoryName of [
+            'Other',
+            'Food',
+            'Clothes',
+            'Entertainment',
+        ]) {
+            const uuid = uuidv4();
+            const result = await dynamo.putItem({
+                TableName: tableName,
+                Item: DynamoDB.Converter.marshall({
+                    id: uuid,
+                    author_id: userUUID,
+                    title: categoryName,
+                }),
+            }).promise();
+            if (result.$response.error) {
+                throw new Error(result.$response.error.message);
+            }
         }
+
+        return true;
     }
 
-    return true;
-}
+    async function createDefaultAccounts(userUUID: string) {
+        const tableName = await TableNames.accounts();
+        const dynamo = new AWS.DynamoDB();
 
-async function createDefaultAccount(userId: string) {
-    const tableName = await TableNames.accounts();
-    const dynamo = new AWS.DynamoDB();
-
-    for (const account of [
-        'Cash',
-        'Bank account',
-    ]) {
-        const uuid = uuidv4();
-        const result = await dynamo.putItem({
-            TableName: tableName,
-            Item: DynamoDB.Converter.marshall({
-                id: uuid,
-                author_id: userId,
-                title: account,
-            }),
-        }).promise();
-        if (result.$response.error) {
-            throw new Error(result.$response.error.message);
+        for (const account of [
+            'Cash',
+            'Bank account',
+        ]) {
+            const uuid = uuidv4();
+            const result = await dynamo.putItem({
+                TableName: tableName,
+                Item: DynamoDB.Converter.marshall({
+                    id: uuid,
+                    author_id: userUUID,
+                    title: account,
+                }),
+            }).promise();
+            if (result.$response.error) {
+                throw new Error(result.$response.error.message);
+            }
         }
+
+        return true;
     }
 
-    return true;
+    await createDefaultAccounts(userUUID);
+    await createDefaultCategories(userUUID);
 }
 
 export async function userExistsInPool(username: string, userPoolId: string) {
     try {
-        const oldUser = await new CognitoIdentityServiceProvider()
-            .adminGetUser({
-                UserPoolId: userPoolId,
-                Username: username,
-            }).promise();
+        const oldUser = await new CognitoIdentityServiceProvider().adminGetUser({
+            UserPoolId: userPoolId,
+            Username: username,
+        }).promise();
         return !!oldUser.Username;
     } catch (e: any) {
         if (e.toString().includes('UserNotFoundException')) {
@@ -73,19 +77,16 @@ export async function userExistsInPool(username: string, userPoolId: string) {
     }
 }
 
-async function getTokenItem(token: string) {
+async function getEmailFromRegistrationToken(registrationToken: string) {
     try {
         const Item = await new DynamoDB().getItem({
             TableName: process.env.TABLE_NAME_TOKENS as string,
             Key: DynamoDB.Converter.marshall({
-                id: token,
+                id: registrationToken,
             }),
             ConsistentRead: true,
         }).promise();
-        console.log(Item);
-        return Item.Item ? DynamoDB.Converter.unmarshall(Item.Item) as {
-            email: string,
-        } : undefined;
+        return Item.Item ? DynamoDB.Converter.unmarshall(Item.Item).email as string : undefined;
     } catch (e) {
         console.error(e);
         return undefined;
@@ -96,32 +97,26 @@ export const handler = new Handler(async (event: IEvent) => {
     const dynamodb = new DynamoDB();
     const cognito = new AWS.CognitoIdentityServiceProvider();
 
-    if (!process.env.COGNITO_USERPOOL_ID) {
+    const userPoolId = process.env.COGNITO_USERPOOL_ID as string;
+
+
+    if (!userPoolId) {
         return {
             statusCode: 500,
             body: "Invalid configuration of environment variables"
         };
     }
 
-    const userPoolId = process.env.COGNITO_USERPOOL_ID as string;
     const body: {
         token: string,
         password: string,
     } = event.body ? JSON.parse(event.body) : {};
 
-    if (!body.token) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({
-                message: 'Token not provided',
-            }),
-        };
-    }
+    const registrationToken = body.token;
 
-    console.log('body', body);
-    const tokenItem = await getTokenItem(body.token);
+    const email = await getEmailFromRegistrationToken(registrationToken);
 
-    if (!tokenItem) {
+    if (!email) {
         return {
             statusCode: 404,
             body: JSON.stringify({
@@ -130,7 +125,6 @@ export const handler = new Handler(async (event: IEvent) => {
         };
     }
 
-    const username = tokenItem.email;
     const password = body.password;
 
     if (!password || password.length < 6) {
@@ -144,14 +138,13 @@ export const handler = new Handler(async (event: IEvent) => {
 
     const cognitoUserCreated = await cognito.adminCreateUser({
         UserPoolId: userPoolId,
-        Username: username,
-        TemporaryPassword: password,
+        Username: email,
         MessageAction: 'SUPPRESS',
     }).promise();
 
     const cognitoChangePassword = await cognito.adminSetUserPassword({
         Permanent: true,
-        Username: username,
+        Username: email,
         Password: password,
         UserPoolId: userPoolId,
     }).promise();
@@ -194,14 +187,9 @@ export const handler = new Handler(async (event: IEvent) => {
     }).promise();
 
     // Create default things for this newly created user
-    await createDefaultCategories(sub);
-    await createDefaultAccount(sub);
+    await seedDataForUser(sub);
 
-    // Mark the link as consumed
-    await new DynamoDB().deleteItem({
-        TableName: process.env.TABLE_NAME_TOKENS as string,
-        Key: DynamoDB.Converter.marshall({id: body.token}),
-    }).promise()
+    await invalidateRegistrationToken(registrationToken);
 
     return {
         statusCode: 200,
@@ -210,3 +198,13 @@ export const handler = new Handler(async (event: IEvent) => {
         })
     }
 }).create();
+
+/**
+ * Mark the token as consumed, so it can't be used anymore
+ */
+async function invalidateRegistrationToken(registrationToken: string) {
+    await new DynamoDB().deleteItem({
+        TableName: process.env.TABLE_NAME_TOKENS as string,
+        Key: DynamoDB.Converter.marshall({id: registrationToken}),
+    }).promise()
+}
