@@ -24,9 +24,8 @@ export class AccountSummaryListComponent implements OnInit {
     {
       label: 'Balance',
       code: 'current_balance',
-      footerRenderer: () => {
-        return this.total;
-      }
+      renderer: (row) => row.current_balance.toFixed(2),
+      footerRenderer: () => this.total.toFixed(2)
     }
   ];
 
