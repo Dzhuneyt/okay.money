@@ -33,7 +33,7 @@ export class GoogleSsoEndpoints extends Construct {
         const googleClientSecret = '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';
 
         // Enable Google as an Identity Provider in this user pool
-        new UserPoolIdentityProviderGoogle(this, "Google", {
+        const userPoolIdentityProviderGoogle = new UserPoolIdentityProviderGoogle(this, "Google", {
             userPool: this.props.userPool,
             clientId: googleClientId,
             clientSecret: googleClientSecret,
@@ -58,6 +58,7 @@ export class GoogleSsoEndpoints extends Construct {
                 callbackUrls: [callbackUrl],
             },
         });
+        client.node.addDependency(userPoolIdentityProviderGoogle);
 
         new StringParameter(client, 'client-id', {
             parameterName: `/okay-money-${process.env.ENV_NAME}/userpool/google/client-id`,
