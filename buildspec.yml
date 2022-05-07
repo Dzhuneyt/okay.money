@@ -28,3 +28,4 @@ cache:
     - ./cdk/node_modules
     - ./frontend/node_modules
     - ./node_modules
+    - ./cdk/cdk.out
