@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {ChartOptions} from 'chart.js';
+import {ChartOptions, ChartType} from 'chart.js';
 import {BackendService} from 'src/app/services/backend.service';
 import {tap} from 'rxjs/operators';
 
@@ -65,6 +65,8 @@ export class StatsByCategoryComponent implements OnInit {
     income: [],
     expense: [],
   };
+
+  public doughnutChartType: ChartType = 'doughnut';
 
   private static formatDate(date: Date) {
     return date.getTime();

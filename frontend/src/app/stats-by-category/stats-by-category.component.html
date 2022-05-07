@@ -28,7 +28,7 @@
       <p>No activity for this period</p>
     </div>
     <canvas *ngIf="hasExpensesData()"
-            [chartType]="'doughnut'"
+            [type]="doughnutChartType"
             [datasets]="this.dataSets.expenses"
             [labels]="legends.expense"
             [options]="chartOptions"
@@ -39,7 +39,7 @@
       <p>No activity for this period</p>
     </div>
     <canvas *ngIf="hasIncomeData()"
-            [chartType]="'doughnut'"
+            [type]="doughnutChartType"
             [datasets]="this.dataSets.income"
             [labels]="legends.income"
             [options]="chartOptions"
