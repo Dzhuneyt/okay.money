@@ -1,23 +1,26 @@
-<h2 mat-dialog-title>
-  {{isNewRecord() ? 'Create an account' : 'Modify account'}}
-</h2>
+<div *ngIf="isLoading" fxLayout="row" fxLayoutAlign="center center">
+  <mat-spinner></mat-spinner>
+</div>
 
-<mat-dialog-content>
-  <form [formGroup]="form">
-    <mat-form-field
-      appearance="outline"
-      fxFlex="100%"
-    >
-      <mat-label>Name</mat-label>
-      <input formControlName="title" matInput placeholder="e.g. Checking account" type="text">
+<ng-container *ngIf="!isLoading">
+  <h2 mat-dialog-title>{{isNewRecord() ? 'Create an account' : 'Modify account'}}</h2>
 
-    </mat-form-field>
+  <mat-dialog-content>
+    <form [formGroup]="form">
+      <mat-form-field
+        appearance="outline"
+        fxFlex="100%">
+        <mat-label>Name</mat-label>
+        <input formControlName="title" matInput placeholder="e.g. Checking account" type="text">
+      </mat-form-field>
 
-  </form>
-</mat-dialog-content>
+    </form>
+  </mat-dialog-content>
 
-<mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between">
-  <button mat-dialog-close mat-button>Cancel</button>
-  <button (click)="submit()" [disabled]="!form.valid" mat-raised-button color="primary">Save</button>
-</mat-dialog-actions>
-<br/>
+  <mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between">
+    <button mat-dialog-close="" mat-button>Cancel</button>
+    <button (click)="submit()" [disabled]="!form.valid" mat-raised-button color="primary">Save</button>
+  </mat-dialog-actions>
+  <br/>
+</ng-container>
+

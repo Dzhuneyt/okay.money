@@ -103,7 +103,8 @@ export class AccountListComponent implements OnInit {
           // Refresh the table
           this.table.goToPage(this.table.currentPage);
           this.snackbarService.success('Account modified');
-        } else {
+        }
+        if (res === false) {
           this.snackbarService.error('Editing failed');
         }
       });
@@ -140,16 +141,12 @@ export class AccountListComponent implements OnInit {
         width: '700px'
       },
       (res) => {
-        switch (res) {
-          case true:
-            this.accountsService.changes.next({});
-            this.snackbarService.success('Account created');
-            break;
-          case false:
-            this.snackbarService.error('Account creation failed');
-            break;
-          default:
-          // Dialog was closed through the cancel button
+        if (res === true) {
+          this.accountsService.changes.next({});
+          this.snackbarService.success('Account created');
+        }
+        if (res === false) {
+          this.snackbarService.error('Account creation failed');
         }
       });
   }
