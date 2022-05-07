@@ -18,7 +18,7 @@ import {AddAccountComponent} from './home/parts/add-account/add-account.componen
 import {DialogService} from './services/dialog.service';
 import {AccountsService} from './services/accounts.service';
 import {CategoriesService} from './services/categories.service';
-import {ChartsModule} from 'ng2-charts';
+import {NgChartsModule} from 'ng2-charts';
 import {StatsByCategoryComponent} from 'src/app/stats-by-category/stats-by-category.component';
 import {UserService} from 'src/app/services/user.service';
 import {CommonModule} from '@angular/common';
@@ -118,7 +118,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes, {relativeLinkResolution: 'legacy'}),
     BrowserAnimationsModule,
     MaterialComponentsModule,
-    ChartsModule,
+    NgChartsModule,
     UiKitModule,
     HeaderModule,
     MatListModule,
