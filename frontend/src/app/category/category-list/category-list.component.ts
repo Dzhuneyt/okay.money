@@ -115,7 +115,8 @@ export class CategoryListComponent implements OnInit {
           // Refresh the table
           this.table.goToPage(this.table.currentPage);
           this.snackbarService.success('Category modified');
-        } else {
+        }
+        if (res === false) {
           this.snackbarService.error('Editing failed');
         }
       });
