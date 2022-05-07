@@ -1,66 +1,70 @@
-<h2 mat-dialog-title>
-  {{isNewRecord() ? 'Create a transaction' : 'Modify transaction'}}
-</h2>
-
 <div *ngIf="isLoading">
   <mat-spinner></mat-spinner>
 </div>
-<mat-dialog-content *ngIf="!isLoading">
-  <form [formGroup]="form">
-    <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1em">
-      <mat-form-field
-        appearance="outline"
-        fxFlex="70%"
-      >
-        <mat-label>Sum</mat-label>
-        <input formControlName="sum" matInput min="0" placeholder="e.g. 3.55" step="0.01" type="number">
-        <mat-icon matSuffix>attach_money</mat-icon>
 
+<ng-container *ngIf="!isLoading">
+  <h2 mat-dialog-title>
+    {{isNewRecord() ? 'Create a transaction' : 'Modify transaction'}}
+  </h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="form">
+      <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1em">
+        <mat-form-field
+          appearance="outline"
+          fxFlex="70%"
+        >
+          <mat-label>Sum</mat-label>
+          <input formControlName="sum" matInput min="0" placeholder="e.g. 3.55" step="0.01" type="number">
+          <mat-icon matSuffix>attach_money</mat-icon>
+
+        </mat-form-field>
+
+        <mat-form-field
+          appearance="outline"
+          fxFlex="30%"
+        >
+          <mat-label>Transaction type</mat-label>
+          <mat-select formControlName="type">
+            <mat-option [value]="'expense'">Expense</mat-option>
+            <mat-option [value]="'income'">Income</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1em">
+        <mat-form-field
+          appearance="outline"
+          fxFlex>
+          <mat-label>{{accounts.length ? 'Account' : 'Loading accounts...'}}</mat-label>
+          <mat-select formControlName="account_id">
+            <mat-option *ngFor="let account of accounts" [value]="account.id">{{account.title}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field
+          appearance="outline"
+          fxFlex>
+          <mat-label>{{accounts.length ? 'Category' : 'Loading categories...'}}</mat-label>
+          <mat-select formControlName="category_id">
+            <mat-option *ngFor="let category of categories" [value]="category.id">{{category.title}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <textarea cdkTextareaAutosize
+                  formControlName="description"
+                  matInput></textarea>
       </mat-form-field>
+    </form>
+  </mat-dialog-content>
 
-      <mat-form-field
-        appearance="outline"
-        fxFlex="30%"
-      >
-        <mat-label>Transaction type</mat-label>
-        <mat-select formControlName="type">
-          <mat-option [value]="'expense'">Expense</mat-option>
-          <mat-option [value]="'income'">Income</mat-option>
-        </mat-select>
-      </mat-form-field>
+  <mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between">
+    <button mat-dialog-close="" mat-button>Cancel</button>
+    <button (click)="submit()" [disabled]="!form.valid" mat-raised-button color="primary">Save</button>
+  </mat-dialog-actions>
+  <br/>
 
-    </div>
-
-    <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1em">
-      <mat-form-field
-        appearance="outline"
-        fxFlex>
-        <mat-label>{{accounts.length ? 'Account' : 'Loading accounts...'}}</mat-label>
-        <mat-select formControlName="account_id">
-          <mat-option *ngFor="let account of accounts" [value]="account.id">{{account.title}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field
-        appearance="outline"
-        fxFlex>
-        <mat-label>{{accounts.length ? 'Category' : 'Loading categories...'}}</mat-label>
-        <mat-select formControlName="category_id">
-          <mat-option *ngFor="let category of categories" [value]="category.id">{{category.title}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Description</mat-label>
-      <textarea cdkTextareaAutosize
-                formControlName="description"
-                matInput></textarea>
-    </mat-form-field>
-  </form>
-</mat-dialog-content>
-
-<mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between">
-  <button mat-dialog-close="" mat-button>Cancel</button>
-  <button (click)="submit()" [disabled]="!form.valid" mat-raised-button color="primary">Save</button>
-</mat-dialog-actions>
-<br/>
+</ng-container>

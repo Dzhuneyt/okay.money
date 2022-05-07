@@ -1,11 +1,12 @@
-<h2 mat-dialog-title>
-  {{title}}
-</h2>
-<mat-dialog-content>
-  {{body}}
-</mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-button mat-dialog-close>No</button>
-  <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
-  <button (click)="submit()" mat-button>Yes</button>
-</mat-dialog-actions>
+<div *ngIf="isLoading">
+  <mat-spinner></mat-spinner>
+</div>
+
+<ng-container *ngIf="!isLoading">
+  <h2 mat-dialog-title>{{title}}</h2>
+  <mat-dialog-content>{{body}}</mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button mat-dialog-close="">No</button>
+    <button (click)="submit()" mat-button>Yes</button>
+  </mat-dialog-actions>
+</ng-container>

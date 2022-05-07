@@ -15,6 +15,8 @@ export class DeleteConfirmComponent implements OnInit {
   public body: string;
   public onConfirm: () => Observable<any>;
 
+  isLoading = false;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<DeleteConfirmComponent>
@@ -28,8 +30,8 @@ export class DeleteConfirmComponent implements OnInit {
   }
 
   submit() {
-    this
-      .onConfirm()
+    this.isLoading = true;
+    this.onConfirm()
       .pipe(take(1))
       .subscribe((res) => {
         this.dialogRef.close(res);

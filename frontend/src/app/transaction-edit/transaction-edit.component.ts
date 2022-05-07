@@ -76,6 +76,8 @@ export class TransactionEditComponent implements OnInit {
   }
 
   public submit() {
+    this.isLoading = true;
+
     const payload = {};
 
     if (this.form.controls['type'].value === 'expense') {
