@@ -3,6 +3,7 @@ import {FormControl, FormGroup} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {CategoryService} from '../category.service';
 import {Category} from '../../models/Category';
+import {tap} from "rxjs/operators";
 
 @Component({
   selector: 'app-category-edit',
@@ -10,6 +11,7 @@ import {Category} from '../../models/Category';
   styleUrls: ['./category-edit.component.scss']
 })
 export class CategoryEditComponent implements OnInit {
+  isLoading = true;
 
   public form = new FormGroup({
     id: new FormControl(null, []),
@@ -17,7 +19,9 @@ export class CategoryEditComponent implements OnInit {
   });
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: any,
+    @Inject(MAT_DIALOG_DATA) public data: {
+      id?: string,
+    },
     public dialogRef: MatDialogRef<CategoryEditComponent>,
     private categoryService: CategoryService,
     private elementRef: ChangeDetectorRef,
@@ -25,17 +29,19 @@ export class CategoryEditComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.isNewRecord()) {
-      // Edit mode, load existing data
-      this.categoryService.getSingle(this.data.id).subscribe((category: Category) => {
-        this.form.patchValue({
-          id: category.id,
-          title: category.title,
-        });
-
-        this.elementRef.detectChanges();
-      });
+    if (this.isNewRecord()) {
+      this.isLoading = false;
+      return;
     }
+    // Edit mode, load existing data
+    this.categoryService.getSingle(this.data.id).pipe(
+      tap((category: Category) => this.form.patchValue({
+        id: category.id,
+        title: category.title,
+      })),
+      tap(() => this.elementRef.detectChanges()),
+      tap(() => this.isLoading = false),
+    ).subscribe();
   }
 
   public isNewRecord(): boolean {

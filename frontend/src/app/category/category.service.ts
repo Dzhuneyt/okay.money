@@ -24,7 +24,7 @@ export class CategoryService {
     );
   }
 
-  public getSingle(id: number): Observable<Category> {
+  public getSingle(id: string): Observable<Category> {
     return this.backend.request('category/' + id, 'GET');
   }
 
