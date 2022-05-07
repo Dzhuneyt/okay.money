@@ -1,45 +1,46 @@
-import {Construct, Duration, RemovalPolicy, SecretValue, Stack, StackProps} from "@aws-cdk/core";
-import {Bucket, BucketEncryption, IBucket} from "@aws-cdk/aws-s3";
-import * as codepipeline from "@aws-cdk/aws-codepipeline";
-import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";
-import {BuildSpec, Cache, ComputeType, LinuxBuildImage, PipelineProject} from "@aws-cdk/aws-codebuild";
-import {LogGroup, RetentionDays} from "@aws-cdk/aws-logs";
-import {AccountRootPrincipal, CompositePrincipal, Role} from "@aws-cdk/aws-iam";
-import {CodePipelinePostToGitHub} from "@awesome-cdk/cdk-report-codepipeline-status-to-github";
-import {StringParameter} from "@aws-cdk/aws-ssm/lib/parameter";
+import {StringParameter} from "aws-cdk-lib/aws-ssm";
+import {BuildSpec, Cache, LinuxArmBuildImage, LinuxBuildImage, PipelineProject} from "aws-cdk-lib/aws-codebuild";
+import {ManagedPolicy} from "aws-cdk-lib/aws-iam";
+import {Bucket, BucketEncryption, IBucket} from "aws-cdk-lib/aws-s3";
+import {Annotations, Duration, RemovalPolicy, SecretValue, Stack, StackProps} from "aws-cdk-lib";
+import {Construct} from "constructs";
+import {Artifact, Pipeline} from "aws-cdk-lib/aws-codepipeline";
+import {CodeBuildAction, GitHubSourceAction} from "aws-cdk-lib/aws-codepipeline-actions";
+import * as path from "path";
 
 export class CIStack extends Stack {
     private readonly cacheBucket: IBucket;
     private readonly branchName: string;
-    private readonly role: Role;
 
     constructor(scope: Construct, id: string, props: StackProps) {
         super(scope, id, props);
 
         this.branchName = process.env.BRANCH_NAME as string;
 
-        this.cacheBucket = this.getCacheBucket();
-        this.role = new Role(this, 'Role', {
-            assumedBy: new CompositePrincipal(new AccountRootPrincipal())
-        });
+        if (!this.branchName) {
+            Annotations.of(this).addError(`process.env.BRANCH_NAME is required to Deploy ${path.resolve(__dirname)}/CiStack.ts`);
+        }
 
-        const sourceArtifact = new codepipeline.Artifact();
+        this.cacheBucket = this.getCacheBucket();
+
+        const sourceArtifact = new Artifact();
 
         const pipeline = this.getPipeline();
 
-        new CodePipelinePostToGitHub(pipeline, 'CodePipelinePostToGitHub', {
-            pipeline,
-            githubToken: StringParameter.fromStringParameterName(this, 'GithubSecret', 'GITHUB_TOKEN'),
-        });
+        const githubToken = StringParameter.fromStringParameterName(this, 'GithubSecret', 'GITHUB_TOKEN');
+
+        // new CodePipelinePostToGitHub(pipeline, 'CodePipelinePostToGitHub', {
+        //     pipeline,
+        //     githubToken,
+        // });
 
         pipeline.addStage({
             stageName: "Source",
             actions: [
-                new codepipeline_actions.GitHubSourceAction({
+                new GitHubSourceAction({
                     actionName: 'GitHub',
                     output: sourceArtifact,
-                    oauthToken: SecretValue.secretsManager('GITHUB_TOKEN_PERSONAL'),
-                    // Replace these with your actual GitHub project name
+                    oauthToken: SecretValue.plainText(githubToken.stringValue),
                     owner: 'Dzhuneyt',
                     repo: 'okay.money',
                     branch: this.branchName,
@@ -47,47 +48,37 @@ export class CIStack extends Stack {
             ],
         });
 
+        const deployProject = new PipelineProject(this, 'CDK-Deploy', {
+            buildSpec: BuildSpec.fromSourceFilename('buildspec.yml'),
+            cache: Cache.bucket(this.cacheBucket, {prefix: 'cdk-deploy'}),
+            environment: {
+                buildImage: LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_2_0,
+                privileged: true,
+            },
+            environmentVariables: {
+                ENV_NAME: {value: this.branchName},
+            },
+        });
+        deployProject.role?.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'))
 
+        const deployAction = new CodeBuildAction({
+            actionName: "CDK-Deploy",
+            input: sourceArtifact,
+            project: deployProject,
+        });
         pipeline.addStage({
             stageName: "Deploy",
             actions: [
-                new codepipeline_actions.CodeBuildAction({
-                    actionName: "CDK-Deploy",
-                    input: sourceArtifact,
-                    project: new PipelineProject(this, 'CDK-Deploy', {
-                        buildSpec: BuildSpec.fromSourceFilename('buildspec.yml'),
-                        logging: {
-                            cloudWatch: {
-                                enabled: true,
-                                logGroup: new LogGroup(this, 'cdk-deploy-logs', {
-                                    removalPolicy: RemovalPolicy.DESTROY,
-                                    retention: RetentionDays.ONE_MONTH,
-                                })
-                            },
-                        },
-                        cache: Cache.bucket(this.cacheBucket, {prefix: 'ci'}),
-                        environment: {
-                            buildImage: LinuxBuildImage.AMAZON_LINUX_2_3,
-                            computeType: ComputeType.LARGE,
-                            privileged: true,
-                        },
-                        environmentVariables: {
-                            ENV_NAME: {
-                                value: this.branchName,
-                            }
-                        },
-                        role: this.role,
-                    }),
-                })
+                deployAction,
             ],
         })
     }
 
     getPipeline() {
-        return new codepipeline.Pipeline(this, 'Pipeline', {
+        return new Pipeline(this, 'Pipeline', {
             crossAccountKeys: false, // save some costs
             artifactBucket: this.cacheBucket,
-            pipelineName: `finance-${this.branchName}-ci`,
+            pipelineName: `okaymoney-ci--${this.branchName}`,
         });
     }
 
@@ -100,7 +91,7 @@ export class CIStack extends Stack {
                 {
                     expiration: Duration.days(7),
                     abortIncompleteMultipartUploadAfter: Duration.days(7),
-                }
+                },
             ],
         });
     }

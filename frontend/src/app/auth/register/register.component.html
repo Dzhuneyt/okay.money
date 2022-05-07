@@ -1,0 +1,97 @@
+<form
+  *ngIf="hasConfirmToken()"
+  [formGroup]="formWithToken" class="example-form"
+>
+  <mat-card class="example-card">
+    <h2>Finish registration</h2>
+    <mat-card-content>
+      <div fxLayout="column">
+        <mat-form-field
+          fxFlex
+          *ngIf="registrationTokenInfo"
+        >
+          <label>
+            <input
+              [value]="registrationTokenInfo.email"
+              matInput
+              name="email"
+              placeholder="Email"
+              disabled
+              required>
+          </label>
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <label>
+            <input
+              [formControlName]="'password'"
+              matInput
+              name="password"
+              placeholder="Password"
+              type="password"
+              required>
+          </label>
+
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <label>
+            <input
+              [formControlName]="'passwordRepeat'"
+              matInput
+              name="password_repeat"
+              placeholder="Repeat the password"
+              type="password"
+              required>
+          </label>
+          <mat-hint align="end">Minimum 6 characters</mat-hint>
+        </mat-form-field>
+
+      </div>
+      <mat-spinner [style.display]="isLoading ? 'block' : 'none'"></mat-spinner>
+    </mat-card-content>
+    <mat-card-actions style="text-align: center;">
+      <button
+        type="button"
+        (click)="confirmRegistration().subscribe()" color="primary" mat-raised-button>Register
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</form>
+<form
+  *ngIf="!hasConfirmToken()"
+  [formGroup]="form"
+  class="example-form">
+  <mat-card class="example-card">
+    <h2>Register</h2>
+    <mat-card-content>
+      <table class="example-full-width">
+        <tr>
+          <td>
+            <mat-form-field class="example-full-width">
+              <input
+                [formControlName]="'email'"
+                matInput
+                name="email"
+                placeholder="Email"
+                required
+              >
+            </mat-form-field>
+          </td>
+        </tr>
+      </table>
+
+      <mat-spinner [style.display]="isLoading ? 'block' : 'none'"></mat-spinner>
+    </mat-card-content>
+    <mat-card-actions style="text-align: center;">
+      <button
+        [disabled]="form.invalid"
+        type="button"
+        (click)="register().subscribe()" color="primary" mat-raised-button>Register
+      </button>
+    </mat-card-actions>
+    <br/>
+  </mat-card>
+
+  <p class="side-note">
+    Already a member? <a [attr.href]="router.createUrlTree(['/auth/login'])" [routerLink]="['/auth/login']">Login</a>
+  </p>
+</form>

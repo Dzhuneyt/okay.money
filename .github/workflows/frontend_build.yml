@@ -22,4 +22,4 @@ jobs:
         node-version: 16.x
         cache: 'pnpm'
     - run: pnpm install
-    - run: cd angular && npm run build
+    - run: cd frontend && npm run build

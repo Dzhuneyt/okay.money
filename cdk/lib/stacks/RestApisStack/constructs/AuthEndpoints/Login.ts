@@ -1,10 +1,10 @@
-import {AuthorizationType, IResource, IRestApi} from '@aws-cdk/aws-apigateway';
-import {IUserPool} from '@aws-cdk/aws-cognito';
-import {PolicyStatement} from '@aws-cdk/aws-iam';
-import {Construct} from '@aws-cdk/core';
+import {AuthorizationType, IResource} from 'aws-cdk-lib/aws-apigateway';
+import {IUserPool} from 'aws-cdk-lib/aws-cognito';
+import {PolicyStatement} from 'aws-cdk-lib/aws-iam';
 import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
 import {LambdaTypescript} from '../../../../constructs/LambdaTypescript';
-import {getPropsByLambdaFilename} from '../../../../constructs/rest/util/getLambdaCode';
+import {Construct} from "constructs";
+import * as path from "path";
 
 export class Login extends Construct {
     constructor(scope: Construct, id: string, props: {
@@ -14,7 +14,7 @@ export class Login extends Construct {
         super(scope, id);
 
         const fnLogin = new LambdaTypescript(this, 'login', {
-            ...getPropsByLambdaFilename('login.ts'),
+            entry: path.resolve(__dirname, './lambdas/login.ts'),
         });
         fnLogin.addEnvironment('COGNITO_USERPOOL_ID', props.userPool.userPoolId);
 

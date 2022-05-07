@@ -5,8 +5,9 @@ import {TransactionService} from 'src/app/services/transaction.service';
 import {TransactionModel} from 'src/app/models/transaction.model';
 import {CategoriesService, Category} from 'src/app/services/categories.service';
 import {AccountsService} from 'src/app/services/accounts.service';
-import {map, take} from 'rxjs/operators';
+import {filter, tap} from 'rxjs/operators';
 import {Account} from 'src/app/models/account.model';
+import {zip} from 'rxjs';
 
 @Component({
   selector: 'app-transaction-edit',
@@ -27,6 +28,8 @@ export class TransactionEditComponent implements OnInit {
   public categories: Category[] = [];
   public accounts: Account[] = [];
 
+  isLoading = false;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private transaction: TransactionService,
@@ -38,7 +41,9 @@ export class TransactionEditComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.data.id) {
+    if (!this.isNewRecord()) {
+      this.isLoading = true;
+
       // Edit mode, load existing data
       // @TODO Load data from backend and populate form
       this.transaction.getSingle(this.data.id).subscribe((transaction: TransactionModel) => {
@@ -49,22 +54,21 @@ export class TransactionEditComponent implements OnInit {
         this.form.controls['category_id'].setValue(transaction.category.id);
         this.form.controls['account_id'].setValue(transaction.account.id);
 
+        this.isLoading = false;
         this.elementRef.detectChanges();
       });
     }
 
-    this.accountService.getList().pipe(
-      take(1),
-      map(accounts => this.accounts = accounts),
-    ).subscribe(res => {
-      console.log(this.accounts);
-    });
-    this.categoryService.getList().pipe(
-      take(1),
-      map(cats => this.categories = cats),
-    ).subscribe(res => {
-      console.log(this.categories);
-    });
+    zip(
+      this.accountService.getList().pipe(
+        filter(res => !!res),
+        tap(accounts => this.accounts = accounts),
+      ),
+      this.categoryService.getList().pipe(
+        filter(res => !!res),
+        tap(cats => this.categories = cats),
+      ),
+    ).subscribe();
   }
 
   public isNewRecord(): boolean {

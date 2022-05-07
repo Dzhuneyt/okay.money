@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {MenuService} from './menu.service';
-import {UserService} from "src/app/services/user.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {CookieService} from "./cookie.service";
+import {UserService} from 'src/app/services/user.service';
+import {Router} from '@angular/router';
+import {CookieService} from './cookie.service';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +21,7 @@ export class AppComponent implements OnInit {
     public cookieService: CookieService,
   ) {
 
-    this.user.restoreUserState().subscribe(res => {
+    this.user.restoreUserState().subscribe(() => {
       this.appReady = true;
     });
   }

@@ -1,16 +1,7 @@
 import * as AWS from 'aws-sdk';
 import {IEvent} from './interfaces/IEvent';
-import DynamoDB = require('aws-sdk/clients/dynamodb');
-import {ITransaction} from './interfaces/ITransaction';
 import {DynamoManager} from './shared/DynamoManager';
 import {Handler} from './shared/Handler';
-import {isOwnedBy} from './shared/isOwnedBy';
-
-interface Input extends ITransaction {
-    // Since the input is unpredictable, allow any other values
-    // to "checked" by the code below without causing compilation errors
-    [key: string]: any,
-}
 
 const originalHandler = async (event: IEvent) => {
 
@@ -45,7 +36,7 @@ const originalHandler = async (event: IEvent) => {
             statusCode: 200,
             body: JSON.stringify(item),
         }
-    } catch (e) {
+    } catch (e: any) {
         console.log(e);
         return {
             statusCode: 500,

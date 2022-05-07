@@ -17,22 +17,19 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [CategoryListComponent, CategoryEditComponent],
-  imports: [
-    CommonModule,
-    RouterModule.forChild(routes),
-    MaterialComponentsModule,
-    UiKitModule,
-    MatDialogModule,
-    ReactiveFormsModule,
-    FlexLayoutModule,
-  ],
-  exports: [
-    CategoryEditComponent,
-  ],
-  entryComponents: [
-    CategoryEditComponent
-  ],
+    declarations: [CategoryListComponent, CategoryEditComponent],
+    imports: [
+        CommonModule,
+        RouterModule.forChild(routes),
+        MaterialComponentsModule,
+        UiKitModule,
+        MatDialogModule,
+        ReactiveFormsModule,
+        FlexLayoutModule,
+    ],
+    exports: [
+        CategoryEditComponent,
+    ]
 })
 export class CategoryModule {
 }

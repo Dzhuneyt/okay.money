@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
-import {BackendService} from "./backend.service";
-import {Observable} from "rxjs";
-import {map} from "rxjs/operators";
+import {BackendService} from './backend.service';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 export interface Category {
   id: number;

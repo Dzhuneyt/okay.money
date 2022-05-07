@@ -15,7 +15,7 @@ export class TableNames {
      * Get the name of the "users" table
      */
     static async categories() {
-        const Name = `/${appName()}/table/categories/name`;
+        const Name = `/${appName()}/table/category/name`;
         return await this.getByName(Name);
     }
 
@@ -23,12 +23,12 @@ export class TableNames {
      * Get the name of the "users" table
      */
     static async accounts() {
-        const Name = `/${appName()}/table/accounts/name`;
+        const Name = `/${appName()}/table/account/name`;
         return await this.getByName(Name);
     }
 
     static async transactions() {
-        const Name = `/${appName()}/table/transactions/name`;
+        const Name = `/${appName()}/table/transaction/name`;
         return await this.getByName(Name);
     }
 

@@ -1,13 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {BackendService} from '../services/backend.service';
-import {MatDialog} from '@angular/material/dialog';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatTabGroup} from '@angular/material/tabs';
-import {AddAccountComponent} from './parts/add-account/add-account.component';
-import {DialogService} from '../services/dialog.service';
 import {AccountSummaryListComponent} from 'src/app/home/parts/accounts-list/account-summary-list.component';
-import {UserService} from "../services/user.service";
-import {MenuService} from "../menu.service";
+import {UserService} from '../services/user.service';
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-home',
@@ -22,12 +17,12 @@ export class HomeComponent implements OnInit {
 
   constructor(
     public user: UserService,
-    public menuService: MenuService,
+    private title: Title,
   ) {
   }
 
   ngOnInit() {
-
+    this.title.setTitle('Dashboard');
   }
 
 }

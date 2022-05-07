@@ -26,6 +26,16 @@ const chartOptions: ChartOptions = {
 })
 export class StatsByCategoryComponent implements OnInit {
 
+  constructor(
+    private elementRef: ChangeDetectorRef,
+    private backend: BackendService,
+  ) {
+  }
+
+  get hasData() {
+    return (this.legends.income && this.legends.income.length > 0) || (this.legends.expense && this.legends.expense.length > 0);
+  }
+
   public isLoading = true;
 
   public tab: 'income' | 'expenses' = 'expenses';
@@ -56,14 +66,8 @@ export class StatsByCategoryComponent implements OnInit {
     expense: [],
   };
 
-  constructor(
-    private elementRef: ChangeDetectorRef,
-    private backend: BackendService,
-  ) {
-  }
-
-  get hasData() {
-    return (this.legends.income && this.legends.income.length > 0) || (this.legends.expense && this.legends.expense.length > 0);
+  private static formatDate(date: Date) {
+    return date.getTime();
   }
 
   ngOnInit() {
@@ -121,13 +125,13 @@ export class StatsByCategoryComponent implements OnInit {
     const params = {};
 
     if (startDate !== null) {
-      params['start_date'] = this.formatDate(startDate);
+      params['start_date'] = StatsByCategoryComponent.formatDate(startDate);
     }
     if (endDate !== null) {
-      params['end_date'] = this.formatDate(endDate);
+      params['end_date'] = StatsByCategoryComponent.formatDate(endDate);
     }
 
-    this.backend.request('stats/by_category', 'GET').pipe(
+    this.backend.request('stats/by-category', 'GET').pipe(
       tap((apiResult: {
         id: string,
         name: string,
@@ -167,10 +171,6 @@ export class StatsByCategoryComponent implements OnInit {
       tap(() => this.isLoading = false),
       tap(() => this.toggleChartVisibility(true)),
     ).subscribe();
-  }
-
-  private formatDate(date: Date) {
-    return date.getTime();
   }
 
   private makeFakeChart() {

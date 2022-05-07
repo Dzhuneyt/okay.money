@@ -1,10 +1,9 @@
 #!/usr/bin/env node
-import * as cdk from '@aws-cdk/core';
-import {Environment, Tags} from '@aws-cdk/core';
+import {App, Environment, Tags} from 'aws-cdk-lib';
 import 'source-map-support/register';
 import {CIStack} from "../lib/stacks/CIStack/CIStack";
 
-const app = new cdk.App({});
+const app = new App({});
 const env: Environment = {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: 'us-east-1',

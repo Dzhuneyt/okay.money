@@ -17,16 +17,23 @@
       </span>
       <span *ngIf="column.renderer" [innerHTML]="column.renderer(element)"></span>
     </mat-cell>
+
+    <ng-container *ngIf="column.footerRenderer">
+      <mat-footer-cell *matFooterCellDef [innerHTML]="column.footerRenderer()"></mat-footer-cell>
+    </ng-container>
+    <ng-container *ngIf="!column.footerRenderer">
+      <mat-footer-cell mat-footer-cell *matFooterCellDef>
+        <small style="color: red"><em>Error: Column '{{column.code}}' defined no `footerRenderer` function!</em></small>
+      </mat-footer-cell>
+    </ng-container>
   </ng-container>
 
   <ng-container *ngIf="actions.length>0" [matColumnDef]="'actions'">
     <!--These handle the actual header and cell rendering-->
     <mat-header-cell *matHeaderCellDef></mat-header-cell>
-
-    <!--Here follow the different types of columns, e.g. datetime-->
-
     <mat-cell *matCellDef="let element" mat-cell>
       <button (click)="action.onClick(element)"
+              color="primary"
               *ngFor="let action of actions"
               mat-icon-button>
         <mat-icon>{{action.icon}}</mat-icon>
@@ -37,6 +44,10 @@
   <!--Don't touch these. They are just "definitions"-->
   <mat-header-row *matHeaderRowDef="displayedColumnCodes"></mat-header-row>
   <mat-row *matRowDef="let row; columns: displayedColumnCodes;"></mat-row>
+
+  <ng-container *ngIf="hasFooterRow">
+    <mat-footer-row *matFooterRowDef="displayedColumnCodes"></mat-footer-row>
+  </ng-container>
   <!--Don't touch these. They are just "definitions"-->
 </mat-table>
 
@@ -63,13 +74,12 @@
   >
     <div
       *ngFor="let action of footerActions"
-      class="button-wrapper"
-    >
+      class="button-wrapper">
       <button
         mat-raised-button
         (click)="action.onClick()"
-        fxFlex
-      >
+        color="primary"
+        fxFlex>
         <mat-icon>{{action.icon}}</mat-icon>
         {{action.label}}
       </button>
@@ -78,8 +88,7 @@
   </div>
   <div
     *ngIf="shouldShowPagination()"
-    fxFlex="0 0 auto"
-  >
+    fxFlex="0 0 auto">
     <mat-paginator
       [length]="totalCount"
       [pageSize]="pageSize"

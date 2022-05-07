@@ -48,7 +48,7 @@ export const handler = new Handler(async (event: IEvent) => {
                 email: tokenFromDB!.email,
             })
         };
-    } catch (e) {
+    } catch (e: any) {
         console.log('Failed to check token validity');
         console.log(e);
         return {

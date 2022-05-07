@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {BackendService} from "../../../services/backend.service";
-import { MatDialogRef } from "@angular/material/dialog";
+import {BackendService} from '../../../services/backend.service';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-add-account',
@@ -23,7 +23,7 @@ export class AddAccountComponent implements OnInit {
   public submit() {
     this.backend.request('account', 'POST', {}, {
       title: this.title
-    }).subscribe(result => {
+    }).subscribe(() => {
       this.dialogRef.close(true);
     });
   }

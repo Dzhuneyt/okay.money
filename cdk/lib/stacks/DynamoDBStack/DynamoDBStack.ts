@@ -1,7 +1,7 @@
-import {AttributeType} from '@aws-cdk/aws-dynamodb';
-import {StringParameter} from '@aws-cdk/aws-ssm';
-import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {Table} from '../../constructs/Table';
+import {AttributeType} from "aws-cdk-lib/aws-dynamodb";
+import {Stack, StackProps} from "aws-cdk-lib";
+import {Construct} from "constructs";
 
 export class DynamoDBStack extends Stack {
 
@@ -11,16 +11,12 @@ export class DynamoDBStack extends Stack {
 
     constructor(scope: Construct, id: string, props: StackProps) {
         super(scope, id, props);
-
-        this.createDynamoDBtables();
-        this.storeInParameterStore();
+        this.createTables();
     }
 
-    private createDynamoDBtables() {
+    private createTables() {
         this.tableAccount = new Table(this, 'account', {});
-        this.tableCategory = new Table(this, 'category', {});
-        this.tableTransaction = new Table(this, 'transaction', {});
-
+        this.exportValue(this.tableAccount.tableName);
         this.tableAccount.addGlobalSecondaryIndex({
             indexName: 'author_id',
             partitionKey: {
@@ -28,6 +24,10 @@ export class DynamoDBStack extends Stack {
                 name: "author_id",
             },
         });
+
+        this.tableCategory = new Table(this, 'category', {});
+        this.exportValue(this.tableCategory.tableName);
+        this.exportValue(this.tableCategory.tableArn);
         this.tableCategory.addGlobalSecondaryIndex({
             indexName: 'author_id',
             partitionKey: {
@@ -35,6 +35,9 @@ export class DynamoDBStack extends Stack {
                 name: "author_id",
             },
         });
+
+        this.tableTransaction = new Table(this, 'transaction', {});
+        this.exportValue(this.tableTransaction.tableName);
         this.tableTransaction.addGlobalSecondaryIndex({
             indexName: 'author_id',
             partitionKey: {
@@ -44,32 +47,4 @@ export class DynamoDBStack extends Stack {
         });
     }
 
-    private storeInParameterStore() {
-        const appName = `finance/${process.env.ENV_NAME}`;
-
-        new StringParameter(this, 'accounts-arn', {
-            stringValue: this.tableAccount.tableArn,
-            parameterName: `/${appName}/table/accounts/arn`,
-        });
-        new StringParameter(this, 'accounts-name', {
-            stringValue: this.tableAccount.tableName,
-            parameterName: `/${appName}/table/accounts/name`,
-        });
-        new StringParameter(this, 'categories-arn', {
-            stringValue: this.tableCategory.tableArn,
-            parameterName: `/${appName}/table/categories/arn`,
-        });
-        new StringParameter(this, 'categories-name', {
-            stringValue: this.tableCategory.tableName,
-            parameterName: `/${appName}/table/categories/name`,
-        });
-        new StringParameter(this, 'transactions-arn', {
-            stringValue: this.tableTransaction.tableArn,
-            parameterName: `/${appName}/table/transactions/arn`,
-        });
-        new StringParameter(this, 'transactions-name', {
-            stringValue: this.tableTransaction.tableName,
-            parameterName: `/${appName}/table/transactions/name`,
-        });
-    }
 }

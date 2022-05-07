@@ -1,33 +1,25 @@
 <mat-toolbar
-  color="primary"
-  style="padding-top: 0.5em;padding-bottom: 0.5em;"
->
+  color="primary">
   <mat-toolbar-row>
     <div
       [fxFlex]="''+getHeaderFxFlex()"
-      style="margin:auto;"
-      fxLayout="row wrap"
-    >
+      fxLayout="row wrap">
       <button
         (click)="toggleMenu()"
         *ngIf="(this.userService.loginStateChanges | async).loggedIn"
         aria-label="Home page"
         class="hamburger"
-        mat-icon-button
-      >
+        mat-icon-button>
         <mat-icon>menu</mat-icon>
       </button>
       <div>
         <a class="logo"
-           href="#"
-           routerLink="['/home']"
+           routerLink="/home"
            routerLinkActive="true"
            fxLayoutGap="0.2em"
            fxLayoutAlign="center center"
            fxLayout="row">
-          <i fxFlex=""
-             class="fas fa-chart-pie"
-             style="font-size: 2em"></i>
+          <i fxFlex class="fas fa-chart-pie" style="font-size: 2em"></i>
           <span style="font-size: 1.2em">Okay Money</span>
         </a>
       </div>

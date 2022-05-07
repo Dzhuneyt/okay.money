@@ -1,8 +1,8 @@
-import {AuthorizationType, IAuthorizer, IResource, IRestApi} from '@aws-cdk/aws-apigateway';
-import {IUserPool} from '@aws-cdk/aws-cognito';
-import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
-import {NodejsFunction} from '@aws-cdk/aws-lambda-nodejs';
-import {Construct} from '@aws-cdk/core';
+import {AuthorizationType, IAuthorizer, IResource} from 'aws-cdk-lib/aws-apigateway';
+import {IUserPool} from 'aws-cdk-lib/aws-cognito';
+import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
+import {NodejsFunction} from 'aws-cdk-lib/aws-lambda-nodejs';
+import {Construct} from 'constructs';
 import * as path from 'path';
 import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
 

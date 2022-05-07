@@ -8,12 +8,12 @@ phases:
       - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
       - echo Docker started
     runtime-versions:
-      docker: 18
+      docker: 19
   pre_build:
     commands:
       - aws --version
-      - cd $CODEBUILD_SRC_DIR && npm ci
-      - cd $CODEBUILD_SRC_DIR && npx lerna bootstrap
+      - cd $CODEBUILD_SRC_DIR && npm i -g pnpm@6
+      - cd $CODEBUILD_SRC_DIR && pnpm install
   build:
     commands:
       - echo Deploying backend infrastructure
@@ -28,3 +28,4 @@ cache:
     - ./cdk/node_modules
     - ./frontend/node_modules
     - ./node_modules
+    - ./cdk/cdk.out

@@ -1,8 +1,8 @@
 import {ChangeDetectorRef, Component, Inject, OnInit} from '@angular/core';
-import {FormControl, FormGroup} from "@angular/forms";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
-import {AccountsService} from "src/app/services/accounts.service";
-import {Account} from "src/app/models/account.model";
+import {FormControl, FormGroup} from '@angular/forms';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {AccountsService} from 'src/app/services/accounts.service';
+import {Account} from 'src/app/models/account.model';
 
 @Component({
   selector: 'app-account-edit',
@@ -52,7 +52,7 @@ export class AccountEditComponent implements OnInit {
       });
     } else {
       // Edit
-      this.account.updateSingle(this.data.id, payload).subscribe(res => {
+      this.account.updateSingle(this.data.id, payload).subscribe(() => {
         this.dialogRef.close(true);
       });
     }
