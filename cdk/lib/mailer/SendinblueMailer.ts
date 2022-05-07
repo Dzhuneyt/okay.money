@@ -16,7 +16,7 @@ export class SendinblueMailer extends Mailer {
 
         // send mail with defined transport object
         let info = await transporter.sendMail({
-            from: '"Dzhuneyt" <jix2mail@gmail.com>', // sender address
+            from: this.from, // sender address
             to: this.to, // list of receivers
             subject: this.subject, // Subject line
             text: this.body.plainText, // plain text body

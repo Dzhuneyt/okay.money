@@ -10,25 +10,33 @@ export async function seedDataForUser(userUUID: string) {
     async function createDefaultCategories(userUUID: string) {
         const tableName = await TableNames.categories();
         const dynamo = new AWS.DynamoDB();
-        for (const categoryName of [
-            'Other',
+        const defaultCategories = [
             'Food',
             'Clothes',
             'Entertainment',
-        ]) {
-            const uuid = uuidv4();
-            const result = await dynamo.putItem({
-                TableName: tableName,
-                Item: DynamoDB.Converter.marshall({
-                    id: uuid,
-                    author_id: userUUID,
-                    title: categoryName,
+            'Other',
+        ];
+
+        const batchWriteResult = await dynamo.batchWriteItem({
+            RequestItems: {
+                [tableName]: defaultCategories.map(defaultCategory => {
+                    const uuid = uuidv4();
+                    return {
+                        PutRequest: {
+                            Item: DynamoDB.Converter.marshall({
+                                id: uuid,
+                                author_id: userUUID,
+                                title: defaultCategory,
+                            }),
+                        }
+                    };
                 }),
-            }).promise();
-            if (result.$response.error) {
-                throw new Error(result.$response.error.message);
-            }
-        }
+            },
+        }).promise()
+
+        console.log(batchWriteResult.UnprocessedItems);
+        console.log(batchWriteResult.ConsumedCapacity);
+        console.log(batchWriteResult.$response);
 
         return true;
     }
@@ -37,23 +45,31 @@ export async function seedDataForUser(userUUID: string) {
         const tableName = await TableNames.accounts();
         const dynamo = new AWS.DynamoDB();
 
-        for (const account of [
+        const defaultAccounts = [
             'Cash',
             'Bank account',
-        ]) {
-            const uuid = uuidv4();
-            const result = await dynamo.putItem({
-                TableName: tableName,
-                Item: DynamoDB.Converter.marshall({
-                    id: uuid,
-                    author_id: userUUID,
-                    title: account,
+        ];
+
+        const batchWriteResult = await dynamo.batchWriteItem({
+            RequestItems: {
+                [tableName]: defaultAccounts.map(account => {
+                    const uuid = uuidv4();
+                    return {
+                        PutRequest: {
+                            Item: DynamoDB.Converter.marshall({
+                                id: uuid,
+                                author_id: userUUID,
+                                title: account,
+                            }),
+                        }
+                    };
                 }),
-            }).promise();
-            if (result.$response.error) {
-                throw new Error(result.$response.error.message);
-            }
-        }
+            },
+        }).promise()
+
+        console.log(batchWriteResult.UnprocessedItems);
+        console.log(batchWriteResult.ConsumedCapacity);
+        console.log(batchWriteResult.$response);
 
         return true;
     }
@@ -203,8 +219,13 @@ export const handler = new Handler(async (event: IEvent) => {
  * Mark the token as consumed, so it can't be used anymore
  */
 async function invalidateRegistrationToken(registrationToken: string) {
-    await new DynamoDB().deleteItem({
-        TableName: process.env.TABLE_NAME_TOKENS as string,
-        Key: DynamoDB.Converter.marshall({id: registrationToken}),
-    }).promise()
+    try {
+        await new DynamoDB().deleteItem({
+            TableName: process.env.TABLE_NAME_TOKENS as string,
+            Key: DynamoDB.Converter.marshall({id: registrationToken}),
+        }).promise()
+    } catch (e) {
+        console.error(e);
+        // Not the end of the world if it fails, since those records will expire with TTL anyway
+    }
 }

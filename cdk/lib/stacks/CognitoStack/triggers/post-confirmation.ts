@@ -1,28 +1,27 @@
 import {PostConfirmationTriggerHandler} from "aws-lambda";
-import {SES} from "aws-sdk";
 import {seedDataForUser} from "../../RestApisStack/constructs/AuthEndpoints/lambdas/registerConfirm";
+import {getMailer} from "../../../mailer/getMailer";
 
 async function sendWelcomeEmail(email: string) {
-    const postRegistration = {
-        title: "Welcome to Okay.Money",
+    const mailer = await getMailer({
+        to: email,
+        subject: 'Welcome to okay.money!',
         body: {
-            text: "You have registered",
-            html: `You have registered`,
+            html: `<p>Hello!</p>` +
+                `<p>As the founder of okay.money I would like to thank you for joining the platform!</p>` +
+                `<p>Should you have any questions or feedback, don't hesitate to reach out to me at contact@okay.money</p>` +
+                `<p>Cheers! Dzhuneyt</p>`,
+            text: `Hello!\n` +
+                `As the founder of okay.money I would like to thank you for joining the platform!\n` +
+                `Should you have any questions or feedback, don't hesitate to reach out to me at contact@okay.money\n` +
+                `Cheers! Dzhuneyt`,
         }
-    }
-    return await new SES().sendEmail({
-        Destination: {
-            ToAddresses: [email]
-        },
-        Source: 'no-reply@okay.money',
-        Message: {
-            Body: {
-                Html: {Data: postRegistration.body.html},
-                Text: {Data: postRegistration.body.text}
-            },
-            Subject: {Data: postRegistration.title}
-        },
-    }).promise();
+    })
+
+    const emailResult = await mailer.send();
+
+    console.log(emailResult);
+    return emailResult;
 }
 
 export const handler: PostConfirmationTriggerHandler = async (event) => {
@@ -30,15 +29,11 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
     const email = event.request.userAttributes.email; // e.g. example@example.com
     const username = event.userName; // e.g. Google_1111111111111111
 
-    if (process.env.ENV_NAME === 'master') {
-        const emailResult = await sendWelcomeEmail(email);
-        console.log('SES email result', JSON.stringify(emailResult, null, 2));
-    }
-
     await seedDataForUser(sub);
 
-    console.log('Post confirmation lambda called', {
-        sub, email, username,
-    });
+    const emailResult = await sendWelcomeEmail(email);
+    console.log('SES email result', JSON.stringify(emailResult, null, 2));
+
+    console.log('Post confirmation lambda called', {sub, email, username});
     return event;
 }

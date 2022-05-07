@@ -3,8 +3,7 @@ import {Handler} from '../../../../../../lambdas/shared/Handler';
 import {v4} from 'uuid';
 import {DynamoDB} from "aws-sdk";
 import {userExistsInPool} from "./registerConfirm";
-import {SendinblueMailer} from "../../../../../mailer/SendinblueMailer";
-import {SesMailer} from "../../../../../mailer/SesMailer";
+import {getMailer} from '../../../../../mailer/getMailer';
 
 function getBaseUrl(event: IEvent) {
     return event.headers.origin;
@@ -35,38 +34,14 @@ async function sendEmail(config: {
     to: string,
     confirmationLink: string,
 }) {
-    // const mailer = new SesMailer(
-    //     'no-reply@okay.money',
-    //     config.to,
-    //     getSubject(),
-    //     {
-    //         plainText: getBody("plaintext", config.confirmationLink),
-    //         html: getBody("html", config.confirmationLink),
-    //     }
-    // );
-
-    function getMailer() {
-        if (process.env.ENV_NAME === 'master') {
-            return new SesMailer('no-reply@okay.money',
-                config.to,
-                getSubject(),
-                {
-                    plainText: getBody("plaintext", config.confirmationLink),
-                    html: getBody("html", config.confirmationLink),
-                });
+    const mailer = await getMailer({
+        to: config.to,
+        subject: getSubject(),
+        body: {
+            html: getBody("html", config.confirmationLink),
+            text: getBody("plaintext", config.confirmationLink),
         }
-        return new SendinblueMailer(
-            'no-reply@okay.money',
-            config.to,
-            getSubject(),
-            {
-                plainText: getBody("plaintext", config.confirmationLink),
-                html: getBody("html", config.confirmationLink),
-            }
-        );
-    }
-
-    const mailer = getMailer();
+    })
 
     const emailResult = await mailer.send();
 
