@@ -9,6 +9,7 @@ import {CategoryEditComponent} from '../category-edit/category-edit.component';
 import {DeleteConfirmComponent} from '../../delete-confirm/delete-confirm.component';
 import {of} from 'rxjs';
 import {CategoryService} from '../category.service';
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-category-list',
@@ -69,7 +70,9 @@ export class CategoryListComponent implements OnInit {
     private dialogService: DialogService,
     private snackbarService: SnackbarService,
     private categoryService: CategoryService,
+    private title: Title,
   ) {
+    this.title.setTitle('Categories');
   }
 
   ngOnInit() {

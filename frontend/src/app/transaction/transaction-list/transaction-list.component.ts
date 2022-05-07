@@ -11,6 +11,7 @@ import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edi
 import {TransactionService} from 'src/app/services/transaction.service';
 import {SnackbarService} from '../../services/snackbar.service';
 import {TransactionListColumns} from './transaction-list.columns';
+import {Title} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-transaction-list',
@@ -104,7 +105,9 @@ export class TransactionListComponent implements OnInit {
     private dialog: DialogService,
     private transaction: TransactionService,
     private snackbarService: SnackbarService,
+    private title: Title,
   ) {
+    this.title.setTitle('Transactions');
   }
 
   ngOnInit() {

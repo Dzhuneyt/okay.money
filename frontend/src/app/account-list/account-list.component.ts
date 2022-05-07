@@ -10,6 +10,7 @@ import {DeleteConfirmComponent} from '../delete-confirm/delete-confirm.component
 import {MenuService} from '../menu.service';
 import {AccountsService} from '../services/accounts.service';
 import {SnackbarService} from '../services/snackbar.service';
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-account-list',
@@ -54,7 +55,9 @@ export class AccountListComponent implements OnInit {
     private snackbarService: SnackbarService,
     private menuService: MenuService,
     private accountsService: AccountsService,
+    private title: Title,
   ) {
+    this.title.setTitle('Accounts');
   }
 
   ngOnInit() {

@@ -3,6 +3,7 @@ import {AbstractControl, FormControl, FormGroup, ValidatorFn, Validators} from '
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {BackendService} from 'src/app/services/backend.service';
 import {SnackbarService} from '../services/snackbar.service';
+import {Title} from "@angular/platform-browser";
 
 export function samePasswordValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
@@ -20,7 +21,6 @@ export function samePasswordValidator(): ValidatorFn {
 
 
 @Component({
-  selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
@@ -46,7 +46,9 @@ export class ProfileComponent implements OnInit {
     private backend: BackendService,
     private snackbar: MatSnackBar,
     private snackbarService: SnackbarService,
+    private title: Title,
   ) {
+    this.title.setTitle('Profile');
   }
 
   ngOnInit() {
