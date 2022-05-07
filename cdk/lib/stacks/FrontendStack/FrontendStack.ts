@@ -19,6 +19,7 @@ import {Construct} from "constructs";
 import {Certificate, ICertificate} from "aws-cdk-lib/aws-certificatemanager";
 import {RestApi} from "aws-cdk-lib/aws-apigateway";
 import {HttpOrigin, S3Origin} from "aws-cdk-lib/aws-cloudfront-origins";
+import * as path from 'path';
 
 function isDirectory(directory: string) {
     const fs = require('fs');
@@ -57,8 +58,7 @@ export class FrontendStack extends Stack {
 
         if (!process.env.FRONTEND_PATH) {
             // Try to auto resolve, relatively
-            process.env.FRONTEND_PATH = require('path')
-                .resolve(__dirname, '../../../../frontend/dist/frontend/');
+            process.env.FRONTEND_PATH = path.resolve(__dirname, '../../../../frontend/dist/frontend/');
         }
 
         if (!isDirectory(process.env.FRONTEND_PATH as string)) {
@@ -92,7 +92,7 @@ export class FrontendStack extends Stack {
             },
 
             /**
-             * When "/" is visited, assume it's index.html
+             * When "/" is visited, assume it is index.html
              */
             defaultRootObject: 'index.html',
 

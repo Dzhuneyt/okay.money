@@ -1,8 +1,10 @@
 import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
 import {Handler} from '../../../../../../lambdas/shared/Handler';
 import {v4} from 'uuid';
-import {DynamoDB, SES} from "aws-sdk";
+import {DynamoDB} from "aws-sdk";
 import {userExistsInPool} from "./registerConfirm";
+import {SendinblueMailer} from "../../../../../mailer/SendinblueMailer";
+import {SesMailer} from "../../../../../mailer/SesMailer";
 
 function getBaseUrl(event: IEvent) {
     return event.headers.origin;
@@ -29,53 +31,42 @@ const getBody = (type: "plaintext" | "html", confirmationLink: string) => {
     return "";
 };
 
-abstract class Mailer {
-    constructor(
-        protected from: string,
-        protected to: string,
-        protected subject: string,
-        protected body: { plainText: string, html: string }
-    ) {
-    }
-
-    abstract send(): Promise<boolean>;
-}
-
-class SesMailer extends Mailer {
-    async send(): Promise<boolean> {
-        const ses = new SES();
-        const res = await ses.sendEmail({
-            Destination: {
-                ToAddresses: [this.to]
-            },
-            Source: this.from,
-            Message: {
-                Body: {
-                    Html: {Data: this.body.html},
-                    Text: {Data: this.body.plainText}
-                },
-                Subject: {Data: this.subject}
-            },
-        }).promise();
-        console.log('SES email result', JSON.stringify(res, null, 2));
-        return res.MessageId.length > 0
-    }
-}
-
 async function sendEmail(config: {
     to: string,
     confirmationLink: string,
 }) {
-    const mailer = new SesMailer(
-        'no-reply@okay.money',
-        config.to,
-        getSubject(),
-        {
-            plainText: getBody("plaintext", config.confirmationLink),
-            html: getBody("html", config.confirmationLink),
-        }
-    );
+    // const mailer = new SesMailer(
+    //     'no-reply@okay.money',
+    //     config.to,
+    //     getSubject(),
+    //     {
+    //         plainText: getBody("plaintext", config.confirmationLink),
+    //         html: getBody("html", config.confirmationLink),
+    //     }
+    // );
 
+    function getMailer() {
+        if (process.env.ENV_NAME === 'master') {
+            return new SesMailer('no-reply@okay.money',
+                config.to,
+                getSubject(),
+                {
+                    plainText: getBody("plaintext", config.confirmationLink),
+                    html: getBody("html", config.confirmationLink),
+                });
+        }
+        return new SendinblueMailer(
+            'no-reply@okay.money',
+            config.to,
+            getSubject(),
+            {
+                plainText: getBody("plaintext", config.confirmationLink),
+                html: getBody("html", config.confirmationLink),
+            }
+        );
+    }
+
+    const mailer = getMailer();
 
     const emailResult = await mailer.send();
 
@@ -124,6 +115,12 @@ export const handler = new Handler(async (event: IEvent) => {
                 confirmationLink,
                 to: body.email,
             });
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: true,
+                })
+            }
         } catch (e) {
             console.error(e);
             return {
@@ -132,14 +129,6 @@ export const handler = new Handler(async (event: IEvent) => {
                     message: "Failed to send a registration email. Try with a different email",
                 })
             }
-        }
-
-
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                success: true,
-            })
         }
     } catch (e: any) {
         return {
