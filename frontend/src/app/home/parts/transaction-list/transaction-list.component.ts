@@ -87,7 +87,7 @@ export class TransactionListComponent implements OnInit {
           },
           (res) => {
             if (res) {
-              this.transaction.changes.next();
+              this.transaction.changes.next({});
             } else if (res === false) {
               this.snackbarService.error('Creating failed');
             }

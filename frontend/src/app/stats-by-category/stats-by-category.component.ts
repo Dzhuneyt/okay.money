@@ -6,13 +6,13 @@ import {tap} from 'rxjs/operators';
 
 const chartOptions: ChartOptions = {
   responsive: true,
-  tooltips: {
-    enabled: true,
-  },
-  legend: {
-    display: true,
-    position: 'right',
-  },
+  // tooltips: {
+  //   enabled: true,
+  // },
+  // legend: {
+  //   display: true,
+  //   position: 'right',
+  // },
   hover: {
     intersect: false,
     mode: 'nearest'

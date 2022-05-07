@@ -142,7 +142,7 @@ export class AccountListComponent implements OnInit {
       (res) => {
         switch (res) {
           case true:
-            this.accountsService.changes.next();
+            this.accountsService.changes.next({});
             this.snackbarService.success('Account created');
             break;
           case false:

@@ -48,7 +48,7 @@ export class HeaderComponent implements OnInit {
                 },
                 (res) => {
                   if (res) {
-                    this.transactionService.changes.next();
+                    this.transactionService.changes.next({});
                   } else if (res === false) {
                     this.snackbarService.error('Creating failed');
                   }
