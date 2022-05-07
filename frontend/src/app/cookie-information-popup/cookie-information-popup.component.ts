@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {CookieService} from "../cookie.service";
+import {CookieService} from '../cookie.service';
 
 @Component({
   selector: 'app-cookie-information-popup',

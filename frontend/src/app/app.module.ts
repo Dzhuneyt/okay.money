@@ -2,10 +2,8 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
-import {LoginComponent} from './login/login.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {RegisterComponent} from './register/register.component';
 import {BackendService} from './services/backend.service';
 import {HttpClientModule} from '@angular/common/http';
 import {HomeComponent} from './home/home.component';
@@ -46,14 +44,9 @@ import {FeedbackComponent} from './feedback/feedback.component';
 
 const routes: Routes = [
   {
-    path: 'login',
-    component: LoginComponent,
-    canActivate: [AnonymousUserGuard]
-  },
-  {
-    path: 'register',
-    component: RegisterComponent,
-    canActivate: [AnonymousUserGuard]
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule),
+    canActivate: [AnonymousUserGuard],
   },
   {
     path: 'home',
@@ -73,7 +66,6 @@ const routes: Routes = [
   },
   {
     path: 'categories',
-    // @ts-ignore
     loadChildren: () => import('./category/category.module').then(m => m.CategoryModule),
     canActivate: [LoggedInGuard],
   },
@@ -92,7 +84,7 @@ const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '/home',
+    redirectTo: '/auth/login',
   }
 ];
 
@@ -100,8 +92,6 @@ const routes: Routes = [
   declarations: [
     AppComponent,
     HomeComponent,
-    LoginComponent,
-    RegisterComponent,
     AccountSummaryListComponent,
     AddAccountComponent,
     TransactionListComponent,

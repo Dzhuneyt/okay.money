@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {BackendService} from "../services/backend.service";
-import {catchError} from "rxjs/operators";
-import {BehaviorSubject, Observable, of} from "rxjs";
-import {Category} from "../models/Category";
+import {BackendService} from '../services/backend.service';
+import {catchError} from 'rxjs/operators';
+import {BehaviorSubject, Observable, of} from 'rxjs';
+import {Category} from '../models/Category';
 
 @Injectable({
   providedIn: 'root'

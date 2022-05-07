@@ -7,7 +7,7 @@ import {CategoriesService, Category} from 'src/app/services/categories.service';
 import {AccountsService} from 'src/app/services/accounts.service';
 import {filter, tap} from 'rxjs/operators';
 import {Account} from 'src/app/models/account.model';
-import {zip} from "rxjs";
+import {zip} from 'rxjs';
 
 @Component({
   selector: 'app-transaction-edit',

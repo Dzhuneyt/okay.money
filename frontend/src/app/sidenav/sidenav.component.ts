@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {UserService} from "../services/user.service";
-import {Router} from "@angular/router";
-import {filter} from "rxjs/operators";
-import {DialogService} from "../services/dialog.service";
-import {FeedbackComponent} from "../feedback/feedback.component";
-import {SnackbarService} from "../services/snackbar.service";
+import {UserService} from '../services/user.service';
+import {Router} from '@angular/router';
+import {filter} from 'rxjs/operators';
+import {DialogService} from '../services/dialog.service';
+import {FeedbackComponent} from '../feedback/feedback.component';
+import {SnackbarService} from '../services/snackbar.service';
 
 @Component({
   selector: 'app-sidenav',
@@ -32,8 +32,8 @@ export class SidenavComponent implements OnInit {
     // Wait for logout event
     this.userService.loginStateChanges
       .pipe(filter(value => !value.loggedIn))
-      .subscribe(value => {
-        this.router.navigate(['/login']);
+      .subscribe(() => {
+        this.router.navigate(['/login']).then();
       });
 
     const absoluteUrl = window.location.origin + this.router.createUrlTree(['/login']);

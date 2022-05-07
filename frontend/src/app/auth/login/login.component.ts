@@ -4,10 +4,10 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {LocalStorage} from '@ngx-pwa/local-storage';
 import {Observable, Observer} from 'rxjs';
 import {UserService} from 'src/app/services/user.service';
-import {BackendService} from '../services/backend.service';
-import {SnackbarService} from '../services/snackbar.service';
-import {Title} from "@angular/platform-browser";
-import {filter, map} from "rxjs/operators";
+import {Title} from '@angular/platform-browser';
+import {filter, map} from 'rxjs/operators';
+import { BackendService } from 'src/app/services/backend.service';
+import {SnackbarService} from '../../services/snackbar.service';
 
 @Component({
   selector: 'app-login',

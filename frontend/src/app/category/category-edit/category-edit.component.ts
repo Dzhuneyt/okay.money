@@ -1,8 +1,8 @@
 import {ChangeDetectorRef, Component, Inject, OnInit} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {CategoryService} from "../category.service";
-import {Category} from "../../models/Category";
+import {CategoryService} from '../category.service';
+import {Category} from '../../models/Category';
 
 @Component({
   selector: 'app-category-edit',
@@ -53,7 +53,7 @@ export class CategoryEditComponent implements OnInit {
       });
     } else {
       // Edit
-      this.categoryService.updateSingle(this.data.id, payload).subscribe(res => {
+      this.categoryService.updateSingle(this.data.id, payload).subscribe(() => {
         this.dialogRef.close(true);
       });
     }

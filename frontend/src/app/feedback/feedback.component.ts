@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {MatDialogRef} from '@angular/material/dialog';
 import {FormBuilder, Validators} from '@angular/forms';
-import {BackendService} from "../services/backend.service";
+import {BackendService} from '../services/backend.service';
 
 @Component({
   selector: 'app-feedback',

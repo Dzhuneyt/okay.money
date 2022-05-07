@@ -3,11 +3,11 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, Router} from '@angular/router';
 import {LocalStorage} from '@ngx-pwa/local-storage';
-import {BehaviorSubject, EMPTY, Observable, Observer, ReplaySubject} from 'rxjs';
-import {BackendService} from '../services/backend.service';
-import {UserService} from '../services/user.service';
+import {EMPTY, Observable, Observer} from 'rxjs';
+import {BackendService} from '../../services/backend.service';
+import {UserService} from '../../services/user.service';
 import {catchError, filter, map} from 'rxjs/operators';
-import {SnackbarService} from '../services/snackbar.service';
+import {SnackbarService} from '../../services/snackbar.service';
 
 @Component({
   selector: 'app-register',
@@ -59,7 +59,7 @@ export class RegisterComponent implements OnInit {
         this.backendService
           .request('register/registrationToken', 'GET', {token})
           .pipe(
-            catchError(err => {
+            catchError(() => {
               this.snackbarService.error('Invalid registration link. It may be expired');
               // Redirect to registration page so the user can re-register
               this.router.navigate(['/register']);

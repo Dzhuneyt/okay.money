@@ -35,7 +35,7 @@
         style="margin:auto;"></mat-spinner>
     </mat-card-content>
 
-    <mat-card-actions style="text-align: center;">
+    <mat-card-actions fxLayout="column" fxLayoutAlign="center center">
       <button
         type="button"
         [disabled]="!email || !password"
@@ -47,7 +47,8 @@
   </mat-card>
 
   <p class="side-note">
-    Not a member yet? <a [attr.href]="router.createUrlTree(['/register'])" [routerLink]="['/register']">Register</a>
+    Not a member yet? <a [attr.href]="router.createUrlTree(['/auth/register'])"
+                         [routerLink]="['/auth/register']">Register</a>
   </p>
 
 </form>

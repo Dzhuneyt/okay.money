@@ -1,8 +1,8 @@
 import { ComponentFixture, inject, TestBed, waitForAsync } from '@angular/core/testing';
 
 import {HomeComponent} from './home.component';
-import {HttpClientModule} from "@angular/common/http";
-import {HttpClientTestingModule, HttpTestingController} from "@angular/common/http/testing";
+import {HttpClientModule} from '@angular/common/http';
+import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 
 describe('HomeComponent', () => {
     let component: HomeComponent;

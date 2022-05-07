@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {MenuService} from "../menu.service";
-import {Title} from "@angular/platform-browser";
+import {MenuService} from '../menu.service';
+import {Title} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-welcome-component',
