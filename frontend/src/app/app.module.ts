@@ -13,7 +13,6 @@ import {FlexLayoutModule} from '@angular/flex-layout';
 import {AccountSummaryListComponent} from 'src/app/home/parts/accounts-list/account-summary-list.component';
 import {RouterModule, Routes} from '@angular/router';
 import {UiKitModule} from './ui-kit/ui-kit.module';
-import {TransactionListComponent} from './home/parts/transaction-list/transaction-list.component';
 import {AddAccountComponent} from './home/parts/add-account/add-account.component';
 import {DialogService} from './services/dialog.service';
 import {AccountsService} from './services/accounts.service';
@@ -23,8 +22,6 @@ import {StatsByCategoryComponent} from 'src/app/stats-by-category/stats-by-categ
 import {UserService} from 'src/app/services/user.service';
 import {CommonModule} from '@angular/common';
 import {SidenavComponent} from 'src/app/sidenav/sidenav.component';
-import {MatListModule} from '@angular/material/list';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';
@@ -53,9 +50,8 @@ const routes: Routes = [
     component: HomeComponent,
   },
   {
-    // @TODO refactor into lazy loaded module
     path: 'transactions',
-    component: TransactionListComponent,
+    loadChildren: () => import('./transaction/transaction.module').then(m => m.TransactionModule),
     canActivate: [LoggedInGuard],
   },
   {
@@ -94,7 +90,6 @@ const routes: Routes = [
     HomeComponent,
     AccountSummaryListComponent,
     AddAccountComponent,
-    TransactionListComponent,
     StatsByCategoryComponent,
     SidenavComponent,
     DeleteConfirmComponent,

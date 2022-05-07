@@ -9,7 +9,7 @@ import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.comp
 import {of} from 'rxjs';
 import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';
-import {SnackbarService} from '../../../services/snackbar.service';
+import {SnackbarService} from '../../services/snackbar.service';
 import {TransactionListColumns} from './transaction-list.columns';
 
 @Component({
