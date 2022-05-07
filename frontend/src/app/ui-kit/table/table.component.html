@@ -13,7 +13,7 @@
       </span>
       <span
         *ngIf="column.type==='datetime'">
-        {{element[column.code] | timeAgo}}
+        {{element[column.code] | relativeTime}}
       </span>
       <span *ngIf="column.renderer" [innerHTML]="column.renderer(element)"></span>
     </mat-cell>

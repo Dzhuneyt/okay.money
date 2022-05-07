@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {TableAction, TableColumn, TableComponent, TableGlobalAction} from 'src/app/table/table.component';
+import {TableAction, TableColumn, TableComponent, TableGlobalAction} from 'src/app/ui-kit/table/table.component';
 import {catchError, map} from 'rxjs/operators';
 import {BackendService} from 'src/app/services/backend.service';
 import {CategoriesService} from 'src/app/services/categories.service';
@@ -38,9 +38,11 @@ export class TransactionListComponent implements OnInit {
           },
           (res) => {
             if (res) {
-              this.table.goToPage(this.table.currentPage);
               // Refresh the table
-            } else if (res === false) {
+              this.table.goToPage(this.table.currentPage);
+              return;
+            }
+            if (res === false) {
               this.snackbarService.error('Editing failed');
             }
           });
@@ -53,14 +55,12 @@ export class TransactionListComponent implements OnInit {
         this.dialog.open(DeleteConfirmComponent, {
             data: {
               title: 'Are you sure you want to delete this transaction?',
-              onConfirm: () => {
-                return this.backend.request('transaction/' + transaction.id, 'DELETE').pipe(
-                  catchError(err => {
-                    console.error(err);
-                    return of(false);
-                  })
-                );
-              },
+              onConfirm: () => this.backend.request('transaction/' + transaction.id, 'DELETE').pipe(
+                catchError(err => {
+                  console.error(err);
+                  return of(false);
+                })
+              ),
             },
           },
           (res) => {
@@ -68,7 +68,9 @@ export class TransactionListComponent implements OnInit {
               // Refresh the table
               this.snackbarService.success('Deleted');
               this.table.goToPage(this.table.currentPage);
-            } else if (res === false) {
+              return;
+            }
+            if (res === false) {
               this.snackbarService.error('Delete failed');
             }
           });

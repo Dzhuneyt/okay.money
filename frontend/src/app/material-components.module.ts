@@ -13,6 +13,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatTableModule} from '@angular/material/table';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import {MatListModule} from "@angular/material/list";
 
 export const USED_ANGULAR_MATERIAL_COMPONENTS = [
   MatCardModule,
@@ -30,6 +32,8 @@ export const USED_ANGULAR_MATERIAL_COMPONENTS = [
   MatDialogModule,
   MatSelectModule,
   MatTabsModule,
+  MatSlideToggleModule,
+  MatListModule,
 ];
 
 @NgModule({

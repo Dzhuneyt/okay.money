@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {of} from 'rxjs';
-import {TableAction, TableColumn, TableComponent, TableGlobalAction} from 'src/app/table/table.component';
+import {TableAction, TableColumn, TableComponent, TableGlobalAction} from 'src/app/ui-kit/table/table.component';
 import {Account} from 'src/app/models/account.model';
 import {catchError, map} from 'rxjs/operators';
 import {BackendService} from 'src/app/services/backend.service';

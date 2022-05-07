@@ -1,4 +1,4 @@
-import {TableColumnType} from 'src/app/table/table.component';
+import {TableColumnType} from 'src/app/ui-kit/table/table.component';
 import {TransactionModel} from 'src/app/models/transaction.model';
 
 export const TransactionListColumns = [
@@ -12,10 +12,9 @@ export const TransactionListColumns = [
     code: 'sum',
     renderer: (element: TransactionModel) => {
       if (element.sum > 0) {
-        return '<span class="green-text">+' + Math.abs(element.sum) + '</span>';
-      } else {
-        return '<span class="red-text">-' + Math.abs(element.sum) + '</span>';
+        return `<span class="green-text">+${Math.abs(element.sum)}</span>`;
       }
+      return `<span class="red-text">-${Math.abs(element.sum)}</span>`;
     }
   },
   {

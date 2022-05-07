@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {from, Observable} from 'rxjs';
 import {take} from 'rxjs/operators';
+import {DateTime} from 'luxon';
 
 export enum TableColumnType {
   standard = 'standard', // default
@@ -110,5 +111,9 @@ export class TableComponent implements OnInit {
     // The pagination in this case will have the next/prev buttons disabled
     // anyway but it displays useful information like "showing 1-18 of 18 elements"
     return this.currentPageItems.length > 0;
+  }
+
+  toRelativeDateTime(elementElement: any) {
+    return DateTime.fromSeconds(elementElement / 1000).toRelative();
   }
 }

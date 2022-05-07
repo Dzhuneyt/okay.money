@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BackendService} from '../../../services/backend.service';
 import {map, take} from 'rxjs/operators';
-import {TableColumn, TableComponent} from '../../../table/table.component';
+import {TableColumn, TableComponent} from '../../../ui-kit/table/table.component';
 import {Account} from '../../../models/account.model';
 
 @Component({

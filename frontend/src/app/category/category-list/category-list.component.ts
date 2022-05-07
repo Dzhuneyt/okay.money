@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {TableAction, TableColumn, TableComponent, TableGlobalAction} from '../../table/table.component';
+import {TableAction, TableColumn, TableComponent, TableGlobalAction} from '../../ui-kit/table/table.component';
 import {catchError, map} from 'rxjs/operators';
 import {Category} from '../../models/Category';
 import {BackendService} from '../../services/backend.service';
