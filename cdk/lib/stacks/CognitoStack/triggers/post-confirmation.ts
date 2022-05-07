@@ -30,8 +30,10 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
     const email = event.request.userAttributes.email; // e.g. example@example.com
     const username = event.userName; // e.g. Google_1111111111111111
 
-    // const emailResult = await sendWelcomeEmail(email);
-    // console.log('SES email result', JSON.stringify(emailResult, null, 2));
+    if (process.env.ENV_NAME === 'master') {
+        const emailResult = await sendWelcomeEmail(email);
+        console.log('SES email result', JSON.stringify(emailResult, null, 2));
+    }
 
     await seedDataForUser(sub);
 
