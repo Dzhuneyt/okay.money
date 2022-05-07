@@ -1,11 +1,12 @@
 import {StringParameter} from "aws-cdk-lib/aws-ssm";
-import {BuildSpec, Cache, LinuxBuildImage, PipelineProject} from "aws-cdk-lib/aws-codebuild";
+import {BuildSpec, Cache, LinuxArmBuildImage, LinuxBuildImage, PipelineProject} from "aws-cdk-lib/aws-codebuild";
 import {ManagedPolicy} from "aws-cdk-lib/aws-iam";
 import {Bucket, BucketEncryption, IBucket} from "aws-cdk-lib/aws-s3";
-import {Duration, RemovalPolicy, SecretValue, Stack, StackProps} from "aws-cdk-lib";
+import {Annotations, Duration, RemovalPolicy, SecretValue, Stack, StackProps} from "aws-cdk-lib";
 import {Construct} from "constructs";
 import {Artifact, Pipeline} from "aws-cdk-lib/aws-codepipeline";
 import {CodeBuildAction, GitHubSourceAction} from "aws-cdk-lib/aws-codepipeline-actions";
+import * as path from "path";
 
 export class CIStack extends Stack {
     private readonly cacheBucket: IBucket;
@@ -15,6 +16,10 @@ export class CIStack extends Stack {
         super(scope, id, props);
 
         this.branchName = process.env.BRANCH_NAME as string;
+
+        if (!this.branchName) {
+            Annotations.of(this).addError(`process.env.BRANCH_NAME is required to Deploy ${path.resolve(__dirname)}/CiStack.ts`);
+        }
 
         this.cacheBucket = this.getCacheBucket();
 
@@ -45,16 +50,13 @@ export class CIStack extends Stack {
 
         const deployProject = new PipelineProject(this, 'CDK-Deploy', {
             buildSpec: BuildSpec.fromSourceFilename('buildspec.yml'),
-            cache: Cache.bucket(this.cacheBucket, {prefix: 'ci'}),
+            cache: Cache.bucket(this.cacheBucket, {prefix: 'cdk-deploy'}),
             environment: {
-                buildImage: LinuxBuildImage.AMAZON_LINUX_2_3,
-                // computeType: ComputeType.LARGE,
+                buildImage: LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_2_0,
                 privileged: true,
             },
             environmentVariables: {
-                ENV_NAME: {
-                    value: this.branchName,
-                }
+                ENV_NAME: {value: this.branchName},
             },
         });
         deployProject.role?.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'))
@@ -76,7 +78,7 @@ export class CIStack extends Stack {
         return new Pipeline(this, 'Pipeline', {
             crossAccountKeys: false, // save some costs
             artifactBucket: this.cacheBucket,
-            pipelineName: `finance-${this.branchName}-ci`,
+            pipelineName: `okaymoney-ci--${this.branchName}`,
         });
     }
 
@@ -89,7 +91,7 @@ export class CIStack extends Stack {
                 {
                     expiration: Duration.days(7),
                     abortIncompleteMultipartUploadAfter: Duration.days(7),
-                }
+                },
             ],
         });
     }
