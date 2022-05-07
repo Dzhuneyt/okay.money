@@ -3,10 +3,7 @@ import {IEvent} from '../../../../../../lambdas/interfaces/IEvent';
 import {Handler} from '../../../../../../lambdas/shared/Handler';
 import {getUserByCognitoSub} from "../../UserEndpoints/lambdas/getProfile";
 
-export const appName = () => `finance/${process.env.ENV_NAME}`;
-
 export const handler = new Handler(async (event: IEvent) => {
-        console.log(event);
         const userId = event.requestContext.authorizer.claims.sub;
 
         const cognitoUser = await getUserByCognitoSub(userId, process.env.USER_POOL_ID as string);

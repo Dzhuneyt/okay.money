@@ -2,6 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatTabGroup} from '@angular/material/tabs';
 import {AccountSummaryListComponent} from 'src/app/home/parts/accounts-list/account-summary-list.component';
 import {UserService} from '../services/user.service';
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-home',
@@ -16,11 +17,12 @@ export class HomeComponent implements OnInit {
 
   constructor(
     public user: UserService,
+    private title: Title,
   ) {
   }
 
   ngOnInit() {
-
+    this.title.setTitle('Dashboard');
   }
 
 }
