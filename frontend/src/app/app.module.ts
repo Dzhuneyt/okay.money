@@ -11,7 +11,7 @@ import {HeaderModule} from './header/header.module';
 import {MaterialComponentsModule} from './material-components.module';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {AccountSummaryListComponent} from 'src/app/home/parts/accounts-list/account-summary-list.component';
-import {RouterModule, Routes} from '@angular/router';
+import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
 import {UiKitModule} from './ui-kit/ui-kit.module';
 import {AddAccountComponent} from './home/parts/add-account/add-account.component';
 import {DialogService} from './services/dialog.service';
@@ -23,7 +23,6 @@ import {UserService} from 'src/app/services/user.service';
 import {CommonModule} from '@angular/common';
 import {SidenavComponent} from 'src/app/sidenav/sidenav.component';
 import {DeleteConfirmComponent} from 'src/app/delete-confirm/delete-confirm.component';
-import {TransactionEditComponent} from 'src/app/transaction-edit/transaction-edit.component';
 import {TransactionService} from 'src/app/services/transaction.service';
 import {LoggedInGuard} from 'src/app/guards/logged-in.guard';
 import {AnonymousUserGuard} from 'src/app/guards/anonymous-user.guard';
@@ -38,6 +37,7 @@ import {CookiePolicyComponent} from './cookie-policy/cookie-policy.component';
 import {CookieInformationPopupComponent} from './cookie-information-popup/cookie-information-popup.component';
 import {CookieService} from './cookie.service';
 import {FeedbackComponent} from './feedback/feedback.component';
+import {TransactionEditComponent} from "./transaction-edit/transaction-edit.component";
 
 const routes: Routes = [
   {
@@ -93,7 +93,6 @@ const routes: Routes = [
     StatsByCategoryComponent,
     SidenavComponent,
     DeleteConfirmComponent,
-    TransactionEditComponent,
     AccountListComponent,
     AccountEditComponent,
     ProfileComponent,
@@ -103,6 +102,7 @@ const routes: Routes = [
     PrivacyPolicyComponent,
     CookieInformationPopupComponent,
     FeedbackComponent,
+    TransactionEditComponent,
   ],
   imports: [
     BrowserModule,
@@ -110,7 +110,9 @@ const routes: Routes = [
     FormsModule,
     FlexLayoutModule,
     HttpClientModule,
-    RouterModule.forRoot(routes),
+    RouterModule.forRoot(routes, {
+      preloadingStrategy: PreloadAllModules,
+    }),
     BrowserAnimationsModule,
     MaterialComponentsModule,
     NgChartsModule,
