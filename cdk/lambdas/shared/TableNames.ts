@@ -3,6 +3,9 @@ import {SSM} from 'aws-sdk';
 const appName = () => `finance/${process.env.ENV_NAME}`;
 
 export class TableNames {
+
+    static cache = new Map<string, string>();
+
     /**
      * Get the name of the "users" table
      */
@@ -33,20 +36,19 @@ export class TableNames {
     }
 
     private static async getByName(Name: string) {
-        let param;
-        try {
-            param = await new SSM().getParameter({
+        if (!this.cache.has(Name)) {
+            let param = await new SSM().getParameter({
                 Name,
                 WithDecryption: true,
             }).promise();
-        } catch (e) {
-            console.error(e);
-            throw new Error(`Internal error when retrieving SSM param ${Name}. Check logs`);
+
+            if (!param.Parameter || !param.Parameter.Value) {
+                throw new Error(`Can not find parameter with name ${Name}`)
+            }
+            this.cache.set(Name, param.Parameter.Value);
         }
-        if (!param.Parameter || !param.Parameter.Value) {
-            throw new Error(`Can not find parameter with name ${Name}`)
-        }
-        return param.Parameter.Value;
+
+        return this.cache.get(Name) as string;
     }
 
 }

@@ -1,6 +1,6 @@
 import {AuthorizationType, IResource} from 'aws-cdk-lib/aws-apigateway';
 import {IUserPool} from 'aws-cdk-lib/aws-cognito';
-import {PolicyStatement} from 'aws-cdk-lib/aws-iam';
+import {ManagedPolicy, PolicyStatement} from 'aws-cdk-lib/aws-iam';
 import {LambdaIntegration} from '../../../../constructs/LambdaIntegration';
 import {LambdaTypescript} from '../../../../constructs/LambdaTypescript';
 import {Table} from "../../../../constructs/Table";
@@ -8,6 +8,7 @@ import * as path from "path";
 import {Construct} from "constructs";
 import {RemovalPolicy} from "aws-cdk-lib";
 import {BillingMode} from "aws-cdk-lib/aws-dynamodb";
+import {StringParameter} from "aws-cdk-lib/aws-ssm";
 
 export class Register extends Construct {
     private tableForRegistrationTokens: Table;
@@ -27,6 +28,8 @@ export class Register extends Construct {
         this.createRegistrationEndpoint();
         this.createRegisterTokenGetEndpoint();
         this.createRegisterConfirmEndpoint();
+
+        this.createInternalUserCreationLambda();
     }
 
     /**
@@ -149,5 +152,20 @@ export class Register extends Construct {
             .addMethod('GET', new LambdaIntegration(lambda), {
                 authorizationType: AuthorizationType.NONE,
             });
+    }
+
+    private createInternalUserCreationLambda() {
+        const lambda = new LambdaTypescript(this, 'InternalUserCreator', {
+            entry: path.resolve(__dirname, 'lambdas/internal-user-creator.ts'),
+            description: `Can register users directly for the okay.money environment ${process.env.ENV_NAME}. Just invoke directly using a payload like: {email, password}`
+        })
+        lambda.addEnvironment('COGNITO_USERPOOL_ID', this.props.userPool.userPoolId);
+        lambda.role?.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AmazonCognitoPowerUser'));
+
+        new StringParameter(lambda, 'StringParameter', {
+            parameterName: `/okaymoney/${process.env.ENV_NAME}/internal/user-creation-lambda-arn`,
+            stringValue: lambda.functionArn,
+            description: `Reference to an internal Lambda ARN that can be invoked using an {email, password} payload and it will directly register a user. Useful for E2E tests and debugging`,
+        })
     }
 }

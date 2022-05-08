@@ -89,25 +89,5 @@ export class CognitoStack extends Stack {
             stringValue: this.userTable.tableArn,
             parameterName: `/${appName}/table/users/arn`,
         });
-
-        // Create a utility Lambda for being able to create new users
-        // by calling that Lambda from the AWS console using a payload like:
-        // {username: "test", password: "testtest"}
-        const fnCreateUser = new LambdaTypescript(this, 'fn-create-user', {
-            entry: path.resolve(__dirname, 'util/lambda/create-user.ts'),
-            description: "Debugging lambda that allows you to skip the registration process and create a user immediately",
-            timeout: Duration.seconds(10),
-            environment: {
-                COGNITO_USERPOOL_ID: this.userPool.userPoolId,
-            }
-        });
-        fnCreateUser.addToRolePolicy(new PolicyStatement({
-            resources: [this.userPool.userPoolArn],
-            actions: [
-                "cognito-idp:AdminCreateUser",
-                "cognito-idp:AdminSetUserPassword",
-            ]
-        }));
-        this.userTable.grantReadWriteData(fnCreateUser);
     }
 }
