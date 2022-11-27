@@ -39,14 +39,16 @@ try {
     });
     restApisStack.addDependency(dynamoStack);
 
+    const githubProvider = new GithubOidcProviderStack(app, `${appName}-github-oidc`, {env});
+
     // Provide a high level stack that depends on all others, providing
     // an easy mechanism to deploy "everything" by just deploying this stack
     const mainStack = new Stack(app, `${appName}-backend`, {env});
     mainStack.addDependency(restApisStack);
+    mainStack.addDependency(githubProvider);
 
     new FrontendStack(app, `${appName}-frontend`, {env, api: restApisStack.api});
 
-    new GithubOidcProviderStack(app, `${appName}-github-oidc`, {env});
 
     Tags.of(app).add('app', 'personal-finance');
     Tags.of(app).add('environment', process.env.ENV_NAME as string);
