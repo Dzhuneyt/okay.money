@@ -39,7 +39,8 @@ try {
     });
     restApisStack.addDependency(dynamoStack);
 
-    const githubProvider = new GithubOidcProviderStack(app, `${appName}-github-oidc`, {env});
+    // This is a global stack for the whole account
+    const githubProvider = new GithubOidcProviderStack(app, `${appName.replace(process.env.ENV_NAME, 'global')}-github-oidc`, {env});
 
     // Provide a high level stack that depends on all others, providing
     // an easy mechanism to deploy "everything" by just deploying this stack
