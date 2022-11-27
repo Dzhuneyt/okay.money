@@ -11,6 +11,6 @@ permissions:
 
 jobs:
   build:
-    uses: ./github/workflows/_deploy_infrastructure.yml
+    uses: ./.github/workflows/_deploy_infrastructure.yml
     with:
         branch: develop
