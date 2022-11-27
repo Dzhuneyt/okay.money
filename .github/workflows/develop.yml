@@ -27,6 +27,6 @@ jobs:
           role-to-assume: arn:aws:iam::${{env.AWS_ACCOUNT}}:role/github-actions
           aws-region: ${{env.AWS_REGION}}
 
-      - run: ENV_NAME=dummy ./node_modules/.bin/cdk synth --all
+      - run: ENV_NAME=develop ./node_modules/.bin/cdk diff '*-backend' --require-approval=never
         working-directory: cdk
 
