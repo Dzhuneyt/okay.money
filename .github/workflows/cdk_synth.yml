@@ -1,7 +1,9 @@
 name: CDK Synth
 
 on:
-  - push
+  push:
+    branches:
+      - master
 
 jobs:
   build:
