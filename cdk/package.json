@@ -32,6 +32,7 @@
     "@awesome-cdk/cdk-report-codepipeline-status-to-github": "^1.0.8",
     "@sendgrid/mail": "^7.6.2",
     "@types/uuid": "^8.3.4",
+    "aws-cdk-github-oidc": "^2.3.2",
     "aws-cdk-lib": "^2.0.0",
     "aws-sdk": "^2.1117.0",
     "axios": "^0.27.2",

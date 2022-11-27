@@ -5,6 +5,7 @@ import {DynamoDBStack} from '../lib/stacks/DynamoDBStack/DynamoDBStack';
 import {RestApisStack} from '../lib/stacks/RestApisStack/RestApisStack';
 import {FrontendStack} from "../lib/stacks/FrontendStack/FrontendStack";
 import {App, Environment, Stack, Tags} from 'aws-cdk-lib';
+import {GithubOidcProviderStack} from "../lib/stacks/GithubOidcProviderStack/GithubOidcProviderStack";
 
 if (!process.env.ENV_NAME) {
     throw new Error(`process.env.ENV_NAME is not defined`);
@@ -44,6 +45,8 @@ try {
     mainStack.addDependency(restApisStack);
 
     new FrontendStack(app, `${appName}-frontend`, {env, api: restApisStack.api});
+
+    new GithubOidcProviderStack(app, `${appName}-github-oidc`, {env});
 
     Tags.of(app).add('app', 'personal-finance');
     Tags.of(app).add('environment', process.env.ENV_NAME as string);
