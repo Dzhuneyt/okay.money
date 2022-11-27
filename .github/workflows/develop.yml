@@ -23,5 +23,6 @@ jobs:
           role-to-assume: arn:aws:iam::364533559210:role/github-actions
           aws-region: us-east-1
 
-      - run: cd cdk && ENV_NAME=dummy npx cdk synth --all
+      - run: ENV_NAME=dummy npx cdk synth --all
+        working-directory: cdk
 
