@@ -13,6 +13,7 @@ export class GithubOidcProviderStack extends Stack {
             owner: 'Dzhuneyt',            // your repository owner (organization or user) name
             repo: 'okay.money',            // your repository name (without the owner name)
             filter: 'ref:refs/heads/*',   // JWT sub suffix filter, defaults to '*'
+            roleName: 'github-actions',
         });
     }
 }
