@@ -9,6 +9,10 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  AWS_ACCOUNT: '364533559210'
+  AWS_REGION: 'us-east-1'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,8 +24,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
-          role-to-assume: arn:aws:iam::364533559210:role/github-actions
-          aws-region: us-east-1
+          role-to-assume: arn:aws:iam:::role/github-actions
 
       - run: ENV_NAME=dummy npx cdk synth --all
         working-directory: cdk
