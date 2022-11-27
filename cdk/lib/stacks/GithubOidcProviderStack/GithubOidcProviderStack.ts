@@ -6,9 +6,9 @@ export class GithubOidcProviderStack extends Stack {
 
     constructor(scope: Construct, id: string, props: StackProps) {
         super(scope, id, props);
-        const provider = new GithubActionsIdentityProvider(scope, 'GithubProvider');
+        const provider = new GithubActionsIdentityProvider(this, 'GithubProvider');
 
-        new GithubActionsRole(scope, 'UploadRole', {
+        new GithubActionsRole(this, 'UploadRole', {
             provider: provider,           // reference into the OIDC provider
             owner: 'octo-org',            // your repository owner (organization or user) name
             repo: 'octo-repo',            // your repository name (without the owner name)
