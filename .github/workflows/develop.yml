@@ -24,7 +24,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
-          role-to-assume: arn:aws:iam:::role/github-actions
+          role-to-assume: ${{'arn:aws:iam:'+env.AWS_ACCOUNT+'::role/github-actions'}}
           aws-region: ${{env.AWS_REGION}}
 
       - run: ENV_NAME=dummy npx cdk synth --all
