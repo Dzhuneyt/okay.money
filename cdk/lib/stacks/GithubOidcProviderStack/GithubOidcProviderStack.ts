@@ -8,11 +8,11 @@ export class GithubOidcProviderStack extends Stack {
         super(scope, id, props);
         const provider = new GithubActionsIdentityProvider(this, 'GithubProvider');
 
-        new GithubActionsRole(this, 'UploadRole', {
+        new GithubActionsRole(this, 'GithubActionsRole', {
             provider: provider,           // reference into the OIDC provider
-            owner: 'octo-org',            // your repository owner (organization or user) name
-            repo: 'octo-repo',            // your repository name (without the owner name)
-            filter: 'ref:refs/tags/v*',   // JWT sub suffix filter, defaults to '*'
+            owner: 'Dzhuneyt',            // your repository owner (organization or user) name
+            repo: 'okay.money',            // your repository name (without the owner name)
+            filter: 'ref:refs/heads/*',   // JWT sub suffix filter, defaults to '*'
         });
     }
 }
