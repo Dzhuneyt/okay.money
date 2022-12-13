@@ -8,8 +8,6 @@
     "deploy": "npm run deploy:backend",
     "deploy:backend": "cdk deploy '*-backend' --require-approval=never --outputs-file ./outputs.json",
     "deploy:frontend": "cdk deploy '*-frontend' --require-approval=never --outputs-file ./outputs.json",
-    "deploy:ci": "cdk deploy '*' --app 'npx ts-node --prefer-ts-exts bin/ci.ts' --require-approval=never --outputs-file ./ci-outputs.json",
-    "synth:ci": "cdk synth '*' --app 'npx ts-node --prefer-ts-exts bin/ci.ts'",
     "test": "jest",
     "cdk": "cdk",
     "build": "cdk synth"

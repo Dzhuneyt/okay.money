@@ -48,6 +48,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
-      - run: cd cdk && ENV_NAME=dummy npx cdk synth --all
+      - run: ENV_NAME=dummy npx cdk synth --all
+        working-directory: cdk
