@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "docker run -it --rm -w /app -v $(pwd):/app:delegated -p 80:4200 alexsuch/angular-cli:10.2.3 ng serve --host 0.0.0.0 --proxy-config proxy.conf.json",
-    "start": "npx ng build",
+    "start": "npm run serve",
     "serve": "npx ng serve --proxy-config proxy.conf.json",
     "build": "npx ng build",
     "util:lite-server": "npx lite-server",

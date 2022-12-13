@@ -1,9 +1,6 @@
-import * as AWS from 'aws-sdk';
-import {CognitoIdentityServiceProvider, DynamoDB} from 'aws-sdk';
-import {AttributeType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
+import {DynamoDB} from 'aws-sdk';
 import {Handler} from "../../../../../../lambdas/shared/Handler";
 import {IEvent} from "../../../../../../lambdas/interfaces/IEvent";
-import {TableNames} from "../../../../../../lambdas/shared/TableNames";
 
 async function getTokenItem(token: string) {
     try {
