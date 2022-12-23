@@ -3,6 +3,7 @@ import {LogGroup, RetentionDays} from 'aws-cdk-lib/aws-logs';
 import {RemovalPolicy, Stack} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {GatewayResponseMapper} from './GatewayResponseMapper';
+import {StringParameter} from "aws-cdk-lib/aws-ssm";
 
 export class ApiGateway extends Construct {
     public readonly api: RestApi;
@@ -40,6 +41,11 @@ export class ApiGateway extends Construct {
                 authorizationType: AuthorizationType.NONE,
             },
         });
+
+        new StringParameter(this.api, 'StringParameter', {
+            stringValue: this.api.url,
+            parameterName: `/finance/${process.env.ENV_NAME}/api-url`,
+        })
 
         new GatewayResponseMapper(this, 'gateway-responses', {
             api: this.api,

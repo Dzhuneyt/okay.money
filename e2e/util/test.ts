@@ -1,7 +1,7 @@
-import {test as base} from '@playwright/test'
+import {APIRequestContext, test as base} from '@playwright/test'
 import {randEmail} from '@ngneat/falso';
 import * as AWS from "aws-sdk";
-import {APIGateway, CloudFormation, DynamoDB} from "aws-sdk";
+import {APIGateway, CloudFormation, DynamoDB, SSM} from "aws-sdk";
 
 async function resolveApiUrl(envName: string) {
     if (!envName) {
@@ -17,17 +17,67 @@ async function resolveApiUrl(envName: string) {
     const stages = await new APIGateway().getStages({
         restApiId,
     }).promise()
-    const stageName = stages.item.find(x => true).stageName;
+    const stageName = stages.item.find(_ => true).stageName;
     const region = AWS.config.region;
 
     return `https://${restApiId}.execute-api.${region}.amazonaws.com/${stageName}/`;
+}
+
+class RandomUser {
+
+    public email: string;
+    public password: string;
+
+    private envName: string;
+
+    constructor(protected request: APIRequestContext) {
+        this.email = randEmail();
+        this.password = 'Pa$$w0rd';
+
+        const envName = process.env.ENV_NAME as string;
+        if (!envName) {
+            throw new Error(`process.env.ENV_NAME is not defined`);
+        }
+
+        this.envName = envName;
+    }
+
+    async register() {
+        const apiUrl = await this.getApiUrl();
+        const result = await this.request.post(`${apiUrl}api/register`, {
+            data: {
+                email: this.email, password: this.password,
+            }
+        })
+        await test.expect(result.ok()).toBeTruthy();
+    }
+
+    private async getApiUrl() {
+        const Name = `/finance/${process.env.ENV_NAME}/api-url`;
+        const param = await new SSM().getParameter({
+            Name,
+            WithDecryption: true,
+        }).promise()
+        if (!param.Parameter.Value) {
+            throw new Error(`Can not find SSM parameter with name ${Name}`)
+        }
+        return param.Parameter.Value;
+    }
 }
 
 export const test = base.extend<{
     createTestUser: () => Promise<{
         email: string, password: string,
     }>,
+    getRandomUser: () => RandomUser,
 }>({
+    getRandomUser: async ({request}, use) => {
+
+        // usage:
+        // const t = new RandomUser(request);
+        // await t.register();
+        await use(() => new RandomUser(request));
+    },
     createTestUser: async ({request}, use) => {
         await use(async () => {
             const email = randEmail();
@@ -48,25 +98,10 @@ export const test = base.extend<{
             }
 
             async function getTableForRegistrationTokens() {
-                let NextToken: string | undefined = undefined;
-                do {
-                    const resources = await new CloudFormation().listStackResources({
-                        StackName: `finance-${envName}-rest-apis`,
-                        NextToken,
-                    }).promise()
-
-                    const tableName = resources.StackResourceSummaries
-                        .filter(x => x.ResourceType === 'AWS::DynamoDB::Table')
-                        .find(x => {
-                            return x.LogicalResourceId.toLowerCase().startsWith('authregisterregistrationtokens');
-                        })?.PhysicalResourceId
-
-                    if (tableName) {
-                        return tableName;
-                    }
-
-                    NextToken = resources.NextToken;
-                } while (NextToken);
+                const param = await new SSM().getParameter({
+                    Name: `/finance/${process.env.ENV_NAME}/table/registration-tokens/name`,
+                }).promise()
+                return param.Parameter.Value as string;
             }
 
             async function getRegistrationTokenByEmail(email: string) {
