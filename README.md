@@ -1,3 +1,5 @@
+> ⚠️ **Warning:** This repository is archived and no longer maintained.
+
 # Okay.Money
 ## Personal finance manager
 
