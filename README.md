@@ -3,5 +3,6 @@
 
 ### Technology
 
-Frontend: Angular
-Backend: Node.js
+- Frontend: Angular
+- Backend: AWS API gateway, AWS Lambda
+- Database: AWS DynamoDB
